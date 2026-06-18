@@ -534,12 +534,12 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
               {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
             <tbody>{order.items.map((it,idx)=>{
-              const dest=itemDest[it.sku];
-              const sel=itemSel[it.sku]||false;
+              const dest=itemDest[it.id||i];
+              const sel=itemSel[it.id||i]||false;
               return(
                 <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:sel?C.red+"06":"transparent"}}>
                   <td style={{padding:"9px 10px"}}>
-                    <input type="checkbox" checked={sel} onChange={()=>toggleItemSel(it.sku)}
+                    <input type="checkbox" checked={sel} onChange={()=>toggleItemSel(it.id||i)}
                       style={{width:15,height:15,cursor:"pointer",accentColor:C.red}}/>
                   </td>
                   <td style={{padding:"9px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
@@ -548,11 +548,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                   <td style={{padding:"9px 10px"}}>
                     <div style={{display:"flex",gap:5}}>
-                      <button onClick={()=>setDestOne(it.sku,"interno")}
+                      <button onClick={()=>setDestOne(it.id||i,"interno")}
                         style={{background:dest==="interno"?C.green:C.white,color:dest==="interno"?C.white:C.gray700,border:`1.5px solid ${dest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
                         Interno
                       </button>
-                      <button onClick={()=>setDestOne(it.sku,"externo")}
+                      <button onClick={()=>setDestOne(it.id||i,"externo")}
                         style={{background:dest==="externo"?C.purple:C.white,color:dest==="externo"?C.white:C.gray700,border:`1.5px solid ${dest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
                         Externo
                       </button>
@@ -571,7 +571,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             <span>Externo: <strong style={{color:C.purple}}>{externos}</strong></span>
             {pendentes>0&&<span style={{color:C.amber}}>Pendente: <strong>{pendentes}</strong></span>}
           </div>
-          <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{destinos:itemDest});setActionDone(true);}}
+          <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{
+              destinos: Object.fromEntries(
+                order.items.map((it,i)=>[it.sku,(itemDest[it.id||i]||"")])
+              )
+            });setActionDone(true);}}
             disabled={!allDestDefined}
             style={{background:allDestDefined?C.green:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"10px 22px",cursor:allDestDefined?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
             <Ic n="check" s={14} c={C.white}/> Confirmar direcionamento
@@ -744,16 +748,17 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
   // Direcionamento local state
-  const skus=order.items.map(i=>i.sku);
+  const skus=order.items.map(it=>it.sku);
+  const itemKeys=order.items.map((it,i)=>it.id||i);
   const[itemSel,setItemSel]=useState({});
-  const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach(it=>{if(it.dest)m[it.sku]=it.dest;});return m;});
+  const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach((it,i)=>{if(it.dest)m[it.id||i]=it.dest;});return m;});
   const nSel=skus.filter(s=>itemSel[s]).length;
-  const allDestDefined=order.items.every(it=>itemDest[it.sku]);
-  const toggleItemSel=(sku)=>setItemSel(p=>({...p,[sku]:!p[sku]}));
-  const selAllItems=()=>{const allOn=skus.every(s=>itemSel[s]);const n={};skus.forEach(s=>n[s]=!allOn);setItemSel(n);};
-  const setDestSel=(dest)=>{const selSkus=skus.filter(s=>itemSel[s]);if(!selSkus.length){alert("Selecione ao menos um item.");return;}setItemDest(p=>{const n={...p};selSkus.forEach(s=>n[s]=dest);return n;});};
-  const setDestAll=(dest)=>{const n={};skus.forEach(s=>n[s]=dest);setItemDest(n);};
-  const setDestOne=(sku,dest)=>setItemDest(p=>({...p,[sku]:dest}));
+  const allDestDefined=order.items.every((it,i)=>itemDest[it.id||i]);
+  const toggleItemSel=(key)=>setItemSel(p=>({...p,[key]:!p[key]}));
+  const selAllItems=()=>{const allOn=itemKeys.every(k=>itemSel[k]);const n={};itemKeys.forEach(k=>n[k]=!allOn);setItemSel(n);};
+  const setDestSel=(dest)=>{const selKeys=itemKeys.filter(k=>itemSel[k]);if(!selKeys.length){alert("Selecione ao menos um item.");return;}setItemDest(p=>{const n={...p};selKeys.forEach(k=>n[k]=dest);return n;});};
+  const setDestAll=(dest)=>{const n={};itemKeys.forEach(k=>n[k]=dest);setItemDest(n);};
+  const setDestOne=(key,dest)=>setItemDest(p=>({...p,[key]:dest}));
   const total=order.items.reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
   const ACTION_ROLES=["programador","amostra_digital","amostra_fisica","direcionador","posvenda","bordado_interno","bordado_externo","expedicao","faturamento"];
@@ -1712,7 +1717,18 @@ function Login({onLogin}){
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
 export default function App(){
   const isMobile=useIsMobile();
-  const[user,setUser]=useState(null);
+  const[user,setUser]=useState(()=>{
+    try{const s=sessionStorage.getItem("sgp_user");return s?JSON.parse(s):null;}
+    catch{return null;}
+  });
+  const doLogin=(u)=>{
+    try{sessionStorage.setItem("sgp_user",JSON.stringify(u));}catch{}
+    setUser(u);setPage("demandas");
+  };
+  const doLogout=()=>{
+    try{sessionStorage.removeItem("sgp_user");}catch{}
+    setUser(null);
+  };
   const[page,setPage]=useState("demandas");
   const[orders,setOrders]=useState(ORDERS_INIT);
   const[sel,setSel]=useState(null);
@@ -1791,14 +1807,14 @@ export default function App(){
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
-  if(!user)return <Login onLogin={u=>{setUser(u);setPage("demandas");}}/>;
+  if(!user)return <Login onLogin={doLogin}/>;
 
   return(
     <div style={{display:"flex",height:"100dvh",...F.body,background:C.gray100,overflow:"hidden",flexDirection:"column"}}>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
         {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)}/>}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-          <Topbar user={user} title={TITLES[page]||""} notifs={notifs} onBell={()=>setShowN(!showN)} onLogout={()=>setUser(null)} isMobile={isMobile}/>
+          <Topbar user={user} title={TITLES[page]||""} notifs={notifs} onBell={()=>setShowN(!showN)} onLogout={doLogout} isMobile={isMobile}/>
           {showN&&<NotifPanel notifs={notifs} user={user} onClose={()=>setShowN(false)}/>}
           <div style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
             {page==="demandas"&&<MinhasDemandas user={user} orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
