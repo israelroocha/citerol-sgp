@@ -2,6 +2,24 @@ import { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
+// ─── WORKER CONFIG ────────────────────────────────────────────────────────────
+const WORKER_URL = "https://citerol-sgp.israel-caetano-lima.workers.dev";
+const SGP_TOKEN  = "sgp_citerol_2024_xK9mP";
+
+async function apiFetch(path, method = "GET", body = null) {
+  const res = await fetch(`${WORKER_URL}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "X-SGP-Token": SGP_TOKEN,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`Worker ${method} ${path} → ${res.status}`);
+  return res.json();
+}
+
+
 const C = {
   red:"#9E0B0F", redHover:"#7a0809", green:"#4B5528",
   black:"#111", gray800:"#2d2d2d", gray700:"#444",
@@ -1135,8 +1153,62 @@ function MinhasDemandas({user,orders,onOpen,slaCfg}){
 
 // ─── DIRECIONAMENTO (COMPLETO) ────────────────────────────────────────────────
 function Direcionamento({orders,setOrders,onOpen,slaCfg}){
-  const pendentes=orders.filter(o=>!o.amOk&&!o.concluido);
-  const prontos=orders.filter(o=>o.amOk&&o.etapa==="Direcionamento"&&!o.concluido);
+  const [loading,setLoading]=useState(false);
+  const [loadError,setLoadError]=useState(null);
+  const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
+
+  useEffect(()=>{
+    setLoading(true);
+    setLoadError(null);
+    apiFetch("/direcionamento")
+      .then(res=>{
+        if(res.success){
+          // Converte formato HubSpot para formato do portal
+          const converted=res.data.map(o=>({
+            id:           o.id,
+            posvendaId:   o.posvendaId,
+            bordadoId:    o.bordadoId,
+            client:       o.client,
+            vendedor:     o.vendedor,
+            valor:        o.valor,
+            prazoFinal:   o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
+            obs:          "",
+            etapa:        "Direcionamento",
+            amOk:         o.amostrasAprovada,
+            sepOk:        o.separacaoCompleta,
+            entradaAt:    o.dataEntrada,
+            etapaAt:      o.etapaAt||o.dataEntrada,
+            alertas:      o.alertas||[],
+            concluido:    false,
+            bordado:{
+              pts:0,cores:[],arq:"",arqOk:false,
+              amDig:[],amDigObs:"",amFis:[],amFisObs:"",
+            },
+            items: o.items.length>0
+              ? o.items.map(it=>({
+                  sku:    it.sku||it.nome,
+                  desc:   it.nome,
+                  cor:    it.tamanho,
+                  qty:    it.quantidade,
+                  dest:   null,
+                  status: it.status==="Aguardando bordado"?"separado":
+                          it.status==="faltante"?"faltante":"separado",
+                }))
+              : [{sku:"SEM-ITENS",desc:"Itens não carregados (objeto customizado)",cor:"—",qty:0,dest:null,status:"separado"}],
+            timeline:[{stage:"Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+            chat:[],
+          }));
+          setHsOrders(converted);
+        }
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  },[]);
+
+  // Usa dados reais se carregados, senão usa mock
+  const activeOrders = hsOrders !== null ? hsOrders : orders;
+  const pendentes=activeOrders.filter(o=>!o.amOk&&!o.concluido);
+  const prontos=activeOrders.filter(o=>o.amOk&&o.etapa==="Direcionamento"&&!o.concluido);
   // Estado local de seleção por pedido: {orderId: {sku: true/false}}
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
@@ -1179,6 +1251,17 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
       <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo"/>
+      {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
+        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        Carregando pedidos do HubSpot...
+      </div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,display:"flex",alignItems:"center",gap:8}}>
+        <Ic n="warn" s={14} c={C.red}/> Erro ao carregar: {loadError}
+        <button onClick={()=>window.location.reload()} style={{marginLeft:"auto",background:C.red,color:C.white,border:"none",borderRadius:5,padding:"4px 10px",cursor:"pointer",...F.body,fontSize:12}}>Tentar novamente</button>
+      </div>}
+      {hsOrders!==null&&!loading&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green}}>
+        <Ic n="check" s={13} c={C.green}/> {hsOrders.length} pedido{hsOrders.length!==1?"s":""} carregado{hsOrders.length!==1?"s":""} do HubSpot
+      </div>}
       {/* Pedidos aguardando amostra */}
       {pendentes.length>0&&(
         <div>
@@ -1802,6 +1885,14 @@ export default function App(){
         const hasInterno=newItems.some(it=>it.dest==="interno");
         const hasExterno=newItems.some(it=>it.dest==="externo");
         const nextEtapa=hasInterno?"Bordado Interno":"Bordado Externo";
+        // Chama Worker para persistir no HubSpot
+        const order=prev.find(x=>x.id===orderId);
+        if(order?.bordadoId){
+          apiFetch(`/direcionamento/${order.posvendaId}`,"PATCH",{
+            bordadoId:order.bordadoId,
+            destinos:payload.destinos,
+          }).catch(e=>console.error("Worker patch error:",e));
+        }
         return{...o,items:newItems,etapa:nextEtapa,etapaAt:now,
           timeline:[...o.timeline,{stage:nextEtapa,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
