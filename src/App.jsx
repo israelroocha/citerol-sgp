@@ -533,11 +533,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
               {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
-            <tbody>{order.items.map((it,idx)=>{
+            <tbody>{order.items.map((it,i)=>{
               const dest=itemDest[it.id||i];
               const sel=itemSel[it.id||i]||false;
               return(
-                <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:sel?C.red+"06":"transparent"}}>
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`,background:sel?C.red+"06":"transparent"}}>
                   <td style={{padding:"9px 10px"}}>
                     <input type="checkbox" checked={sel} onChange={()=>toggleItemSel(it.id||i)}
                       style={{width:15,height:15,cursor:"pointer",accentColor:C.red}}/>
