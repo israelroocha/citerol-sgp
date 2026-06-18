@@ -1210,8 +1210,8 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
                   {["","SKU","Descrição","Cor","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
                 </tr></thead>
                 <tbody>{o.items.map((it,idx)=>{
-                  const thisDest=dm[it.sku]||it.dest;
-                  const isSelected=sm[it.sku]||false;
+                  const thisDest=(destMap[o.id]||{})[it.sku]||it.dest;
+                  const isSelected=(sel[o.id]||{})[it.sku]||false;
                   return(
                     <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:isSelected?C.red+"06":"transparent"}}>
                       <td style={{padding:"8px 10px"}}>
