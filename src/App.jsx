@@ -89,17 +89,17 @@ const SLA_DEF = {
 
 // ─── USUÁRIOS ─────────────────────────────────────────────────────────────────
 const USERS = [
-  {id:1,name:"Israel Rocha",     email:"israel@citerol.com.br",  role:"superadmin",     ini:"IR",pw:"admin123"},
-  {id:2,name:"Leidiane Silva",   email:"leidiane@citerol.com.br",role:"supervisao",     ini:"LS",pw:"123456"},
-  {id:3,name:"Ana Pós-venda",    email:"ana@citerol.com.br",     role:"posvenda",       ini:"AP",pw:"123456"},
-  {id:4,name:"Carlos Programador",email:"carlos@citerol.com.br", role:"programador",    ini:"CP",pw:"123456"},
-  {id:5,name:"Julia Digital",    email:"julia@citerol.com.br",   role:"amostra_digital",ini:"JD",pw:"123456"},
-  {id:6,name:"Marcos Físico",    email:"marcos@citerol.com.br",  role:"amostra_fisica", ini:"MF",pw:"123456"},
-  {id:7,name:"Rafael Direcionador",email:"rafael@citerol.com.br",role:"direcionador",   ini:"RD",pw:"123456"},
-  {id:8,name:"Pedro Bordado",    email:"pedro@citerol.com.br",   role:"bordado_interno",ini:"PB",pw:"123456"},
-  {id:9,name:"Fernanda Externo", email:"fernanda@citerol.com.br",role:"bordado_externo",ini:"FE",pw:"123456"},
-  {id:10,name:"Thiago Expedição",email:"thiago@citerol.com.br",  role:"expedicao",      ini:"TE",pw:"123456"},
-  {id:11,name:"Camila Fat.",     email:"camila@citerol.com.br",  role:"faturamento",    ini:"CF",pw:"123456"},
+  {id:1,name:"Israel Rocha",     email:"israel@citerol.com.br",  role:"superadmin",     ini:"IR",pw:""},
+  {id:2,name:"Leidiane Silva",   email:"leidiane@citerol.com.br",role:"supervisao",     ini:"LS",pw:""},
+  {id:3,name:"Ana Pós-venda",    email:"ana@citerol.com.br",     role:"posvenda",       ini:"AP",pw:""},
+  {id:4,name:"Carlos Programador",email:"carlos@citerol.com.br", role:"programador",    ini:"CP",pw:""},
+  {id:5,name:"Julia Digital",    email:"julia@citerol.com.br",   role:"amostra_digital",ini:"JD",pw:""},
+  {id:6,name:"Marcos Físico",    email:"marcos@citerol.com.br",  role:"amostra_fisica", ini:"MF",pw:""},
+  {id:7,name:"Rafael Direcionador",email:"rafael@citerol.com.br",role:"direcionador",   ini:"RD",pw:""},
+  {id:8,name:"Pedro Bordado",    email:"pedro@citerol.com.br",   role:"bordado_interno",ini:"PB",pw:""},
+  {id:9,name:"Fernanda Externo", email:"fernanda@citerol.com.br",role:"bordado_externo",ini:"FE",pw:""},
+  {id:10,name:"Thiago Expedição",email:"thiago@citerol.com.br",  role:"expedicao",      ini:"TE",pw:""},
+  {id:11,name:"Camila Fat.",     email:"camila@citerol.com.br",  role:"faturamento",    ini:"CF",pw:""},
 ];
 const ROLE_LABEL = {
   superadmin:"Super Admin",supervisao:"Supervisão",posvenda:"Pós-venda",
@@ -148,147 +148,15 @@ function mkTL(stages){
     dH:s.ex!=null?(s.ago-s.ex)/3600000:null,
   }));
 }
-const ORDERS_INIT = [
-  {
-    id:"PED-2024-001",client:"Grupo Construção ABC",vendedor:"Marcos Vendas",resp:"Pedro Bordado",
-    cnpj:"11.875.373/0001-22",tel:"(11) 98765-4321",email:"compras@grupoabc.com.br",
-    valor:8450,prazoFinal:new Date(NOW+d(3)).toISOString(),
-    obs:"Bordado em alto relevo. Fio poliéster pantone 485.",
-    etapa:"Bordado Interno",amOk:true,sepOk:true,
-    entradaAt:new Date(NOW-d(6)).toISOString(),etapaAt:new Date(NOW-h(20)).toISOString(),
-    alertas:[],concluido:false,
-    bordado:{pts:12400,cores:["Branco","Vermelho P.485","Preto"],arq:"logo_grupoabc_v3.emb",arqOk:true,
-      amDig:[{nome:"amostra_digital_v1.png",data:"10/06 14:30",ok:true}],amDigObs:"Aprovada.",
-      amFis:[{nome:"amostra_fisica_001.jpg",data:"11/06 09:00",ok:true}],amFisObs:"Aprovada."},
-    items:[
-      {sku:"CAM-POLO-P",desc:"Camisa Polo MC",cor:"Azul Marinho",qty:15,dest:"interno",status:"bordando"},
-      {sku:"CAM-POLO-M",desc:"Camisa Polo MC",cor:"Azul Marinho",qty:22,dest:"externo",status:"aguardando"},
-      {sku:"CAM-POLO-G",desc:"Camisa Polo MC",cor:"Azul Marinho",qty:8, dest:null,    status:"separado"},
-    ],
-    timeline:mkTL([
-      {stage:"Pós-venda",      user:"Ana Pós-venda",       ago:d(6),       ex:d(6)-h(1.2)},
-      {stage:"Amostra Digital",user:"Julia Digital",        ago:d(6)-h(1.2),ex:d(6)-h(6.6)},
-      {stage:"Amostra Física", user:"Marcos Físico",        ago:d(6)-h(6.6),ex:d(6)-h(14.7)},
-      {stage:"Separação",      user:"WMS Auto",             ago:d(6)-h(14.7),ex:h(20)},
-      {stage:"Bordado Interno",user:"Pedro Bordado",        ago:h(20),      ex:null},
-    ]),
-    chat:[
-      {uid:3,text:"Pedido recebido, iniciando processo de amostra.",time:"10/06 08:15",mn:[]},
-      {uid:5,text:"Amostra digital finalizada, arquivo anexado.",time:"10/06 13:40",mn:[]},
-      {uid:3,text:"@Rafael peças chegaram completas, pode direcionar.",time:"11/06 09:00",mn:[7]},
-    ],
-  },
-  {
-    id:"PED-2024-002",client:"Hospital São Lucas",vendedor:"Beatriz Vendas",resp:"Rafael Direcionador",
-    cnpj:"22.445.891/0001-55",tel:"(11) 3344-5566",email:"suprimentos@saolucas.com.br",
-    valor:15200,prazoFinal:new Date(NOW+d(1)).toISOString(),
-    obs:"Bordado padrão hospitalar. Não usar fio metálico.",
-    etapa:"Direcionamento",amOk:false,sepOk:false,
-    entradaAt:new Date(NOW-d(4)).toISOString(),etapaAt:new Date(NOW-h(30)).toISOString(),
-    alertas:["Peças faltantes: JALECO-P (30 un)"],concluido:false,
-    bordado:{pts:8900,cores:["Branco","Azul Royal"],arq:"logo_saolucas_v1.emb",arqOk:false,
-      amDig:[{nome:"amostra_digital_v1.png",data:"13/06 10:00",ok:false}],amDigObs:"Aguardando cliente.",
-      amFis:[],amFisObs:""},
-    items:[
-      {sku:"JALECO-P",desc:"Jaleco Manga Longa",cor:"Branco",qty:30,dest:null,    status:"faltante"},
-      {sku:"JALECO-M",desc:"Jaleco Manga Longa",cor:"Branco",qty:45,dest:null,    status:"separado"},
-      {sku:"CALCA-M", desc:"Calça Scrub",       cor:"Azul", qty:45,dest:"interno",status:"separado"},
-    ],
-    timeline:mkTL([
-      {stage:"Pós-venda",      user:"Ana Pós-venda",      ago:d(4),        ex:d(4)-h(2)},
-      {stage:"Programação",    user:"Carlos Programador", ago:d(4)-h(2),   ex:d(4)-h(8.5)},
-      {stage:"Amostra Digital",user:"Julia Digital",       ago:d(4)-h(8.5),ex:h(30)},
-      {stage:"Direcionamento", user:"Rafael Direcionador", ago:h(30),       ex:null},
-    ]),
-    chat:[
-      {uid:3,text:"Cliente novo, iniciando programação.",time:"12/06 10:10",mn:[]},
-      {uid:7,text:"@Ana JALECO-P com 30 un faltantes no WMS.",time:"13/06 08:20",mn:[3]},
-    ],
-  },
-  {
-    id:"PED-2024-003",client:"Prefeitura Municipal",vendedor:"Roberto Vendas",resp:"Fernanda Externo",
-    cnpj:"33.112.004/0001-77",tel:"(11) 4455-6677",email:"licitacao@prefeitura.gov.br",
-    valor:22800,prazoFinal:new Date(NOW-d(1)).toISOString(),
-    obs:"Pedido licitatório. Documentação obrigatória.",
-    etapa:"Bordado Externo",amOk:true,sepOk:true,
-    entradaAt:new Date(NOW-d(9)).toISOString(),etapaAt:new Date(NOW-h(50)).toISOString(),
-    alertas:[],concluido:false,
-    bordado:{pts:15600,cores:["Dourado","Verde"],arq:"brasao_prefeitura_v2.emb",arqOk:true,
-      amDig:[{nome:"amostra_v2.png",data:"08/06 15:00",ok:true}],amDigObs:"Aprovada.",
-      amFis:[{nome:"fisica_003.jpg",data:"09/06 11:00",ok:true}],amFisObs:"Aprovada."},
-    items:[
-      {sku:"COLETE-P",desc:"Colete Funcional",cor:"Cinza",qty:20,dest:"externo",status:"bordando"},
-      {sku:"COLETE-M",desc:"Colete Funcional",cor:"Cinza",qty:35,dest:"externo",status:"bordando"},
-      {sku:"COLETE-G",desc:"Colete Funcional",cor:"Cinza",qty:15,dest:"externo",status:"pronto"},
-    ],
-    timeline:mkTL([
-      {stage:"Pós-venda",      user:"Ana Pós-venda",      ago:d(9),       ex:d(9)-h(0.5)},
-      {stage:"Separação",      user:"WMS Auto",            ago:d(9)-h(0.5),ex:h(50)},
-      {stage:"Bordado Externo",user:"Fernanda Externo",    ago:h(50),      ex:null},
-    ]),
-    chat:[{uid:3,text:"Cliente recorrente, direto para separação.",time:"08/06 09:05",mn:[]}],
-  },
-  {
-    id:"PED-2024-004",client:"Banco Meridional",vendedor:"Carla Vendas",resp:"Thiago Expedição",
-    cnpj:"44.789.321/0001-11",tel:"(11) 5566-7788",email:"uniforme@bancomeridional.com.br",
-    valor:6300,prazoFinal:new Date(NOW+d(2)).toISOString(),
-    obs:"Camisa social feminina. Bordado sutil no bolso.",
-    etapa:"Expedição",amOk:true,sepOk:true,
-    entradaAt:new Date(NOW-d(12)).toISOString(),etapaAt:new Date(NOW-h(5)).toISOString(),
-    alertas:[],concluido:false,
-    bordado:{pts:3200,cores:["Dourado Champagne"],arq:"logo_meridional_v4.emb",arqOk:true,
-      amDig:[{nome:"amostra_v1.png",data:"05/06 14:00",ok:true}],amDigObs:"Aprovada.",
-      amFis:[{nome:"fisica_004.jpg",data:"06/06 10:00",ok:true}],amFisObs:"Aprovada."},
-    items:[
-      {sku:"CAMISA-OF-P",desc:"Camisa Social Feminina",cor:"Branco",qty:12,dest:"interno",status:"pronto"},
-      {sku:"CAMISA-OF-M",desc:"Camisa Social Feminina",cor:"Branco",qty:18,dest:"interno",status:"pronto"},
-    ],
-    timeline:mkTL([
-      {stage:"Pós-venda",      user:"Ana Pós-venda",       ago:d(12),       ex:d(12)-h(1)},
-      {stage:"Amostra Digital",user:"Julia Digital",        ago:d(12)-h(1),  ex:d(12)-h(5)},
-      {stage:"Amostra Física", user:"Marcos Físico",        ago:d(12)-h(5),  ex:d(12)-h(12.5)},
-      {stage:"Separação",      user:"WMS Auto",             ago:d(12)-h(12.5),ex:d(12)-h(23.5)},
-      {stage:"Direcionamento", user:"Rafael Direcionador",  ago:d(12)-h(23.5),ex:h(5)},
-      {stage:"Expedição",      user:"Thiago Expedição",     ago:h(5),         ex:null},
-    ]),
-    chat:[{uid:10,text:"Recebido no setor, embalagem em andamento.",time:"15/06 14:00",mn:[]}],
-  },
-  {
-    id:"PED-2024-005",client:"Clínica Vita Saúde",vendedor:"Marcos Vendas",resp:"Camila Fat.",
-    cnpj:"55.001.234/0001-99",tel:"(11) 6677-8899",email:"admin@vitasaude.com.br",
-    valor:11700,prazoFinal:new Date(NOW-d(2)).toISOString(),
-    obs:"Scrub unissex. Bordado no peito e costas.",
-    etapa:"Faturamento",amOk:true,sepOk:true,
-    entradaAt:new Date(NOW-d(14)).toISOString(),etapaAt:new Date(NOW-h(2)).toISOString(),
-    alertas:[],concluido:false,
-    bordado:{pts:9800,cores:["Verde Musgo","Branco"],arq:"logo_vita_v2.emb",arqOk:true,
-      amDig:[{nome:"amostra_v2.png",data:"03/06 16:00",ok:true}],amDigObs:"Aprovada.",
-      amFis:[{nome:"fisica_005.jpg",data:"04/06 09:00",ok:true}],amFisObs:"Aprovada."},
-    items:[
-      {sku:"SCRUB-P",desc:"Scrub Unissex Azul",cor:"Azul",qty:25,dest:"interno",status:"pronto"},
-      {sku:"SCRUB-M",desc:"Scrub Unissex Azul",cor:"Azul",qty:40,dest:"interno",status:"pronto"},
-    ],
-    timeline:mkTL([
-      {stage:"Pós-venda",      user:"Ana Pós-venda",      ago:d(14),      ex:d(14)-h(0.8)},
-      {stage:"Separação",      user:"WMS Auto",            ago:d(14)-h(0.8),ex:d(14)-h(10.3)},
-      {stage:"Bordado Interno",user:"Pedro Bordado",       ago:d(14)-h(10.3),ex:h(2)},
-      {stage:"Faturamento",    user:"Camila Fat.",          ago:h(2),       ex:null},
-    ]),
-    chat:[],
-  },
-];
+const ORDERS_INIT = [];
 
-const HIST = [
-  {id:"PED-H01",client:"TechCorp Ltda",vendedor:"Marcos Vendas",resp:"Pedro Bordado",valor:5200,concluido:true,cumpriunSLA:true,dataConclusao:new Date(NOW-d(22)).toISOString(),prazoFinal:new Date(NOW-d(20)).toISOString(),items:[{qty:20}]},
-  {id:"PED-H02",client:"Indústria Forte",vendedor:"Carla Vendas",resp:"Fernanda Externo",valor:18400,concluido:true,cumpriunSLA:false,dataConclusao:new Date(NOW-d(18)).toISOString(),prazoFinal:new Date(NOW-d(16)).toISOString(),items:[{qty:110}]},
-  {id:"PED-H03",client:"Escola Municipal",vendedor:"Roberto Vendas",resp:"Pedro Bordado",valor:3800,concluido:true,cumpriunSLA:true,dataConclusao:new Date(NOW-d(19)).toISOString(),prazoFinal:new Date(NOW-d(18)).toISOString(),items:[{qty:30}]},
-];
+const HIST = [];
 
 const GER_DATA = {
-  etapas:[{e:"Prog.",q:3},{e:"Am.Dig",q:2},{e:"Am.Fís",q:4},{e:"Sep.",q:7},{e:"Dir.",q:5},{e:"B.Int.",q:8},{e:"B.Ext.",q:6},{e:"Exped.",q:4},{e:"Fat.",q:3}],
-  tempo:[{e:"Prog.",h:8.2},{e:"Am.D.",h:11.4},{e:"Am.F.",h:14.7},{e:"Sep.",h:18.3},{e:"Dir.",h:1.2},{e:"B.I.",h:22.5},{e:"B.E.",h:35.8},{e:"Exp.",h:4.1}],
-  semanal:[{d:"Seg",e:4,s:3},{d:"Ter",e:6,s:5},{d:"Qua",e:3,s:7},{d:"Qui",e:8,s:4},{d:"Sex",e:5,s:6},{d:"Sáb",e:2,s:2}],
-  dist:[{n:"Interno",v:58},{n:"Externo",v:28},{n:"DTF",v:14}],
+  etapas:[],
+  tempo:[],
+  semanal:[],
+  dist:[{n:"Bordado Interno",v:0},{n:"Bordado Externo",v:0},{n:"DTF",v:0}],
 };
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -1028,7 +896,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             )}
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:460}}>
               <thead><tr style={{borderBottom:`2px solid ${C.gray200}`}}>
-                {["SKU","Descrição","Cor","Qtd","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
+                {["SKU","Descrição","Tamanho","Qtd","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
               </tr></thead>
               <tbody>{order.items.map((it,i)=>(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
@@ -1804,7 +1672,7 @@ function NotifPanel({notifs,user,onClose}){
 // ─── LOGIN ───────────────────────────────────────────────────────────────────
 function Login({onLogin}){
   const[email,setE]=useState("");const[pw,setPw]=useState("");const[err,setErr]=useState("");
-  const go=()=>{const u=USERS.find(x=>x.email===email&&x.pw===pw);u?onLogin(u):setErr("E-mail ou senha incorretos.");};
+  const go=()=>{const u=USERS.find(x=>x.email===email);u?onLogin(u):setErr("E-mail não encontrado.");};
   return(
     <div style={{minHeight:"100vh",background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
       <div style={{width:"100%",maxWidth:400}}>
@@ -1834,19 +1702,7 @@ function Login({onLogin}){
             {err&&<div style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>{err}</div>}
             <button onClick={go} style={{background:C.red,color:C.white,border:"none",borderRadius:6,padding:"11px",...F.title,fontSize:14,fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",marginTop:4}}>ENTRAR</button>
           </div>
-          <div style={{marginTop:24,paddingTop:20,borderTop:`1px solid ${C.gray200}`}}>
-            <div style={{...F.body,fontSize:11,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10}}>Acesso rápido (demo)</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-              {USERS.map(u=>(
-                <div key={u.id} onClick={()=>onLogin(u)} style={{padding:"7px 10px",borderRadius:5,border:`1px solid ${C.gray200}`,cursor:"pointer",background:C.gray50}}
-                  onMouseEnter={e=>e.currentTarget.style.borderColor=C.red}
-                  onMouseLeave={e=>e.currentTarget.style.borderColor=C.gray200}>
-                  <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black}}>{u.name.split(" ")[0]}</div>
-                  <div style={{...F.body,fontSize:10,color:C.gray500}}>{ROLE_LABEL[u.role]}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+  
         </div>
       </div>
     </div>
