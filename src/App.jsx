@@ -531,7 +531,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
             <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-              {["","SKU","Descrição","Cor","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
+              {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
             <tbody>{order.items.map((it,idx)=>{
               const dest=itemDest[it.sku];
@@ -896,7 +896,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             )}
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:460}}>
               <thead><tr style={{borderBottom:`2px solid ${C.gray200}`}}>
-                {["SKU","Descrição","Tamanho","Qtd","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
+                {["SKU","Descrição","TAM","Qtd","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
               </tr></thead>
               <tbody>{order.items.map((it,i)=>(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
@@ -1207,7 +1207,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
             <div style={{overflowX:"auto",marginBottom:12}}>
               <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
                 <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-                  {["","SKU","Descrição","Cor","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
+                  {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
                 </tr></thead>
                 <tbody>{o.items.map((it,idx)=>{
                   const thisDest=(destMap[o.id]||{})[it.sku]||it.dest;
