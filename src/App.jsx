@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
+// ─── VERSÃO ───────────────────────────────────────────────────────────────────
+const SGP_VERSION = "v1.1.0";
+
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
 const WORKER_URL = "https://citerol-sgp.israel-caetano-lima.workers.dev";
@@ -202,6 +205,48 @@ const F = {
   body:  { fontFamily:"'Montserrat',sans-serif" },
 };
 
+// ─── EXIBIÇÃO DE ARQUIVOS (resolve fileIds do HubSpot) ────────────────────────
+function ArquivosBox({fileIds,titulo,emptyText}){
+  const [arquivos,setArquivos]=useState(null);
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{
+    if(!fileIds||!fileIds.length){setArquivos([]);return;}
+    setLoading(true);
+    apiFetch(`/arquivos?ids=${fileIds.join(";")}`)
+      .then(r=>{if(r.success)setArquivos(r.arquivos);else setArquivos([]);})
+      .catch(()=>setArquivos([]))
+      .finally(()=>setLoading(false));
+  },[JSON.stringify(fileIds)]);
+
+  if(loading)return <div style={{...F.body,fontSize:12,color:C.gray400,padding:"8px 0"}}>Carregando arquivos...</div>;
+  if(!arquivos||arquivos.length===0)return <div style={{...F.body,fontSize:13,color:C.gray400}}>{emptyText||"Nenhum arquivo anexado."}</div>;
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {arquivos.map((a,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:7,padding:"10px 14px",border:`1px solid ${C.gray200}`}}>
+          <div style={{width:32,height:32,borderRadius:6,background:C.red+"12",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <Ic n="download" s={16} c={C.red}/>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.nome}</div>
+            {a.tamanho>0&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:1}}>{(a.tamanho/1024).toFixed(0)} KB</div>}
+          </div>
+          {a.url
+            ?<a href={a.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
+              <span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"7px 14px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                <Ic n="download" s={13} c={C.white}/> Baixar
+              </span>
+            </a>
+            :<span style={{...F.body,fontSize:11,color:C.gray400}}>indisponível</span>
+          }
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Av({ini,size=32,bg=C.red}){
   return <div style={{width:size,height:size,borderRadius:"50%",background:bg,color:C.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*.34,fontWeight:700,...F.title,flexShrink:0}}>{ini}</div>;
 }
@@ -317,7 +362,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
         <Av ini={user.ini} size={30}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{(user.nome||user.name||"").split(" ")[0]}</div>
-          <div style={{...F.body,fontSize:10,color:C.gray500}}>{user.admin?"Administrador":"Operador"}</div>
+          <div style={{...F.body,fontSize:10,color:C.gray500}}>{user.admin?"Administrador":"Operador"} · {SGP_VERSION}</div>
         </div>
       </div>}
     </div>
@@ -612,6 +657,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{config.title.toUpperCase()}</div>
           <div style={{...F.body,fontSize:13,color:C.gray600}}>{config.hint}</div>
         </div>
+        {/* Arquivos anexados pelo vendedor — referência para a execução */}
+        {(order.arquivoBordado&&order.arquivoBordado.length>0)?<div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivos do vendedor (referência)</label>
+          <ArquivosBox fileIds={order.arquivoBordado}/>
+        </div>:null}
         {/* Upload */}
         <div>
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivo</label>
@@ -866,6 +916,15 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           </div>}
           {/* BORDADO */}
           {tab==="bordado"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
+            {/* Arquivos de bordado anexados pelo vendedor */}
+            <div>
+              <SecH>Arquivos de Bordado</SecH>
+              <ArquivosBox fileIds={order.arquivoBordado} emptyText="Nenhum arquivo de bordado anexado ao negócio."/>
+            </div>
+            {(order.arquivoDtfsilk&&order.arquivoDtfsilk.length>0)?<div>
+              <SecH>Arquivos DTF / Silk</SecH>
+              <ArquivosBox fileIds={order.arquivoDtfsilk} emptyText="Nenhum arquivo DTF/Silk."/>
+            </div>:null}
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
               {[["Pontos",order.bordado.pts.toLocaleString()],["Arquivo",order.bordado.arq],["Arquivo aprovado",order.bordado.arqOk?"Sim":"Não"],["Cores",order.bordado.cores.join(", ")]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
