@@ -1046,6 +1046,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
           const converted=res.data.map(o=>({
             id:           o.id,
             posvendaId:   o.posvendaId,
+            vendasId:     o.vendasId,
             bordadoId:    o.bordadoId,
             client:       o.client,
             vendedor:     o.vendedor,
@@ -1576,7 +1577,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       .then(res=>{
         if(res.success){
           const conv=res.data.map(o=>({
-            id:o.id,posvendaId:o.posvendaId,bordadoId:o.bordadoId,
+            id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
             client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
