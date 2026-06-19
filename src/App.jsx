@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.3.2";
+const SGP_VERSION = "v1.4.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -137,6 +137,12 @@ const ETAPA_PROPRIEDADE = {
   "Programação":     "programacao_de_bordado",
   "Amostra Digital": "amostra_digital",
   "Amostra Física":  "amostra_fisica",
+};
+
+// Propriedade do motivo de rejeição por etapa que volta
+const ETAPA_PROP_MOTIVO = {
+  "Amostra Digital": "motivo_da_rejeicao_da_amostra_digital",
+  "Amostra Física":  "motivo_da_rejeicao_do_bordado",
 };
 
 // Mapa nome da etapa -> ID da etapa no HubSpot (funil Bordado)
@@ -661,13 +667,20 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
     const config=UPLOAD_ETAPAS[etapa];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
-        {order.reprogramacao&&<div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
-          <div>
-            <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>REPROGRAMAÇÃO</div>
-            <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:1}}>Este item foi reprovado e voltou para esta etapa. Anexe o novo arquivo — o anterior foi removido.</div>
-          </div>
-        </div>}
+        {order.reprogramacao&&(()=>{
+          const motivo=etapa==="Amostra Digital"?order.motivoRejAmDigital:etapa==="Amostra Física"?order.motivoRejAmFisica:"";
+          return <div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:10}}>
+            <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
+            <div style={{flex:1}}>
+              <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>REPROGRAMAÇÃO</div>
+              <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:1}}>Este item foi reprovado e voltou para esta etapa. Anexe o novo arquivo — o anterior foi removido.</div>
+              {motivo&&<div style={{marginTop:8,padding:"8px 10px",background:C.white,borderRadius:6,border:"1px solid #fed7aa"}}>
+                <div style={{...F.body,fontSize:10,fontWeight:700,color:"#c2410c",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo da reprovação</div>
+                <div style={{...F.body,fontSize:13,color:"#7c2d12"}}>{motivo}</div>
+              </div>}
+            </div>
+          </div>;
+        })()}
         <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
           <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{config.title.toUpperCase()}</div>
           <div style={{...F.body,fontSize:13,color:C.gray600}}>{config.hint}</div>
@@ -1663,6 +1676,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
             condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
             arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+            motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
             reprogramacao:o.reprogramacao||false,
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
@@ -2108,6 +2122,7 @@ function AppInner(){
         if(!payload.fileBase64||!payload.propriedade){ alert("Arquivo ou propriedade ausente."); return; }
         const res=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
           propriedade:payload.propriedade,
+          propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
           fileBase64:payload.fileBase64,
           fileName:payload.fileName,
           novaEtapa:ETAPA_STAGE_ID[next],
@@ -2132,11 +2147,13 @@ function AppInner(){
         };
         const volta=voltaMap[o.etapa]||"Amostra Digital";
         const propVolta=ETAPA_PROPRIEDADE[volta];
+        const propMotivo=ETAPA_PROP_MOTIVO[volta];
         if(bordadoId&&ETAPA_STAGE_ID[volta]){
           await apiFetch(`/reprovar/${bordadoId}`,"PATCH",{
             propriedade:propVolta,
+            propMotivo:propMotivo,
+            motivo:payload.obs||"",
             novaEtapa:ETAPA_STAGE_ID[volta],
-            nota:`Amostra REPROVADA → volta para ${volta} (reprogramação). ${payload.obs?"Motivo: "+payload.obs:""}`,
           });
         }
       }
