@@ -129,6 +129,20 @@ const MODULO_ETAPA = {
   faturamento:              "Faturamento",
 };
 
+// Mapa nome da etapa -> ID da etapa no HubSpot (funil Bordado)
+const ETAPA_STAGE_ID = {
+  "Programação":                "1377887836",
+  "Amostra Digital":            "1377887837",
+  "Aprovação de Amostra Digital":"1377887838",
+  "Amostra Física":             "1377887839",
+  "Aprovação de Amostra Física":"1377887840",
+  "Liberado para bordar":       "1377887841",
+  "Bordado Externo":            "1377887842",
+  "Bordado Interno":            "1377706615",
+  "Bordado Interno e Externo":  "1383604282",
+  "Bordado Finalizado":         "1377706616",
+};
+
 // Helper: usuário tem acesso a um módulo?
 function temAcesso(user, moduloId) {
   if (!user) return false;
@@ -1552,8 +1566,10 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
   const [loading,setLoading]=useState(false);
   const [hsData,setHsData]=useState(null);
   const [loadError,setLoadError]=useState(null);
+  const [busca,setBusca]=useState("");
+  const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
 
-  useEffect(()=>{
+  const carregar=()=>{
     if(!endpoint){setHsData(null);return;}
     setLoading(true);setLoadError(null);
     apiFetch(endpoint)
@@ -1580,40 +1596,103 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       })
       .catch(e=>setLoadError(e.message))
       .finally(()=>setLoading(false));
-  },[endpoint]);
+  };
+  useEffect(carregar,[endpoint]);
 
   const source=hsData!==null?hsData:orders;
-  const mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
+  let mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
+
+  // Filtro de busca (código do produto/SKU ou nome do cliente)
+  const q=busca.trim().toLowerCase();
+  if(q){
+    mine=mine.filter(o=>
+      (o.client||"").toLowerCase().includes(q) ||
+      (o.id||"").toLowerCase().includes(q) ||
+      (o.items||[]).some(it=>(it.sku||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q))
+    );
+  }
+
+  // Filtro de SLA
+  if(filtroSLA!=="todos"){
+    mine=mine.filter(o=>{
+      const st=getSLA(o,slaCfg).st;
+      return filtroSLA==="atrasados"?st==="late":filtroSLA==="risco"?st==="risk":st==="ok";
+    });
+  }
+
+  // Contadores para os chips de filtro
+  const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
+  const nLate=all.filter(o=>getSLA(o,slaCfg).st==="late").length;
+  const nRisk=all.filter(o=>getSLA(o,slaCfg).st==="risk").length;
+
+  const FilterChip=({id,label,count,color})=>(
+    <button onClick={()=>setFiltroSLA(id)}
+      style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${filtroSLA===id?(color||C.red):C.gray200}`,background:filtroSLA===id?(color||C.red)+"0e":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:filtroSLA===id?700:500,color:filtroSLA===id?(color||C.red):C.gray600,whiteSpace:"nowrap"}}>
+      {label}{count!==undefined&&<span style={{background:filtroSLA===id?(color||C.red):C.gray200,color:filtroSLA===id?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{count}</span>}
+    </button>
+  );
+
   return(
     <div style={{padding:24}}>
-      <PageH title={title} sub={`${mine.length} pedido${mine.length!==1?"s":""} nesta etapa`}/>
+      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} nesta etapa`}/>
+
+      {/* Barra de busca + filtros */}
+      <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
+        <div style={{position:"relative",flex:1,minWidth:220}}>
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>
+            <Ic n="search" s={15} c={C.gray400}/>
+          </div>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, SKU ou código..."
+            style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+        </div>
+        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+          <FilterChip id="todos" label="Todos" count={all.length} color={C.gray600}/>
+          <FilterChip id="atrasados" label="Atrasados" count={nLate} color={C.red}/>
+          <FilterChip id="risco" label="Em risco" count={nRisk} color={C.amber}/>
+          <FilterChip id="ok" label="No prazo" color={C.green}/>
+        </div>
+      </div>
+
       {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando do HubSpot...</div>}
       {loadError&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {loadError}</div>}
+
       {mine.length===0
         ?<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
-          <Ic n="check" s={32} c={C.gray300} style={{display:"block",margin:"0 auto 10px"}}/>Nenhum pedido nesta etapa.
+          <Ic n="check" s={32} c={C.gray300} style={{display:"block",margin:"0 auto 10px"}}/>
+          {q||filtroSLA!=="todos"?"Nenhum pedido encontrado com esses filtros.":"Nenhum pedido nesta etapa."}
         </div>
         :mine.map(o=>{
           const sla=getSLA(o,slaCfg);
           const ac=sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300;
+          const slaLabel=sla.st==="late"?"ATRASADO":sla.st==="risk"?"EM RISCO":"NO PRAZO";
+          const slaColor=sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green;
+          const totalPecas=o.items.reduce((s,i)=>s+(i.qty||0),0);
           return(
-            <Card key={o.id} style={{marginBottom:10,borderLeft:`3px solid ${ac}`}}>
+            <Card key={o.id} onClick={()=>onOpen(o)}
+              style={{marginBottom:10,borderLeft:`4px solid ${ac}`,cursor:"pointer",transition:"box-shadow 0.15s,transform 0.15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.08)";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.boxShadow="";e.currentTarget.style.transform="";}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
-                    {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Atrasado":"Em risco"} color={sla.st==="late"?C.red:C.amber}/>}
+                    {/* SLA em destaque logo de cara */}
+                    <span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
+                      <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
+                      {slaLabel}
+                    </span>
                   </div>
-                  <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{o.client} · {fmtR(o.valor)}</div>
-                  <div style={{...F.body,fontSize:12,color:C.gray600}}>{o.items.length} SKUs · {o.items.reduce((s,i)=>s+i.qty,0)} peças</div>
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
-                    <SLABar pct={sla.pct} st={sla.st}/><span style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
+                  <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
+                  <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{fmtR(o.valor)} · {o.items.length} SKU{o.items.length!==1?"s":""} · {totalPecas} peça{totalPecas!==1?"s":""}</div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
+                    <SLABar pct={sla.pct} st={sla.st}/>
+                    <span style={{...F.body,fontSize:10,color:slaColor,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
                   </div>
                   {o.alertas.length>0&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{o.alertas.map((a,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:"#92400e",fontWeight:600}}><Ic n="warn" s={11} c={C.amber}/>{a}</div>)}</div>}
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end"}}>
-                  <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
-                  <button style={{background:actionColor,color:C.white,border:"none",borderRadius:6,padding:"7px 14px",cursor:"pointer",...F.body,fontSize:12,fontWeight:700}}>{actionLabel}</button>
+                <div style={{display:"flex",alignItems:"center",gap:6,color:C.gray400}}>
+                  <span style={{...F.body,fontSize:12,color:C.gray400}}>Abrir</span>
+                  <Ic n="chevR" s={16} c={C.gray400}/>
                 </div>
               </div>
             </Card>
@@ -1931,28 +2010,30 @@ function AppInner(){
 
       // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ────────────────
       if(tipo==="upload"){
-        // Programação → Amostra Digital
-        // Amostra Digital → Aprovação de Amostra Digital (pós-venda aprova)
-        // Amostra Física → Aprovação de Amostra Física (pós-venda aprova)
         const nextMap={
           "Programação":"Amostra Digital",
           "Amostra Digital":"Aprovação de Amostra Digital",
           "Amostra Física":"Aprovação de Amostra Física",
         };
         const next=nextMap[o.etapa]||o.etapa;
+        // Persiste no HubSpot
+        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
+          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next} (${payload.arquivo||"arquivo anexado"})`}).catch(e=>console.error(e));
+        }
         return{...o,etapa:next,etapaAt:now,
           timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
       // ── APROVAR AMOSTRA (pós-venda) ──────────────────────────────────────────
       if(tipo==="aprovar_amostra"){
-        // Aprovação de Amostra Digital → Amostra Física
-        // Aprovação de Amostra Física → Liberado para bordar (amOk=true)
-        if(o.etapa==="Aprovação de Amostra Digital"){
+        const next=o.etapa==="Aprovação de Amostra Digital"?"Amostra Física":"Liberado para bordar";
+        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
+          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`}).catch(e=>console.error(e));
+        }
+        if(next==="Amostra Física"){
           return{...o,etapa:"Amostra Física",etapaAt:now,
             timeline:[...o.timeline,{stage:"Amostra Física",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
         }
-        // Amostra física aprovada
         return{...o,amOk:true,etapa:"Liberado para bordar",etapaAt:now,
           timeline:[...o.timeline,{stage:"Liberado para bordar",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
@@ -1964,6 +2045,9 @@ function AppInner(){
           "Aprovação de Amostra Física":"Amostra Física",
         };
         const volta=voltaMap[o.etapa]||"Amostra Digital";
+        if(o.bordadoId&&ETAPA_STAGE_ID[volta]){
+          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[volta],nota:`Amostra reprovada → volta para ${volta}`}).catch(e=>console.error(e));
+        }
         return{...o,amOk:false,etapa:volta,etapaAt:now,
           timeline:[...o.timeline,{stage:volta+" (retrabalho)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
@@ -1971,14 +2055,17 @@ function AppInner(){
       // ── MOVIMENTAÇÃO SIMPLES ─────────────────────────────────────────────────
       if(tipo==="mover"){
         const nextMap={
-          "Bordado Interno":"Expedição",
-          "Bordado Externo":"Expedição",
-          "Bordado Interno e Externo":"Expedição",
+          "Bordado Interno":"Bordado Finalizado",
+          "Bordado Externo":"Bordado Finalizado",
+          "Bordado Interno e Externo":"Bordado Finalizado",
           "Expedição":"Faturamento",
           "Faturamento":"Concluído",
         };
         const next=nextMap[o.etapa]||o.etapa;
         const concluido=next==="Concluído";
+        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
+          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`}).catch(e=>console.error(e));
+        }
         return{...o,etapa:next,etapaAt:now,concluido,dataConclusao:concluido?now:null,
           timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
