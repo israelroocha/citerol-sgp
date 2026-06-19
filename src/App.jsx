@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.2.0";
+const SGP_VERSION = "v1.3.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -130,6 +130,13 @@ const MODULO_ETAPA = {
   bordado_externo:          "Bordado Externo",
   expedicao:                "Expedição",
   faturamento:              "Faturamento",
+};
+
+// Mapa de etapa -> propriedade de arquivo no HubSpot
+const ETAPA_PROPRIEDADE = {
+  "Programação":     "programacao_de_bordado",
+  "Amostra Digital": "amostra_digital",
+  "Amostra Física":  "amostra_fisica",
 };
 
 // Mapa nome da etapa -> ID da etapa no HubSpot (funil Bordado)
@@ -653,6 +660,13 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
     const config=UPLOAD_ETAPAS[etapa];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+        {order.reprogramacao&&<div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
+          <div>
+            <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>REPROGRAMAÇÃO</div>
+            <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:1}}>Este item foi reprovado e voltou para esta etapa. Anexe o novo arquivo — o anterior foi removido.</div>
+          </div>
+        </div>}
         <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
           <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{config.title.toUpperCase()}</div>
           <div style={{...F.body,fontSize:13,color:C.gray600}}>{config.hint}</div>
@@ -694,9 +708,29 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <textarea value={obsText} onChange={e=>setObsText(e.target.value)} rows={3} placeholder="Informações relevantes sobre este arquivo..."
             style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
         </div>
-        <button onClick={()=>{if(!uploadFile){alert("Anexe um arquivo antes de confirmar.");return;}onAction(order.id,"upload",{arquivo:uploadName,obs:obsText});setActionDone(true);}}
-          style={{background:uploadFile?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFile?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
-          <Ic n="send" s={15} c={C.white}/> {config.btn}
+        <button onClick={async()=>{
+            if(!uploadFile){alert("Anexe um arquivo antes de confirmar.");return;}
+            setUploading(true);
+            try{
+              // Converte o arquivo em base64
+              const base64=await new Promise((res,rej)=>{
+                const r=new FileReader();
+                r.onload=()=>res(r.result.split(",")[1]);
+                r.onerror=rej;
+                r.readAsDataURL(uploadFile);
+              });
+              await onAction(order.id,"upload",{
+                arquivo:uploadName,obs:obsText,
+                fileBase64:base64,fileName:uploadName,
+                propriedade:ETAPA_PROPRIEDADE[etapa],
+              });
+              setActionDone(true);
+            }catch(e){alert("Erro no upload: "+e.message);}
+            finally{setUploading(false);}
+          }}
+          disabled={uploading}
+          style={{background:uploading?"#ccc":uploadFile?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFile&&!uploading?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+          <Ic n="send" s={15} c={C.white}/> {uploading?"Enviando...":config.btn}
         </button>
       </div>
     );
@@ -797,6 +831,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
   const defaultTab=ETAPAS_COM_ACAO.includes(order.etapa)?"acao":"info";
   const[tab,setTab]=useState(defaultTab);
   const[uploadFile,setUploadFile]=useState(null);
+  const[uploading,setUploading]=useState(false);
   const[uploadName,setUploadName]=useState("");
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
@@ -1095,52 +1130,29 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
   const [loadError,setLoadError]=useState(null);
   const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
 
-  useEffect(()=>{
+  const carregarDir=()=>{
     setLoading(true);
     setLoadError(null);
     apiFetch("/direcionamento")
       .then(res=>{
         if(res.success){
-          // Converte formato HubSpot para formato do portal
           const converted=res.data.map(o=>({
-            id:           o.id,
-            posvendaId:   o.posvendaId,
-            vendasId:     o.vendasId,
-            bordadoId:    o.bordadoId,
-            client:       o.client,
-            cnpj:         o.cnpj||"",
-            razaoSocial:  o.razaoSocial||"",
-            tel:          o.telefone||"",
-            email:        o.email||"",
-            obs:          o.infoImportante||o.descricao||"",
-            endereco:     o.endereco||"",
-            condicaoPagamento: o.condicaoPagamento||"",
-            vendedor:     o.vendedor,
-            valor:        o.valor,
-            prazoFinal:   o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
-            obs:          "",
-            etapa:        "Direcionamento",
-            amOk:         o.amostrasAprovada,
-            sepOk:        o.separacaoCompleta,
-            entradaAt:    o.dataEntrada,
-            etapaAt:      o.etapaAt||o.dataEntrada,
-            alertas:      o.alertas||[],
-            concluido:    false,
-            bordado:{
-              pts:0,cores:[],arq:"",arqOk:false,
-              amDig:[],amDigObs:"",amFis:[],amFisObs:"",
-            },
-            items: o.items.length>0
-              ? o.items.map(it=>({
-                  sku:    it.sku||it.nome,
-                  desc:   it.nome,
-                  cor:    it.tamanho,
-                  qty:    it.quantidade,
-                  dest:   null,
-                  status: it.status==="Aguardando bordado"?"separado":
-                          it.status==="faltante"?"faltante":"separado",
-                }))
-              : [{sku:"SEM-ITENS",desc:"Itens não carregados (objeto customizado)",cor:"—",qty:0,dest:null,status:"separado"}],
+            id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+            client:o.client,cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",
+            tel:o.telefone||"",email:o.email||"",
+            obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+            condicaoPagamento:o.condicaoPagamento||"",vendedor:o.vendedor,valor:o.valor,
+            prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
+            etapa:"Direcionamento",amOk:o.amostrasAprovada,sepOk:o.separacaoCompleta,
+            entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+            alertas:o.alertas||[],concluido:false,
+            bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+            arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
+            items:(o.items||[]).map(it=>({
+              id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
+              dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+              status:it.status==="faltante"?"faltante":"separado",
+            })),
             timeline:[{stage:"Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
             chat:[],
           }));
@@ -1149,6 +1161,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       })
       .catch(e=>setLoadError(e.message))
       .finally(()=>setLoading(false));
+  };
+  useEffect(carregarDir,[]);
+  useEffect(()=>{
+    _refreshListeners.push(carregarDir);
+    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==carregarDir);};
   },[]);
 
   // Usa dados reais se carregados, senão usa mock
@@ -1648,6 +1665,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
             obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
             condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
+            arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+            reprogramacao:o.reprogramacao||false,
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
@@ -1668,6 +1687,10 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       .finally(()=>setLoading(false));
   };
   useEffect(carregar,[endpoint]);
+  useEffect(()=>{
+    _refreshListeners.push(carregar);
+    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==carregar);};
+  },[endpoint]);
 
   const source=hsData!==null?hsData:orders;
   let mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
@@ -1746,6 +1769,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
+                    {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
                     {/* SLA em destaque logo de cara */}
                     <span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
                       <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
@@ -2015,6 +2039,9 @@ class ErrorBoundary extends Component {
 }
 
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
+let _refreshListeners=[];
+function triggerRefresh(){ _refreshListeners.forEach(fn=>fn()); }
+
 function AppInner(){
   const isMobile=useIsMobile();
   const[user,setUser]=useState(()=>{
@@ -2054,7 +2081,7 @@ function AppInner(){
     mn.forEach(uid=>setNotifs(ns=>[...ns,{toUid:uid,text:`${user.nome||user.name||"Usuário"}: "${text.slice(0,50)}..."`,orderId:oid,time:t,read:false}]));
   };
 
-  const handleAction=(orderId,tipo,payload)=>{
+  const handleAction=async(orderId,tipo,payload)=>{
     setOrders(prev=>prev.map(o=>{
       if(o.id!==orderId)return o;
       const now=new Date().toISOString();
@@ -2086,11 +2113,17 @@ function AppInner(){
           "Amostra Física":"Aprovação de Amostra Física",
         };
         const next=nextMap[o.etapa]||o.etapa;
-        // Persiste no HubSpot
-        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
-          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next} (${payload.arquivo||"arquivo anexado"})`}).catch(e=>console.error(e));
+        // Upload real do arquivo + move etapa + grava nos 3 deals
+        if(o.bordadoId&&payload.fileBase64&&payload.propriedade){
+          apiFetch(`/upload-etapa/${o.bordadoId}`,"POST",{
+            propriedade:payload.propriedade,
+            fileBase64:payload.fileBase64,
+            fileName:payload.fileName,
+            novaEtapa:ETAPA_STAGE_ID[next],
+            nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
+          }).catch(e=>console.error("upload-etapa:",e));
         }
-        return{...o,etapa:next,etapaAt:now,
+        return{...o,etapa:next,etapaAt:now,reprogramacao:false,
           timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
@@ -2115,11 +2148,16 @@ function AppInner(){
           "Aprovação de Amostra Física":"Amostra Física",
         };
         const volta=voltaMap[o.etapa]||"Amostra Digital";
+        const propVolta=ETAPA_PROPRIEDADE[volta]; // limpa o arquivo da etapa que volta
         if(o.bordadoId&&ETAPA_STAGE_ID[volta]){
-          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[volta],nota:`Amostra reprovada → volta para ${volta}`}).catch(e=>console.error(e));
+          apiFetch(`/reprovar/${o.bordadoId}`,"PATCH",{
+            propriedade:propVolta,
+            novaEtapa:ETAPA_STAGE_ID[volta],
+            nota:`Amostra REPROVADA → volta para ${volta} (reprogramação). ${payload.obs?"Motivo: "+payload.obs:""}`,
+          }).catch(e=>console.error("reprovar:",e));
         }
-        return{...o,amOk:false,etapa:volta,etapaAt:now,
-          timeline:[...o.timeline,{stage:volta+" (retrabalho)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        return{...o,amOk:false,etapa:volta,etapaAt:now,reprogramacao:true,
+          timeline:[...o.timeline,{stage:volta+" (REPROGRAMAÇÃO)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
       // ── MOVIMENTAÇÃO SIMPLES ─────────────────────────────────────────────────
@@ -2143,6 +2181,8 @@ function AppInner(){
       return o;
     }));
     setSel(null);
+    // Recarrega as filas após o HubSpot processar a mudança
+    setTimeout(()=>triggerRefresh(),800);
   };
 
   const TITLES={
