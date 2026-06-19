@@ -302,7 +302,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
       {!collapsed&&<div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",gap:10}}>
         <Av ini={user.ini} size={30}/>
         <div style={{flex:1,minWidth:0}}>
-          <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name.split(" ")[0]}</div>
+          <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{(user.nome||user.name||"").split(" ")[0]}</div>
           <div style={{...F.body,fontSize:10,color:C.gray500}}>{user.admin?"Administrador":"Operador"}</div>
         </div>
       </div>}
@@ -1633,7 +1633,7 @@ function Usuarios(){
       .then(()=>carregar()).catch(e=>alert(e.message));
   };
 
-  const ini=(nome)=>nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+  const ini=(nome)=>(nome||"").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
 
   return(
     <div style={{padding:24}}>
@@ -1762,7 +1762,8 @@ function Login({onLogin}){
       .then(r=>{
         if(r.success&&r.user){
           // adiciona ini e admin para o portal
-          const u={...r.user,ini:r.user.nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()};
+          const nome=r.user.nome||r.user.name||r.user.email||"Usuário";
+          const u={...r.user,nome,name:nome,ini:nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()};
           onLogin(u);
         }else setErr(r.error||"E-mail ou senha incorretos.");
       })
@@ -1865,7 +1866,7 @@ function AppInner(){
     const n=new Date();const t=`${n.getDate().toString().padStart(2,"0")}/${(n.getMonth()+1).toString().padStart(2,"0")} ${n.getHours().toString().padStart(2,"0")}:${n.getMinutes().toString().padStart(2,"0")}`;
     const upd=o=>o.id===oid?{...o,chat:[...o.chat,{uid:user.id,text,time:t,mn}]}:o;
     setOrders(p=>p.map(upd));setSel(p=>p?.id===oid?upd(p):p);
-    mn.forEach(uid=>setNotifs(ns=>[...ns,{toUid:uid,text:`${user.name}: "${text.slice(0,50)}..."`,orderId:oid,time:t,read:false}]));
+    mn.forEach(uid=>setNotifs(ns=>[...ns,{toUid:uid,text:`${user.nome||user.name||"Usuário"}: "${text.slice(0,50)}..."`,orderId:oid,time:t,read:false}]));
   };
 
   const handleAction=(orderId,tipo,payload)=>{
