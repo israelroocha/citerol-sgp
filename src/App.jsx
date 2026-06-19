@@ -573,7 +573,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
           <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{
               destinos: Object.fromEntries(
-                order.items.map((it,i)=>[it.sku,(itemDest[it.id||i]||"")])
+                order.items.map((it,i)=>[it.id||it.sku,(itemDest[it.id||i]||"")])
               )
             });setActionDone(true);}}
             disabled={!allDestDefined}
