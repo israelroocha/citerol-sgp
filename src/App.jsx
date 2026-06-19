@@ -1548,11 +1548,47 @@ function SLAConfig({slaCfg,onSave}){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg}){
-  const mine=orders.filter(o=>o.etapa===etapa&&!o.concluido);
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint}){
+  const [loading,setLoading]=useState(false);
+  const [hsData,setHsData]=useState(null);
+  const [loadError,setLoadError]=useState(null);
+
+  useEffect(()=>{
+    if(!endpoint){setHsData(null);return;}
+    setLoading(true);setLoadError(null);
+    apiFetch(endpoint)
+      .then(res=>{
+        if(res.success){
+          const conv=res.data.map(o=>({
+            id:o.id,posvendaId:o.posvendaId,bordadoId:o.bordadoId,
+            client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
+            prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
+            etapa:o.etapa||etapa,amOk:false,sepOk:true,
+            entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+            alertas:o.alertas||[],concluido:false,
+            bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+            items:(o.items||[]).map(it=>({
+              id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
+              qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+              status:"separado",
+            })),
+            timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+            chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
+          }));
+          setHsData(conv);
+        }
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  },[endpoint]);
+
+  const source=hsData!==null?hsData:orders;
+  const mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
   return(
     <div style={{padding:24}}>
       <PageH title={title} sub={`${mine.length} pedido${mine.length!==1?"s":""} nesta etapa`}/>
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando do HubSpot...</div>}
+      {loadError&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {loadError}</div>}
       {mine.length===0
         ?<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
           <Ic n="check" s={32} c={C.gray300} style={{display:"block",margin:"0 auto 10px"}}/>Nenhum pedido nesta etapa.
@@ -1980,11 +2016,13 @@ function AppInner(){
             {page==="ranking"&&<Ranking hist={HIST}/>}
             {page==="pedidos"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
-            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
-            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
-            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
-            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
+            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
+            {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
+            {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
+            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/etapa-bordado/1377706615" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/etapa-bordado/1377887842" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
