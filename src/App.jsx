@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.1.0";
+const SGP_VERSION = "v1.2.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -857,7 +857,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Prazo Final",fmtD(order.prazoFinal)],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Prazo Final",fmtD(order.prazoFinal)],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,wordBreak:"break-word"}}>{v}</div>
@@ -1108,6 +1108,13 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
             vendasId:     o.vendasId,
             bordadoId:    o.bordadoId,
             client:       o.client,
+            cnpj:         o.cnpj||"",
+            razaoSocial:  o.razaoSocial||"",
+            tel:          o.telefone||"",
+            email:        o.email||"",
+            obs:          o.infoImportante||o.descricao||"",
+            endereco:     o.endereco||"",
+            condicaoPagamento: o.condicaoPagamento||"",
             vendedor:     o.vendedor,
             valor:        o.valor,
             prazoFinal:   o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
@@ -1638,6 +1645,9 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           const conv=res.data.map(o=>({
             id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
             client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
+            cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
+            obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+            condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
