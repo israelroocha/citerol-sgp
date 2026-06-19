@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.3.1";
+const SGP_VERSION = "v1.3.2";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -739,28 +739,25 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 
   // ── PÓS-VENDA / CS — Aprovação de amostra ─────────────────────────────────
   if(etapa==="Aprovação de Amostra Digital"||etapa==="Aprovação de Amostra Física"){
+    const ehDigital=etapa==="Aprovação de Amostra Digital";
+    const tituloEtapa=ehDigital?"APROVAÇÃO DE AMOSTRA DIGITAL":"APROVAÇÃO DE AMOSTRA FÍSICA";
+    const voltaPara=ehDigital?"Amostra Digital":"Amostra Física";
+    // Arquivo anexado pelo analista (fileId guardado na propriedade da etapa)
+    const fileIdArquivo=ehDigital?order.arqAmostraDigital:order.arqAmostraFisica;
+    const fileIds=fileIdArquivo?[fileIdArquivo]:[];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
         <div style={{background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:8,padding:"14px 16px"}}>
-          <div style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.1em",marginBottom:4}}>APROVAÇÃO DE AMOSTRA FÍSICA</div>
-          <div style={{...F.body,fontSize:13,color:C.gray700}}>A amostra física está pronta e foi entregue ao vendedor. Após contato com o cliente, registre a decisão abaixo.</div>
+          <div style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.1em",marginBottom:4}}>{tituloEtapa}</div>
+          <div style={{...F.body,fontSize:13,color:C.gray700}}>{ehDigital
+            ?"O analista anexou a amostra digital. Veja o arquivo abaixo e, após contato com o cliente, registre a decisão."
+            :"A amostra física está pronta. Veja o arquivo abaixo e, após contato com o cliente, registre a decisão."}</div>
         </div>
-        {/* Mostrar arquivo da amostra física se existir */}
-        {order.bordado.amFis.length>0&&(
-          <div>
-            <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Arquivo da amostra física</div>
-            {order.bordado.amFis.map((a,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:6,padding:"10px 14px",border:`1px solid ${C.gray200}`,marginBottom:6}}>
-                <Ic n="scissors" s={16} c={C.gray400}/>
-                <div style={{flex:1}}>
-                  <div style={{...F.body,fontSize:13,fontWeight:600}}>{a.nome}</div>
-                  <div style={{...F.body,fontSize:11,color:C.gray400}}>{a.data}</div>
-                </div>
-                <Btn label="Baixar" icon="download" variant="secondary" size="sm"/>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Arquivo da amostra anexado pelo analista */}
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{ehDigital?"Amostra digital anexada":"Amostra física anexada"}</label>
+          <ArquivosBox fileIds={fileIds} emptyText="Nenhum arquivo de amostra anexado ainda."/>
+        </div>
         {/* Observação */}
         <div>
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações do cliente (opcional)</label>
@@ -779,7 +776,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </button>
         </div>
         <div style={{...F.body,fontSize:11,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
-          <Ic n="warn" s={11} c={C.gray300}/> Reprovar retorna o pedido para a etapa de Programação de Bordado.
+          <Ic n="warn" s={11} c={C.gray300}/> Reprovar retorna o pedido para a etapa de {voltaPara} (reprogramação) e remove o arquivo anterior.
         </div>
       </div>
     );
