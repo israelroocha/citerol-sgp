@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.4.0";
+const SGP_VERSION = "v1.5.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -276,14 +276,25 @@ function SecH({children,style={}}){
   return <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:12,...style}}>{children}</div>;
 }
 
-function PageH({title,sub,bc}){
+function PageH({title,sub,bc,onRefresh,refreshing}){
   return (
-    <div style={{marginBottom:24}}>
-      {bc&&<div style={{...F.body,fontSize:12,color:C.gray400,marginBottom:4,display:"flex",gap:6,alignItems:"center"}}>
-        SGP <Ic n="chevR" s={11} c={C.gray400}/> <span style={{color:C.gray600}}>{bc}</span>
-      </div>}
-      <h1 style={{...F.title,fontSize:24,fontWeight:700,color:C.black,lineHeight:1.1}}>{title}</h1>
-      {sub&&<p style={{...F.body,fontSize:13,color:C.gray500,marginTop:4}}>{sub}</p>}
+    <div style={{marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+      <div>
+        {bc&&<div style={{...F.body,fontSize:12,color:C.gray400,marginBottom:4,display:"flex",gap:6,alignItems:"center"}}>
+          SGP <Ic n="chevR" s={11} c={C.gray400}/> <span style={{color:C.gray600}}>{bc}</span>
+        </div>}
+        <h1 style={{...F.title,fontSize:24,fontWeight:700,color:C.black,lineHeight:1.1}}>{title}</h1>
+        {sub&&<p style={{...F.body,fontSize:13,color:C.gray500,marginTop:4}}>{sub}</p>}
+      </div>
+      {onRefresh&&<button onClick={onRefresh} disabled={refreshing}
+        style={{display:"flex",alignItems:"center",gap:7,padding:"9px 16px",borderRadius:8,border:`1.5px solid ${C.gray200}`,background:C.white,cursor:refreshing?"wait":"pointer",...F.body,fontSize:13,fontWeight:600,color:refreshing?C.gray400:C.gray700,whiteSpace:"nowrap",flexShrink:0}}
+        onMouseEnter={e=>{if(!refreshing)e.currentTarget.style.borderColor=C.red;}}
+        onMouseLeave={e=>e.currentTarget.style.borderColor=C.gray200}>
+        <span style={{display:"inline-block",transition:"transform 0.5s",transform:refreshing?"rotate(360deg)":"none"}}>
+          <Ic n="refresh" s={15} c={refreshing?C.gray400:C.red}/>
+        </span>
+        {refreshing?"Atualizando...":"Atualizar"}
+      </button>}
     </div>
   );
 }
@@ -1186,6 +1197,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
   const[confirmed,setConfirmed]=useState({});// orderId: bool
+  const[pendentesAberto,setPendentesAberto]=useState(false);// caixa recolhível
 
   const toggleSel=(oid,sku)=>{
     setSel(prev=>({...prev,[oid]:{...(prev[oid]||{}),[sku]:!(prev[oid]||{})[sku]}}));
@@ -1223,7 +1235,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo"/>
+      <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo" onRefresh={carregarDir} refreshing={loading}/>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         Carregando pedidos do HubSpot...
@@ -1235,14 +1247,21 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       {hsOrders!==null&&!loading&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green}}>
         <Ic n="check" s={13} c={C.green}/> {hsOrders.length} pedido{hsOrders.length!==1?"s":""} carregado{hsOrders.length!==1?"s":""} do HubSpot
       </div>}
-      {/* Pedidos aguardando amostra */}
+      {/* Pedidos aguardando amostra — caixa recolhível */}
       {pendentes.length>0&&(
         <div>
-          <div style={{background:C.amber+"10",border:`1px solid ${C.amber}38`,borderRadius:8,padding:"10px 16px",marginBottom:10,display:"flex",alignItems:"center",gap:8}}>
+          <div onClick={()=>setPendentesAberto(v=>!v)}
+            style={{background:C.amber+"10",border:`1px solid ${C.amber}38`,borderRadius:8,padding:"10px 16px",marginBottom:pendentesAberto?10:0,display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
             <Ic n="warn" s={15} c={C.amber}/>
             <span style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.08em"}}>AGUARDANDO APROVAÇÃO DE AMOSTRA — {pendentes.length}</span>
+            <span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,...F.body,fontSize:11,color:C.amber,fontWeight:600}}>
+              {pendentesAberto?"Recolher":"Ver"}
+              <span style={{display:"inline-block",transition:"transform 0.2s",transform:pendentesAberto?"rotate(180deg)":"none"}}>
+                <Ic n="chevDown" s={14} c={C.amber}/>
+              </span>
+            </span>
           </div>
-          {pendentes.map(o=>(
+          {pendentesAberto&&pendentes.map(o=>(
             <div key={o.id} onClick={()=>onOpen(o)} style={{background:"#fffbeb",border:`1px solid ${C.amber}40`,borderLeft:`3px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",cursor:"pointer",marginBottom:8,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
               <div><span style={{...F.body,fontWeight:700}}>{o.id}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
               <Tag label="Amostra pendente" color={C.amber}/>
@@ -1738,7 +1757,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 
   return(
     <div style={{padding:24}}>
-      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} nesta etapa`}/>
+      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} nesta etapa`} onRefresh={carregar} refreshing={loading}/>
 
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
@@ -1858,7 +1877,7 @@ function Usuarios(){
   return(
     <div style={{padding:24}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,flexWrap:"wrap",gap:12}}>
-        <PageH title="Usuários" sub="Crie acessos e defina quais módulos cada pessoa enxerga"/>
+        <PageH title="Usuários" sub="Crie acessos e defina quais módulos cada pessoa enxerga" onRefresh={carregar} refreshing={loading}/>
         <Btn label="Novo acesso" icon="users" onClick={abrirNovo}/>
       </div>
 
