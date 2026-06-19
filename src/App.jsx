@@ -542,6 +542,7 @@ function Timeline({order}){
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
 function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
   const etapa=order.etapa;
+  const[uploading,setUploading]=useState(false);
 
   // Ação já confirmada
   if(actionDone){
@@ -831,7 +832,6 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
   const defaultTab=ETAPAS_COM_ACAO.includes(order.etapa)?"acao":"info";
   const[tab,setTab]=useState(defaultTab);
   const[uploadFile,setUploadFile]=useState(null);
-  const[uploading,setUploading]=useState(false);
   const[uploadName,setUploadName]=useState("");
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
