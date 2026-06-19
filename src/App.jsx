@@ -87,55 +87,60 @@ const SLA_DEF = {
   "Bordado Externo":120,"Expedição":8,"Faturamento":4,
 };
 
-// ─── USUÁRIOS ─────────────────────────────────────────────────────────────────
-const USERS = [
-  {id:1,name:"Israel Rocha",     email:"israel@citerol.com.br",  role:"superadmin",     ini:"IR",pw:""},
-  {id:2,name:"Leidiane Silva",   email:"leidiane@citerol.com.br",role:"supervisao",     ini:"LS",pw:""},
-  {id:3,name:"Ana Pós-venda",    email:"ana@citerol.com.br",     role:"posvenda",       ini:"AP",pw:""},
-  {id:4,name:"Carlos Programador",email:"carlos@citerol.com.br", role:"programador",    ini:"CP",pw:""},
-  {id:5,name:"Julia Digital",    email:"julia@citerol.com.br",   role:"amostra_digital",ini:"JD",pw:""},
-  {id:6,name:"Marcos Físico",    email:"marcos@citerol.com.br",  role:"amostra_fisica", ini:"MF",pw:""},
-  {id:7,name:"Rafael Direcionador",email:"rafael@citerol.com.br",role:"direcionador",   ini:"RD",pw:""},
-  {id:8,name:"Pedro Bordado",    email:"pedro@citerol.com.br",   role:"bordado_interno",ini:"PB",pw:""},
-  {id:9,name:"Fernanda Externo", email:"fernanda@citerol.com.br",role:"bordado_externo",ini:"FE",pw:""},
-  {id:10,name:"Thiago Expedição",email:"thiago@citerol.com.br",  role:"expedicao",      ini:"TE",pw:""},
-  {id:11,name:"Camila Fat.",     email:"camila@citerol.com.br",  role:"faturamento",    ini:"CF",pw:""},
+// ─── MÓDULOS DO SISTEMA ───────────────────────────────────────────────────────
+// Cada módulo é uma permissão individual atribuível a um usuário.
+const NAV_ITEMS = [
+  // Principal
+  {id:"demandas",    label:"Minhas Demandas",    icon:"pin",     grupo:"Principal"},
+  {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
+  {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
+  // Análise
+  {id:"gerencial",   label:"Gerencial",          icon:"chart",   grupo:"Análise"},
+  {id:"historico",   label:"Histórico",          icon:"history", grupo:"Análise"},
+  {id:"ranking",     label:"Ranking / Premiação",icon:"trophy",  grupo:"Análise"},
+  // Operações
+  {id:"pedidos",                 label:"Todos os Pedidos",         icon:"list",    grupo:"Operações"},
+  {id:"direcionamento",          label:"Direcionamento",           icon:"arrow",   grupo:"Operações"},
+  {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Operações"},
+  {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Operações"},
+  {id:"aprovacao_amostra_digital",label:"Aprovação Amostra Digital",icon:"check",  grupo:"Operações"},
+  {id:"amostra_fisica",          label:"Amostra Física",           icon:"scissors",grupo:"Operações"},
+  {id:"aprovacao_amostra_fisica",label:"Aprovação Amostra Física", icon:"check",   grupo:"Operações"},
+  {id:"bordado_interno",         label:"Bordado Interno",          icon:"needle",  grupo:"Operações"},
+  {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operações"},
+  {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
+  {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
+  // Sistema
+  {id:"sla",         label:"Configurar SLA",     icon:"gear",    grupo:"Sistema"},
+  {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
 ];
-const ROLE_LABEL = {
-  superadmin:"Super Admin",supervisao:"Supervisão",posvenda:"Pós-venda",
-  programador:"Programador de Bordado",amostra_digital:"Amostra Digital",
-  amostra_fisica:"Amostra Física",direcionador:"Direcionador de Bordado",
-  bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-  expedicao:"Expedição",faturamento:"Faturamento",
-};
-const ROLE_STAGES = {
-  programador:["Programação"],amostra_digital:["Amostra Digital"],
-  amostra_fisica:["Amostra Física"],direcionador:["Direcionamento"],
-  bordado_interno:["Bordado Interno"],bordado_externo:["Bordado Externo"],
-  expedicao:["Expedição"],faturamento:["Faturamento"],
-  posvenda:Object.keys(SLA_DEF),supervisao:Object.keys(SLA_DEF),superadmin:Object.keys(SLA_DEF),
+
+// Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
+const MODULO_ETAPA = {
+  direcionamento:           "Direcionamento",
+  programacao:              "Programação",
+  amostra_digital:          "Amostra Digital",
+  aprovacao_amostra_digital:"Aprovação de Amostra Digital",
+  amostra_fisica:           "Amostra Física",
+  aprovacao_amostra_fisica: "Aprovação de Amostra Física",
+  bordado_interno:          "Bordado Interno",
+  bordado_externo:          "Bordado Externo",
+  expedicao:                "Expedição",
+  faturamento:              "Faturamento",
 };
 
-// NAV items
-const NAV_ITEMS = [
-  {id:"demandas",    label:"Minhas Demandas",   icon:"pin",     roles:["superadmin","supervisao","posvenda","programador","amostra_digital","amostra_fisica","direcionador","bordado_interno","bordado_externo","expedicao","faturamento"]},
-  {id:"dashboard",  label:"Dashboard",          icon:"grid",    roles:["superadmin","supervisao","posvenda"]},
-  {id:"funil",      label:"Funil em Tempo Real",icon:"funnel",  roles:["superadmin","supervisao","posvenda"]},
-  {id:"gerencial",  label:"Gerencial",           icon:"chart",   roles:["superadmin","supervisao"]},
-  {id:"historico",  label:"Histórico",           icon:"history", roles:["superadmin","supervisao"]},
-  {id:"ranking",    label:"Ranking / Premiação", icon:"trophy",  roles:["superadmin","supervisao"]},
-  {id:"pedidos",    label:"Todos os Pedidos",    icon:"list",    roles:["superadmin","supervisao","posvenda"]},
-  {id:"direcionamento",label:"Direcionamento",   icon:"arrow",   roles:["superadmin","supervisao","direcionador"]},
-  {id:"programacao",label:"Programação",         icon:"needle",  roles:["superadmin","supervisao","programador"]},
-  {id:"amostra_digital",label:"Amostra Digital", icon:"monitor", roles:["superadmin","supervisao","amostra_digital"]},
-  {id:"amostra_fisica", label:"Amostra Física",  icon:"scissors",roles:["superadmin","supervisao","amostra_fisica"]},
-  {id:"bordado_interno",label:"Bordado Interno", icon:"needle",  roles:["superadmin","supervisao","bordado_interno"]},
-  {id:"bordado_externo",label:"Bordado Externo", icon:"box",     roles:["superadmin","supervisao","bordado_externo"]},
-  {id:"expedicao",  label:"Expedição",           icon:"box",     roles:["superadmin","supervisao","expedicao"]},
-  {id:"faturamento",label:"Faturamento",         icon:"dollar",  roles:["superadmin","supervisao","faturamento"]},
-  {id:"sla",        label:"Configurar SLA",      icon:"gear",    roles:["superadmin","supervisao"]},
-  {id:"usuarios",   label:"Usuários",            icon:"users",   roles:["superadmin"]},
-];
+// Helper: usuário tem acesso a um módulo?
+function temAcesso(user, moduloId) {
+  if (!user) return false;
+  if (user.admin) return true; // admin vê tudo
+  return (user.modulos || []).includes(moduloId);
+}
+
+// Lista de usuários para menções no chat — populada via Worker em runtime.
+// Mantida vazia por padrão para não quebrar referências; o chat resolve nomes
+// pelos dados do pedido quando disponível.
+let USERS = [];
+
 
 // ─── MOCK DATA ────────────────────────────────────────────────────────────────
 const NOW = Date.now();
@@ -252,13 +257,9 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle}){
-  const items=NAV_ITEMS.filter(n=>n.roles.includes(user.role));
-  const groups=[
-    {label:"Principal",ids:["demandas","dashboard","funil"]},
-    {label:"Análise",ids:["gerencial","historico","ranking"]},
-    {label:"Operações",ids:["pedidos","direcionamento","programacao","amostra_digital","amostra_fisica","bordado_interno","bordado_externo","expedicao","faturamento"]},
-    {label:"Sistema",ids:["sla","usuarios"]},
-  ];
+  const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
   return(
     <div style={{width:collapsed?56:240,background:C.white,borderRight:`1px solid ${C.gray200}`,display:"flex",flexDirection:"column",transition:"width 0.2s",overflow:"hidden",flexShrink:0}}>
       <div style={{padding:collapsed?"14px":"16px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",justifyContent:collapsed?"center":"space-between",minHeight:56,gap:8}}>
@@ -277,7 +278,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
       </div>
       <div style={{flex:1,overflowY:"auto",padding:"6px 0"}}>
         {groups.map(g=>{
-          const gi=items.filter(n=>g.ids.includes(n.id));
+          const gi=g.items;
           if(!gi.length)return null;
           return(
             <div key={g.label} style={{marginBottom:2}}>
@@ -302,7 +303,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
         <Av ini={user.ini} size={30}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name.split(" ")[0]}</div>
-          <div style={{...F.body,fontSize:10,color:C.gray500}}>{ROLE_LABEL[user.role]}</div>
+          <div style={{...F.body,fontSize:10,color:C.gray500}}>{user.admin?"Administrador":"Operador"}</div>
         </div>
       </div>}
     </div>
@@ -310,16 +311,12 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
 }
 
 function BottomNav({user,active,onNav}){
-  const allItems=NAV_ITEMS.filter(n=>n.roles.includes(user.role));
+  const allItems=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const groups=[
-    {label:"Principal",ids:["demandas","dashboard","funil"]},
-    {label:"Análise",ids:["gerencial","historico","ranking"]},
-    {label:"Operações",ids:["pedidos","direcionamento","programacao","amostra_digital","amostra_fisica","bordado_interno","bordado_externo","expedicao","faturamento"]},
-    {label:"Sistema",ids:["sla","usuarios"]},
-  ];
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
 
   return(
     <>
@@ -334,7 +331,7 @@ function BottomNav({user,active,onNav}){
             </div>
             <div style={{padding:"4px 0 16px"}}>
               {groups.map(g=>{
-                const gi=allItems.filter(n=>g.ids.includes(n.id));
+                const gi=g.items;
                 if(!gi.length)return null;
                 return(
                   <div key={g.label}>
@@ -428,7 +425,7 @@ function Chat({order,me,onSend}){
             <div key={u.id} onClick={()=>ins(u)} style={{padding:"9px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10}}
               onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
               onMouseLeave={e=>e.currentTarget.style.background=C.white}>
-              <Av ini={u.ini} size={22}/><span style={{...F.body,fontSize:13,fontWeight:600}}>{u.name}</span><span style={{...F.body,fontSize:11,color:C.gray400}}>{ROLE_LABEL[u.role]}</span>
+              <Av ini={u.ini} size={22}/><span style={{...F.body,fontSize:13,fontWeight:600}}>{u.name}</span><span style={{...F.body,fontSize:11,color:C.gray400}}>{u.email||""}</span>
             </div>
           ))}
         </div>}
@@ -478,7 +475,6 @@ function Timeline({order}){
 
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
 function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
-  const role=me.role;
   const etapa=order.etapa;
 
   // Ação já confirmada
@@ -495,7 +491,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── DIRECIONADOR ────────────────────────────────────────────────────────────
-  if(role==="direcionador"||((role==="superadmin"||role==="supervisao")&&etapa==="Direcionamento")){
+  if(etapa==="Direcionamento"){
     const internos=order.items.filter(it=>itemDest[it.sku]==="interno").length;
     const externos=order.items.filter(it=>itemDest[it.sku]==="externo").length;
     const pendentes=order.items.filter(it=>!itemDest[it.sku]).length;
@@ -589,13 +585,13 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── UPLOAD DE ARQUIVO (Programador, Amostra Digital, Amostra Física) ────────
-  const uploadRoles=["programador","amostra_digital","amostra_fisica"];
-  if(uploadRoles.includes(role)||((role==="superadmin"||role==="supervisao")&&["Programação","Amostra Digital","Amostra Física"].includes(etapa))){
-    const config={
-      programador:    {title:"Programação de Bordado",    btn:"Confirmar programação",      nextEtapa:"Amostra Digital", hint:"Anexe o arquivo .EMB ou similar com a programação de pontos.",  accept:".emb,.dst,.pes,.jef"},
-      amostra_digital:{title:"Enviar Amostra Digital",    btn:"Enviar amostra digital",      nextEtapa:"Amostra Física",  hint:"Anexe a imagem da amostra digital para aprovação do pós-venda.", accept:"image/*"},
-      amostra_fisica: {title:"Confirmar Amostra Física",  btn:"Confirmar amostra pronta",    nextEtapa:"Aprovação",       hint:"Anexe a foto da amostra física. O pós-venda será notificado.",    accept:"image/*"},
-    }[role]||{title:"Anexar arquivo",btn:"Confirmar",nextEtapa:"",hint:"",accept:"*"};
+  const UPLOAD_ETAPAS={
+    "Programação":    {title:"Programação de Bordado",  btn:"Confirmar programação",   hint:"Anexe o arquivo .EMB ou similar com a programação de pontos.",  accept:".emb,.dst,.pes,.jef"},
+    "Amostra Digital":{title:"Enviar Amostra Digital",  btn:"Enviar amostra digital",   hint:"Anexe a imagem da amostra digital para aprovação do pós-venda.", accept:"image/*"},
+    "Amostra Física": {title:"Confirmar Amostra Física",btn:"Confirmar amostra pronta", hint:"Anexe a foto da amostra física. O pós-venda será notificado.",    accept:"image/*"},
+  };
+  if(UPLOAD_ETAPAS[etapa]){
+    const config=UPLOAD_ETAPAS[etapa];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
         <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
@@ -643,7 +639,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── PÓS-VENDA / CS — Aprovação de amostra ─────────────────────────────────
-  if((role==="posvenda"||(role==="superadmin"||role==="supervisao"))&&etapa==="Amostra Física"){
+  if(etapa==="Aprovação de Amostra Digital"||etapa==="Aprovação de Amostra Física"){
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
         <div style={{background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:8,padding:"14px 16px"}}>
@@ -692,11 +688,12 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 
   // ── MOVIMENTAÇÃO SIMPLES (Bordado Interno, Externo, Expedição, Faturamento) ─
   const moveConfig={
-    bordado_interno: {title:"BORDADO CONCLUÍDO",    sub:"Confirme que o bordado interno foi executado e as peças estão prontas.",          btn:"Confirmar bordado concluído",   icon:"check",  color:C.green,  next:"Expedição"},
-    bordado_externo: {title:"RETORNO DO EXTERNO",   sub:"Confirme o recebimento das peças bordadas pelo fornecedor externo.",              btn:"Confirmar retorno das peças",   icon:"inbox",  color:C.purple, next:"Expedição"},
-    expedicao:       {title:"PEDIDO EMBALADO",      sub:"Confirme que o pedido foi embalado e está pronto para faturamento.",             btn:"Enviar para faturamento",       icon:"box",    color:C.teal,   next:"Faturamento"},
-    faturamento:     {title:"FATURAR PEDIDO",       sub:"Confirme que o pedido foi faturado e o processo de pós-venda está encerrado.",   btn:"Confirmar faturamento",         icon:"dollar", color:C.green,  next:"Concluído"},
-  }[role]||{title:"MOVIMENTAR PEDIDO",sub:"Confirme a execução desta etapa para avançar o pedido.",btn:"Confirmar e avançar",icon:"arrow",color:C.red,next:""};
+    "Bordado Interno":          {title:"BORDADO CONCLUÍDO",  sub:"Confirme que o bordado interno foi executado e as peças estão prontas.",        btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
+    "Bordado Externo":          {title:"RETORNO DO EXTERNO", sub:"Confirme o recebimento das peças bordadas pelo fornecedor externo.",            btn:"Confirmar retorno das peças", icon:"inbox",  color:C.purple, next:"Expedição"},
+    "Bordado Interno e Externo":{title:"BORDADO CONCLUÍDO",  sub:"Confirme a execução do bordado interno e o retorno do externo.",                btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
+    "Expedição":                {title:"PEDIDO EMBALADO",    sub:"Confirme que o pedido foi embalado e está pronto para faturamento.",            btn:"Enviar para faturamento",     icon:"box",    color:C.teal,   next:"Faturamento"},
+    "Faturamento":              {title:"FATURAR PEDIDO",     sub:"Confirme que o pedido foi faturado e o processo de pós-venda está encerrado.",  btn:"Confirmar faturamento",       icon:"dollar", color:C.green,  next:"Concluído"},
+  }[etapa]||{title:"MOVIMENTAR PEDIDO",sub:"Confirme a execução desta etapa para avançar o pedido.",btn:"Confirmar e avançar",icon:"arrow",color:C.red,next:""};
 
   return(
     <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
@@ -732,16 +729,8 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 
 // ─── ORDER MODAL ─────────────────────────────────────────────────────────────
 function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
-  const defaultTab=(()=>{
-    const r=me.role;const e=order.etapa;
-    if((r==="direcionador"||r==="superadmin"||r==="supervisao")&&e==="Direcionamento")return"acao";
-    if((r==="programador")&&e==="Programação")return"acao";
-    if((r==="amostra_digital")&&e==="Amostra Digital")return"acao";
-    if((r==="amostra_fisica")&&e==="Amostra Física")return"acao";
-    if((r==="posvenda")&&e==="Amostra Física"&&order.bordado.amFis.length>0)return"acao";
-    if(["bordado_interno","bordado_externo","expedicao","faturamento"].includes(r))return"acao";
-    return"info";
-  })();
+  const ETAPAS_COM_ACAO=["Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Faturamento"];
+  const defaultTab=ETAPAS_COM_ACAO.includes(order.etapa)?"acao":"info";
   const[tab,setTab]=useState(defaultTab);
   const[uploadFile,setUploadFile]=useState(null);
   const[uploadName,setUploadName]=useState("");
@@ -761,8 +750,8 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
   const setDestOne=(key,dest)=>setItemDest(p=>({...p,[key]:dest}));
   const total=order.items.reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
-  const ACTION_ROLES=["programador","amostra_digital","amostra_fisica","direcionador","posvenda","bordado_interno","bordado_externo","expedicao","faturamento"];
-  const hasAction=ACTION_ROLES.includes(me.role)||["superadmin","supervisao"].includes(me.role);
+  // A aba Executar aparece quando a etapa atual do pedido tem uma ação possível
+  const hasAction=ETAPAS_COM_ACAO.includes(order.etapa);
   const TABS=[
     {id:"info",l:"Negócio"},
     {id:"sla",l:"SLA / Prazo"},
@@ -893,7 +882,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           </div>}
           {/* PEÇAS */}
           {tab==="itens"&&<div style={{padding:20,overflowX:"auto"}}>
-            {(me.role==="direcionador"||(["superadmin","supervisao"].includes(me.role)&&order.etapa==="Direcionamento"))&&(
+            {(order.etapa==="Direcionamento")&&(
               <div style={{background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:7,padding:"10px 14px",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
                 <Ic n="arrow" s={14} c={C.blue}/>
                 <span style={{...F.body,fontSize:12,color:C.blue,fontWeight:600}}>Para definir Interno/Externo, use a aba <strong>▶ Executar</strong></span>
@@ -973,13 +962,16 @@ function OCard({order,onClick,slaCfg}){
 
 // ─── MINHAS DEMANDAS ─────────────────────────────────────────────────────────
 function MinhasDemandas({user,orders,onOpen,slaCfg}){
-  const etapas=ROLE_STAGES[user.role]||[];
+  // Junta as etapas dos módulos de operação que o usuário tem acesso
+  const etapas=user.admin
+    ? Object.values(MODULO_ETAPA)
+    : (user.modulos||[]).map(m=>MODULO_ETAPA[m]).filter(Boolean);
   const mine=orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido);
   const grouped={};etapas.forEach(e=>{grouped[e]=mine.filter(o=>o.etapa===e);});
   const active=etapas.filter(e=>grouped[e].length>0);
   const semAm=mine.filter(o=>!o.amOk);
   const atrasados=mine.filter(o=>getSLA(o,slaCfg).st==="late");
-  const showAmBox=["direcionador","superadmin","supervisao","posvenda"].includes(user.role);
+  const showAmBox=temAcesso(user,"direcionamento")||user.admin;
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
       <PageH title="Minhas Demandas" sub={`${mine.length} pedido${mine.length!==1?"s":""} sob sua responsabilidade`}/>
@@ -1596,56 +1588,142 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg}
   );
 }
 
-// ─── USUÁRIOS ─────────────────────────────────────────────────────────────────
+// ─── USUÁRIOS (gestão dinâmica por módulo, via Worker + KV) ───────────────────
 function Usuarios(){
-  const[users,setUsers]=useState(USERS);const[show,setShow]=useState(false);
-  const[form,setForm]=useState({name:"",email:"",role:"posvenda",pw:""});
-  const add=()=>{if(!form.name||!form.email)return;setUsers([...users,{...form,id:Date.now(),ini:form.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase(),password:form.pw}]);setShow(false);setForm({name:"",email:"",role:"posvenda",pw:""});};
+  const[users,setUsers]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[err,setErr]=useState(null);
+  const[show,setShow]=useState(false);
+  const[editId,setEditId]=useState(null);
+  const[form,setForm]=useState({nome:"",email:"",senha:"",modulos:[]});
+
+  const carregar=()=>{
+    setLoading(true);setErr(null);
+    apiFetch("/usuarios")
+      .then(r=>{if(r.success)setUsers(r.users);})
+      .catch(e=>setErr(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[]);
+
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+
+  const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
+  const toggleGrupo=(grupo)=>{
+    const ids=NAV_ITEMS.filter(n=>n.grupo===grupo).map(n=>n.id);
+    const allOn=ids.every(id=>form.modulos.includes(id));
+    setForm(f=>({...f,modulos:allOn?f.modulos.filter(m=>!ids.includes(m)):[...new Set([...f.modulos,...ids])]}));
+  };
+
+  const abrirNovo=()=>{setEditId(null);setForm({nome:"",email:"",senha:"",modulos:[]});setShow(true);};
+  const abrirEdit=(u)=>{setEditId(u.id);setForm({nome:u.nome,email:u.email,senha:"",modulos:u.modulos||[]});setShow(true);};
+
+  const salvar=()=>{
+    if(!form.nome||!form.email||(!editId&&!form.senha)){alert("Preencha nome, e-mail e senha.");return;}
+    const req = editId
+      ? apiFetch(`/usuarios/${encodeURIComponent(editId)}`,"PATCH",{nome:form.nome,modulos:form.modulos,...(form.senha?{senha:form.senha}:{})})
+      : apiFetch("/usuarios","POST",{nome:form.nome,email:form.email,senha:form.senha,modulos:form.modulos});
+    req.then(r=>{if(r.success){setShow(false);carregar();}else alert(r.error||"Erro");})
+       .catch(e=>alert(e.message));
+  };
+
+  const excluir=(u)=>{
+    if(!confirm(`Excluir o acesso de ${u.nome}?`))return;
+    apiFetch(`/usuarios/${encodeURIComponent(u.id)}`,"DELETE")
+      .then(()=>carregar()).catch(e=>alert(e.message));
+  };
+
+  const ini=(nome)=>nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+
   return(
     <div style={{padding:24}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,flexWrap:"wrap",gap:12}}>
-        <PageH title="Usuários" sub="Gerencie os acessos do sistema"/>
-        <Btn label="Novo usuário" icon="users" onClick={()=>setShow(!show)}/>
+        <PageH title="Usuários" sub="Crie acessos e defina quais módulos cada pessoa enxerga"/>
+        <Btn label="Novo acesso" icon="users" onClick={abrirNovo}/>
       </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:20}}>Carregando usuários...</div>}
+      {err&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:16}}>Erro: {err}</div>}
+
       {show&&<Card style={{marginBottom:16}}>
-        <SecH>Novo usuário</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10,marginBottom:12}}>
-          {[["name","Nome"],["email","E-mail"],["pw","Senha"]].map(([k,p])=>(
-            <div key={k}>
-              <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>{p}</label>
-              <input placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})}
-                style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
-            </div>
-          ))}
+        <SecH>{editId?"Editar acesso":"Novo acesso"}</SecH>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10,marginBottom:16}}>
           <div>
-            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Perfil</label>
-            <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})} style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}>
-              {Object.entries(ROLE_LABEL).filter(([k])=>k!=="superadmin").map(([k,v])=><option key={k} value={k}>{v}</option>)}
-            </select>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Nome do acesso</label>
+            <input placeholder="Ex: Analista de Bordado" value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>E-mail</label>
+            <input placeholder="email@citerol.com.br" value={form.email} disabled={!!editId} onChange={e=>setForm({...form,email:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:editId?C.gray100:C.white}}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>{editId?"Nova senha (deixe vazio p/ manter)":"Senha"}</label>
+            <input type="password" placeholder="••••••" value={form.senha} onChange={e=>setForm({...form,senha:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
           </div>
         </div>
+
+        {/* Seleção de módulos por grupo */}
+        <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10}}>Módulos com acesso</div>
+        <div style={{display:"flex",flexDirection:"column",gap:14,marginBottom:16}}>
+          {GRUPOS.map(grupo=>{
+            const itensGrupo=NAV_ITEMS.filter(n=>n.grupo===grupo);
+            const allOn=itensGrupo.every(n=>form.modulos.includes(n.id));
+            return(
+              <div key={grupo}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                  <span style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.08em"}}>{grupo.toUpperCase()}</span>
+                  <button onClick={()=>toggleGrupo(grupo)} style={{background:"none",border:`1px solid ${C.gray200}`,borderRadius:4,padding:"2px 8px",...F.body,fontSize:10,color:C.gray500,cursor:"pointer"}}>
+                    {allOn?"Desmarcar todos":"Marcar todos"}
+                  </button>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:6}}>
+                  {itensGrupo.map(n=>{
+                    const on=form.modulos.includes(n.id);
+                    return(
+                      <div key={n.id} onClick={()=>toggleMod(n.id)}
+                        style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",borderRadius:6,border:`1.5px solid ${on?C.red:C.gray200}`,background:on?C.red+"08":C.white,cursor:"pointer"}}>
+                        <div style={{width:16,height:16,borderRadius:4,border:`1.5px solid ${on?C.red:C.gray300}`,background:on?C.red:C.white,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                          {on&&<Ic n="check" s={11} c={C.white}/>}
+                        </div>
+                        <Ic n={n.icon} s={14} c={on?C.red:C.gray400}/>
+                        <span style={{...F.body,fontSize:12,color:on?C.black:C.gray600,fontWeight:on?600:400}}>{n.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         <div style={{display:"flex",gap:8}}>
-          <Btn label="Salvar" icon="check" variant="success" onClick={add}/>
+          <Btn label={editId?"Salvar alterações":"Criar acesso"} icon="check" variant="success" onClick={salvar}/>
           <Btn label="Cancelar" variant="secondary" onClick={()=>setShow(false)}/>
         </div>
       </Card>}
+
       <Card style={{padding:0,overflow:"hidden"}}>
         <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:480}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:520}}>
             <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-              {["Usuário","E-mail","Perfil","Ações"].map(hd=><th key={hd} style={{padding:"11px 16px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
+              {["Acesso","E-mail","Módulos","Ações"].map(hd=><th key={hd} style={{padding:"11px 16px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
             <tbody>{users.map(u=>(
               <tr key={u.id} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                <td style={{padding:"11px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10}}><Av ini={u.ini} size={28}/><span style={{...F.body,fontWeight:600,color:C.black}}>{u.name}</span></div></td>
+                <td style={{padding:"11px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10}}><Av ini={ini(u.nome)} size={28}/><span style={{...F.body,fontWeight:600,color:C.black}}>{u.nome}</span></div></td>
                 <td style={{padding:"11px 16px",...F.body,color:C.gray500,fontSize:12}}>{u.email}</td>
-                <td style={{padding:"11px 16px"}}><Tag label={ROLE_LABEL[u.role]} color={u.role==="superadmin"?C.red:C.gray600}/></td>
+                <td style={{padding:"11px 16px"}}><Tag label={`${(u.modulos||[]).length} módulo${(u.modulos||[]).length!==1?"s":""}`} color={C.gray600}/></td>
                 <td style={{padding:"11px 16px"}}><div style={{display:"flex",gap:6}}>
-                  <Btn label="Editar" variant="secondary" size="sm"/>
-                  {u.role!=="superadmin"&&<Btn label="Remover" variant="danger" size="sm" onClick={()=>setUsers(users.filter(x=>x.id!==u.id))}/>}
+                  <Btn label="Editar" variant="secondary" size="sm" onClick={()=>abrirEdit(u)}/>
+                  <Btn label="Remover" variant="danger" size="sm" onClick={()=>excluir(u)}/>
                 </div></td>
               </tr>
-            ))}</tbody>
+            ))}
+            {!loading&&users.length===0&&<tr><td colSpan={4} style={{padding:30,textAlign:"center",...F.body,color:C.gray400,fontSize:13}}>Nenhum acesso criado ainda.</td></tr>}
+            </tbody>
           </table>
         </div>
       </Card>
@@ -1676,8 +1754,21 @@ function NotifPanel({notifs,user,onClose}){
 
 // ─── LOGIN ───────────────────────────────────────────────────────────────────
 function Login({onLogin}){
-  const[email,setE]=useState("");const[pw,setPw]=useState("");const[err,setErr]=useState("");
-  const go=()=>{const u=USERS.find(x=>x.email===email);u?onLogin(u):setErr("E-mail não encontrado.");};
+  const[email,setE]=useState("");const[pw,setPw]=useState("");const[err,setErr]=useState("");const[loading,setLoading]=useState(false);
+  const go=()=>{
+    if(!email||!pw){setErr("Preencha e-mail e senha.");return;}
+    setLoading(true);setErr("");
+    apiFetch("/login","POST",{email,senha:pw})
+      .then(r=>{
+        if(r.success&&r.user){
+          // adiciona ini e admin para o portal
+          const u={...r.user,ini:r.user.nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()};
+          onLogin(u);
+        }else setErr(r.error||"E-mail ou senha incorretos.");
+      })
+      .catch(()=>setErr("E-mail ou senha incorretos."))
+      .finally(()=>setLoading(false));
+  };
   return(
     <div style={{minHeight:"100vh",background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
       <div style={{width:"100%",maxWidth:400}}>
@@ -1705,7 +1796,7 @@ function Login({onLogin}){
                 style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
             </div>
             {err&&<div style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>{err}</div>}
-            <button onClick={go} style={{background:C.red,color:C.white,border:"none",borderRadius:6,padding:"11px",...F.title,fontSize:14,fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",marginTop:4}}>ENTRAR</button>
+            <button onClick={go} disabled={loading} style={{background:loading?C.gray400:C.red,color:C.white,border:"none",borderRadius:6,padding:"11px",...F.title,fontSize:14,fontWeight:700,cursor:loading?"wait":"pointer",letterSpacing:"0.06em",marginTop:4}}>{loading?"ENTRANDO...":"ENTRAR"}</button>
           </div>
   
         </div>
@@ -1752,12 +1843,15 @@ export default function App(){
     setOrders(prev=>prev.map(o=>{
       if(o.id!==orderId)return o;
       const now=new Date().toISOString();
+
+      // ── DIRECIONAMENTO ──────────────────────────────────────────────────────
       if(tipo==="direcionamento"){
-        const newItems=o.items.map(it=>({...it,dest:payload.destinos[it.sku]||it.dest}));
-        const hasInterno=newItems.some(it=>it.dest==="interno");
-        const hasExterno=newItems.some(it=>it.dest==="externo");
-        const nextEtapa=hasInterno?"Bordado Interno":"Bordado Externo";
-        // Chama Worker para persistir no HubSpot
+        // payload.destinos = { "<id ou sku>": "Interno"|"Externo" }
+        const newItems=o.items.map((it,i)=>({...it,dest:(payload.destinos[it.id||it.sku]||payload.destinos[it.sku]||it.dest)}));
+        const vals=Object.values(payload.destinos).map(v=>v.toLowerCase());
+        const hasInterno=vals.includes("interno");
+        const hasExterno=vals.includes("externo");
+        const nextEtapa=hasInterno&&hasExterno?"Bordado Interno e Externo":hasInterno?"Bordado Interno":"Bordado Externo";
         const order=prev.find(x=>x.id===orderId);
         if(order?.bordadoId){
           apiFetch(`/direcionamento/${order.posvendaId}`,"PATCH",{
@@ -1768,30 +1862,61 @@ export default function App(){
         return{...o,items:newItems,etapa:nextEtapa,etapaAt:now,
           timeline:[...o.timeline,{stage:nextEtapa,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
+
+      // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ────────────────
       if(tipo==="upload"){
-        const nextMap={"Programação":"Amostra Digital","Amostra Digital":"Amostra Física","Amostra Física":"Amostra Física"};
+        // Programação → Amostra Digital
+        // Amostra Digital → Aprovação de Amostra Digital (pós-venda aprova)
+        // Amostra Física → Aprovação de Amostra Física (pós-venda aprova)
+        const nextMap={
+          "Programação":"Amostra Digital",
+          "Amostra Digital":"Aprovação de Amostra Digital",
+          "Amostra Física":"Aprovação de Amostra Física",
+        };
         const next=nextMap[o.etapa]||o.etapa;
         return{...o,etapa:next,etapaAt:now,
           timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
+
+      // ── APROVAR AMOSTRA (pós-venda) ──────────────────────────────────────────
       if(tipo==="aprovar_amostra"){
-        return{...o,amOk:true,etapa:"Separação",etapaAt:now,
-          timeline:[...o.timeline,{stage:"Separação",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        // Aprovação de Amostra Digital → Amostra Física
+        // Aprovação de Amostra Física → Liberado para bordar (amOk=true)
+        if(o.etapa==="Aprovação de Amostra Digital"){
+          return{...o,etapa:"Amostra Física",etapaAt:now,
+            timeline:[...o.timeline,{stage:"Amostra Física",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        }
+        // Amostra física aprovada
+        return{...o,amOk:true,etapa:"Liberado para bordar",etapaAt:now,
+          timeline:[...o.timeline,{stage:"Liberado para bordar",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
+
+      // ── REPROVAR AMOSTRA (volta uma etapa) ───────────────────────────────────
       if(tipo==="reprovar_amostra"){
-        return{...o,amOk:false,etapa:"Programação",etapaAt:now,
-          timeline:[...o.timeline,{stage:"Programação (retrabalho)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        const voltaMap={
+          "Aprovação de Amostra Digital":"Amostra Digital",
+          "Aprovação de Amostra Física":"Amostra Física",
+        };
+        const volta=voltaMap[o.etapa]||"Amostra Digital";
+        return{...o,amOk:false,etapa:volta,etapaAt:now,
+          timeline:[...o.timeline,{stage:volta+" (retrabalho)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
+
+      // ── MOVIMENTAÇÃO SIMPLES ─────────────────────────────────────────────────
       if(tipo==="mover"){
         const nextMap={
-          "Bordado Interno":"Expedição","Bordado Externo":"Expedição",
-          "Expedição":"Faturamento","Faturamento":"Concluído"
+          "Bordado Interno":"Expedição",
+          "Bordado Externo":"Expedição",
+          "Bordado Interno e Externo":"Expedição",
+          "Expedição":"Faturamento",
+          "Faturamento":"Concluído",
         };
         const next=nextMap[o.etapa]||o.etapa;
         const concluido=next==="Concluído";
         return{...o,etapa:next,etapaAt:now,concluido,dataConclusao:concluido?now:null,
           timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
+
       return o;
     }));
     setSel(null);
