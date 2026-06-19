@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
@@ -964,7 +964,7 @@ function OCard({order,onClick,slaCfg}){
 function MinhasDemandas({user,orders,onOpen,slaCfg}){
   // Junta as etapas dos módulos de operação que o usuário tem acesso
   const etapas=user.admin
-    ? Object.values(MODULO_ETAPA)
+    ? Object.values(MODULO_ETAPA).filter(Boolean)
     : (user.modulos||[]).map(m=>MODULO_ETAPA[m]).filter(Boolean);
   const mine=orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido);
   const grouped={};etapas.forEach(e=>{grouped[e]=mine.filter(o=>o.etapa===e);});
@@ -1805,12 +1805,41 @@ function Login({onLogin}){
   );
 }
 
+// ─── ERROR BOUNDARY ───────────────────────────────────────────────────────────
+class ErrorBoundary extends Component {
+  constructor(props){ super(props); this.state={hasError:false,msg:""}; }
+  static getDerivedStateFromError(error){ return {hasError:true,msg:error?.message||String(error)}; }
+  componentDidCatch(error,info){ console.error("SGP crash:",error,info); }
+  render(){
+    if(this.state.hasError){
+      return (
+        <div style={{padding:40,fontFamily:"sans-serif",maxWidth:600,margin:"40px auto"}}>
+          <h2 style={{color:"#9E0B0F",fontSize:20,marginBottom:12}}>Ops, algo quebrou</h2>
+          <p style={{color:"#666",fontSize:14,marginBottom:16}}>Detalhe técnico do erro:</p>
+          <pre style={{background:"#f5f5f5",padding:16,borderRadius:8,fontSize:12,overflow:"auto",color:"#9E0B0F"}}>{this.state.msg}</pre>
+          <button onClick={()=>{try{sessionStorage.clear();}catch{};window.location.reload();}}
+            style={{marginTop:16,background:"#9E0B0F",color:"#fff",border:"none",borderRadius:6,padding:"10px 20px",cursor:"pointer",fontSize:14,fontWeight:700}}>
+            Limpar sessão e recarregar
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
-export default function App(){
+function AppInner(){
   const isMobile=useIsMobile();
   const[user,setUser]=useState(()=>{
-    try{const s=sessionStorage.getItem("sgp_user");return s?JSON.parse(s):null;}
-    catch{return null;}
+    try{
+      const s=sessionStorage.getItem("sgp_user");
+      if(!s)return null;
+      const u=JSON.parse(s);
+      // Migração: se for user da estrutura antiga (sem modulos e sem admin), descarta
+      if(!u.modulos&&!u.admin){sessionStorage.removeItem("sgp_user");return null;}
+      return u;
+    }catch{return null;}
   });
   const doLogin=(u)=>{
     try{sessionStorage.setItem("sgp_user",JSON.stringify(u));}catch{}
@@ -1966,4 +1995,8 @@ export default function App(){
       {sel&&<OrderModal order={sel} me={user} onClose={()=>setSel(null)} onSendChat={sendChat} onAction={handleAction} isMobile={isMobile} slaCfg={slaCfg}/>}
     </div>
   );
+}
+
+export default function App(){
+  return <ErrorBoundary><AppInner/></ErrorBoundary>;
 }
