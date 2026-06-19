@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.3.0";
+const SGP_VERSION = "v1.3.1";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -2082,86 +2082,70 @@ function AppInner(){
   };
 
   const handleAction=async(orderId,tipo,payload)=>{
-    setOrders(prev=>prev.map(o=>{
-      if(o.id!==orderId)return o;
-      const now=new Date().toISOString();
+    // O pedido aberto no modal (vem do HubSpot via Fila/Direcionamento)
+    const o = sel && sel.id===orderId ? sel : null;
+    if(!o){ setSel(null); return; }
 
-      // ── DIRECIONAMENTO ──────────────────────────────────────────────────────
+    const bordadoId = o.bordadoId;
+
+    try{
+      // ── DIRECIONAMENTO ────────────────────────────────────────────────────────
       if(tipo==="direcionamento"){
-        // payload.destinos = { "<id ou sku>": "Interno"|"Externo" }
-        const newItems=o.items.map((it,i)=>({...it,dest:(payload.destinos[it.id||it.sku]||payload.destinos[it.sku]||it.dest)}));
-        const vals=Object.values(payload.destinos).map(v=>v.toLowerCase());
-        const hasInterno=vals.includes("interno");
-        const hasExterno=vals.includes("externo");
-        const nextEtapa=hasInterno&&hasExterno?"Bordado Interno e Externo":hasInterno?"Bordado Interno":"Bordado Externo";
-        const order=prev.find(x=>x.id===orderId);
-        if(order?.bordadoId){
-          apiFetch(`/direcionamento/${order.posvendaId}`,"PATCH",{
-            bordadoId:order.bordadoId,
+        if(o.bordadoId&&o.posvendaId){
+          await apiFetch(`/direcionamento/${o.posvendaId}`,"PATCH",{
+            bordadoId:o.bordadoId,
             destinos:payload.destinos,
-          }).catch(e=>console.error("Worker patch error:",e));
+          });
         }
-        return{...o,items:newItems,etapa:nextEtapa,etapaAt:now,
-          timeline:[...o.timeline,{stage:nextEtapa,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
-      // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ────────────────
-      if(tipo==="upload"){
+      // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ──────────────────
+      else if(tipo==="upload"){
         const nextMap={
           "Programação":"Amostra Digital",
           "Amostra Digital":"Aprovação de Amostra Digital",
           "Amostra Física":"Aprovação de Amostra Física",
         };
         const next=nextMap[o.etapa]||o.etapa;
-        // Upload real do arquivo + move etapa + grava nos 3 deals
-        if(o.bordadoId&&payload.fileBase64&&payload.propriedade){
-          apiFetch(`/upload-etapa/${o.bordadoId}`,"POST",{
-            propriedade:payload.propriedade,
-            fileBase64:payload.fileBase64,
-            fileName:payload.fileName,
-            novaEtapa:ETAPA_STAGE_ID[next],
-            nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
-          }).catch(e=>console.error("upload-etapa:",e));
-        }
-        return{...o,etapa:next,etapaAt:now,reprogramacao:false,
-          timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        if(!bordadoId){ alert("Pedido sem negócio de Bordado associado."); return; }
+        if(!payload.fileBase64||!payload.propriedade){ alert("Arquivo ou propriedade ausente."); return; }
+        const res=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
+          propriedade:payload.propriedade,
+          fileBase64:payload.fileBase64,
+          fileName:payload.fileName,
+          novaEtapa:ETAPA_STAGE_ID[next],
+          nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
+        });
+        if(res.error) throw new Error(res.error);
       }
 
-      // ── APROVAR AMOSTRA (pós-venda) ──────────────────────────────────────────
-      if(tipo==="aprovar_amostra"){
+      // ── APROVAR AMOSTRA (pós-venda) ────────────────────────────────────────────
+      else if(tipo==="aprovar_amostra"){
         const next=o.etapa==="Aprovação de Amostra Digital"?"Amostra Física":"Liberado para bordar";
-        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
-          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`}).catch(e=>console.error(e));
+        if(bordadoId&&ETAPA_STAGE_ID[next]){
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`});
         }
-        if(next==="Amostra Física"){
-          return{...o,etapa:"Amostra Física",etapaAt:now,
-            timeline:[...o.timeline,{stage:"Amostra Física",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
-        }
-        return{...o,amOk:true,etapa:"Liberado para bordar",etapaAt:now,
-          timeline:[...o.timeline,{stage:"Liberado para bordar",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
-      // ── REPROVAR AMOSTRA (volta uma etapa) ───────────────────────────────────
-      if(tipo==="reprovar_amostra"){
+      // ── REPROVAR AMOSTRA (limpa arquivo + volta etapa) ─────────────────────────
+      else if(tipo==="reprovar_amostra"){
         const voltaMap={
           "Aprovação de Amostra Digital":"Amostra Digital",
           "Aprovação de Amostra Física":"Amostra Física",
         };
         const volta=voltaMap[o.etapa]||"Amostra Digital";
-        const propVolta=ETAPA_PROPRIEDADE[volta]; // limpa o arquivo da etapa que volta
-        if(o.bordadoId&&ETAPA_STAGE_ID[volta]){
-          apiFetch(`/reprovar/${o.bordadoId}`,"PATCH",{
+        const propVolta=ETAPA_PROPRIEDADE[volta];
+        if(bordadoId&&ETAPA_STAGE_ID[volta]){
+          await apiFetch(`/reprovar/${bordadoId}`,"PATCH",{
             propriedade:propVolta,
             novaEtapa:ETAPA_STAGE_ID[volta],
             nota:`Amostra REPROVADA → volta para ${volta} (reprogramação). ${payload.obs?"Motivo: "+payload.obs:""}`,
-          }).catch(e=>console.error("reprovar:",e));
+          });
         }
-        return{...o,amOk:false,etapa:volta,etapaAt:now,reprogramacao:true,
-          timeline:[...o.timeline,{stage:volta+" (REPROGRAMAÇÃO)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
-      // ── MOVIMENTAÇÃO SIMPLES ─────────────────────────────────────────────────
-      if(tipo==="mover"){
+      // ── MOVIMENTAÇÃO SIMPLES ───────────────────────────────────────────────────
+      else if(tipo==="mover"){
         const nextMap={
           "Bordado Interno":"Bordado Finalizado",
           "Bordado Externo":"Bordado Finalizado",
@@ -2170,19 +2154,20 @@ function AppInner(){
           "Faturamento":"Concluído",
         };
         const next=nextMap[o.etapa]||o.etapa;
-        const concluido=next==="Concluído";
-        if(o.bordadoId&&ETAPA_STAGE_ID[next]){
-          apiFetch(`/mover-etapa/${o.bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`}).catch(e=>console.error(e));
+        if(bordadoId&&ETAPA_STAGE_ID[next]){
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`});
         }
-        return{...o,etapa:next,etapaAt:now,concluido,dataConclusao:concluido?now:null,
-          timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
 
-      return o;
-    }));
+    }catch(e){
+      alert("Erro ao processar: "+e.message);
+      console.error("handleAction:",e);
+      return; // não fecha o modal em caso de erro, para o usuário tentar de novo
+    }
+
+    // Sucesso — fecha o modal e recarrega as filas
     setSel(null);
-    // Recarrega as filas após o HubSpot processar a mudança
-    setTimeout(()=>triggerRefresh(),800);
+    setTimeout(()=>triggerRefresh(),900);
   };
 
   const TITLES={
