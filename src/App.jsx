@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.7.0";
+const SGP_VERSION = "v1.7.1";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -790,11 +790,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         </div>
         {/* Botões de decisão */}
         <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-          <button onClick={()=>{onAction(order.id,"aprovar_amostra",{obs:obsText});setActionDone(true);}}
+          <button onClick={async()=>{try{await onAction(order.id,"aprovar_amostra",{obs:obsText});setActionDone(true);}catch(e){}}}
             style={{flex:1,minWidth:140,background:C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="check" s={16} c={C.white}/> Amostra Aprovada
           </button>
-          <button onClick={()=>{onAction(order.id,"reprovar_amostra",{obs:obsText});setActionDone(true);}}
+          <button onClick={async()=>{try{await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionDone(true);}catch(e){}}}
             style={{flex:1,minWidth:140,background:C.white,color:C.red,border:`2px solid ${C.red}`,borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="close" s={16} c={C.red}/> Reprovar — Refazer
           </button>
@@ -860,7 +860,10 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       {moveConfig.next&&<div style={{...F.body,fontSize:12,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
         <Ic n="arrow" s={12} c={C.gray300}/> Próxima etapa: <strong style={{color:C.gray600,marginLeft:2}}>{moveConfig.next}</strong>
       </div>}
-      <button onClick={()=>{onAction(order.id,"mover",{obs:obsText});setActionDone(true);}}
+      <button onClick={async()=>{
+          try{ await onAction(order.id,"mover",{obs:obsText}); setActionDone(true); }
+          catch(e){ /* erro já exibido no handleAction */ }
+        }}
         style={{background:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
         <Ic n={moveConfig.icon} s={16} c={C.white}/> {moveConfig.btn}
       </button>
@@ -2250,7 +2253,7 @@ function AppInner(){
     }catch(e){
       alert("Erro ao processar: "+e.message);
       console.error("handleAction:",e);
-      return; // não fecha o modal em caso de erro, para o usuário tentar de novo
+      throw e; // propaga para o botão não marcar como concluído
     }
 
     // Sucesso — fecha o modal e recarrega as filas
