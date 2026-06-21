@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.1.0";
+const SGP_VERSION = "v2.2.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -113,6 +113,7 @@ const NAV_ITEMS = [
   {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operações"},
   {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
   {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
+  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Operações"},
   // Sistema
   {id:"sla",         label:"Configurar SLA",     icon:"gear",    grupo:"Sistema"},
   {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
@@ -581,6 +582,19 @@ function Timeline({order}){
 function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
+
+  // Pedido já concluído — apenas consulta, sem ação
+  if(etapa==="Finalizado"){
+    return(
+      <div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+        <div style={{width:52,height:52,borderRadius:"50%",background:C.green+"14",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <Ic n="check" s={26} c={C.green}/>
+        </div>
+        <div style={{...F.title,fontSize:18,fontWeight:700,color:C.green,textAlign:"center"}}>PEDIDO FINALIZADO</div>
+        <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>Este pedido já foi concluído. Consulte o histórico completo nas abas SLA / Prazo e Timeline.</div>
+      </div>
+    );
+  }
 
   // Ação já confirmada
   if(actionDone){
@@ -1755,7 +1769,7 @@ function SLAConfig({slaCfg,onSave}){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint}){
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado}){
   const [loading,setLoading]=useState(false);
   const [hsData,setHsData]=useState(null);
   const [loadError,setLoadError]=useState(null);
@@ -1839,7 +1853,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 
   return(
     <div style={{padding:24}}>
-      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} nesta etapa`} onRefresh={carregar} refreshing={loading}/>
+      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}`} onRefresh={carregar} refreshing={loading}/>
 
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
@@ -1850,12 +1864,12 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, SKU ou código..."
             style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
         </div>
-        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {!finalizado&&<div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
           <FilterChip id="todos" label="Todos" count={all.length} color={C.gray600}/>
           <FilterChip id="atrasados" label="Atrasados" count={nLate} color={C.red}/>
           <FilterChip id="risco" label="Em risco" count={nRisk} color={C.amber}/>
           <FilterChip id="ok" label="No prazo" color={C.green}/>
-        </div>
+        </div>}
       </div>
 
       {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando do HubSpot...</div>}
@@ -1868,7 +1882,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
         </div>
         :mine.map(o=>{
           const sla=getSLA(o,slaCfg);
-          const ac=sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300;
+          const ac=finalizado?C.green:(sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300);
           const slaLabel=sla.st==="late"?"ATRASADO":sla.st==="risk"?"EM RISCO":"NO PRAZO";
           const slaColor=sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green;
           const totalPecas=o.items.reduce((s,i)=>s+(i.qty||0),0);
@@ -1882,18 +1896,22 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
-                    {/* SLA em destaque logo de cara */}
-                    <span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
-                      <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
-                      {slaLabel}
-                    </span>
+                    {/* Badge de status */}
+                    {finalizado
+                      ?<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.green+"15",color:C.green,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
+                        <Ic n="check" s={10} c={C.green}/> CONCLUÍDO
+                      </span>
+                      :<span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
+                        <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
+                        {slaLabel}
+                      </span>}
                   </div>
                   <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
                   <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{fmtR(o.valor)} · {o.items.length} SKU{o.items.length!==1?"s":""} · {totalPecas} peça{totalPecas!==1?"s":""}</div>
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
+                  {!finalizado&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
                     <SLABar pct={sla.pct} st={sla.st}/>
                     <span style={{...F.body,fontSize:10,color:slaColor,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
-                  </div>
+                  </div>}
                   {o.alertas.length>0&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{o.alertas.map((a,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:"#92400e",fontWeight:600}}><Ic n="warn" s={11} c={C.amber}/>{a}</div>)}</div>}
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:6,color:C.gray400}}>
@@ -2332,7 +2350,7 @@ function AppInner(){
     pedidos:"Todos os Pedidos",direcionamento:"Direcionamento",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-    expedicao:"Expedição",faturamento:"Faturamento",sla:"Configurar SLA",usuarios:"Usuários",
+    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",sla:"Configurar SLA",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
@@ -2363,6 +2381,7 @@ function AppInner(){
             {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
