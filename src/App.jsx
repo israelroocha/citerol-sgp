@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.6.0";
+const SGP_VERSION = "v1.7.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -830,6 +830,27 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
         ))}
       </div>
+      {/* Itens a executar nesta etapa */}
+      {order.items&&order.items.length>0&&(
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Itens para {etapa==="Bordado Externo"?"bordado externo":"bordado"} ({order.items.length})</label>
+          <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
+            <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:380}}>
+              <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
+                {["SKU","Descrição","TAM","Qtd",etapa.includes("e Externo")||etapa==="Bordado Interno e Externo"?"Destino":null].filter(Boolean).map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
+              </tr></thead>
+              <tbody>{order.items.map((it,i)=>(
+                <tr key={it.id||i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray700}}>{it.desc}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray500,fontSize:12}}>{it.cor}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {/* Observação */}
       <div>
         <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações (opcional)</label>
@@ -2202,12 +2223,21 @@ function AppInner(){
         }
       }
 
-      // ── MOVIMENTAÇÃO SIMPLES ───────────────────────────────────────────────────
+      // ── CONCLUSÃO DE BORDADO (interno/externo, aguarda ambos) ──────────────────
+      else if(tipo==="mover"&&(o.etapa==="Bordado Interno"||o.etapa==="Bordado Externo"||o.etapa==="Bordado Interno e Externo")){
+        if(!bordadoId){ alert("Pedido sem negócio de Bordado."); return; }
+        // O lado depende de qual fila/etapa o operador está
+        const lado=o.etapa==="Bordado Externo"?"externo":"interno";
+        const res=await apiFetch(`/concluir-bordado/${bordadoId}`,"PATCH",{lado});
+        if(res.error) throw new Error(res.error);
+        if(!res.totalmenteConcluido){
+          alert(`Lado ${lado} concluído! Aguardando o outro lado (${lado==="interno"?"externo":"interno"}) para finalizar.`);
+        }
+      }
+
+      // ── MOVIMENTAÇÃO SIMPLES (Expedição, Faturamento) ──────────────────────────
       else if(tipo==="mover"){
         const nextMap={
-          "Bordado Interno":"Bordado Finalizado",
-          "Bordado Externo":"Bordado Finalizado",
-          "Bordado Interno e Externo":"Bordado Finalizado",
           "Expedição":"Faturamento",
           "Faturamento":"Concluído",
         };
