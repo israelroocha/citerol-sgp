@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.8.0";
+const SGP_VERSION = "v1.9.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -2248,12 +2248,23 @@ function AppInner(){
         }
       }
 
-      // ── MOVIMENTAÇÃO SIMPLES (Expedição, Faturamento) ──────────────────────────
-      else if(tipo==="mover"){
-        const nextMap={
-          "Expedição":"Faturamento",
-          "Faturamento":"Concluído",
+      // ── MOVIMENTAÇÃO PÓS-VENDA (Expedição → Faturamento → Faturado) ────────────
+      else if(tipo==="mover"&&(o.etapa==="Expedição"||o.etapa==="Faturamento")){
+        if(!o.posvendaId) throw new Error("Pedido sem negócio de Pós-venda.");
+        const stageMap={
+          "Expedição":"1377587761",   // Análise de frete
+          "Faturamento":"1377587762", // Faturado
         };
+        const novaEtapa=stageMap[o.etapa];
+        await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`});
+        resultMsg=o.etapa==="Expedição"
+          ?"Pedido enviado para Faturamento."
+          :"Pedido faturado! Processo de pós-venda concluído.";
+      }
+
+      // ── MOVIMENTAÇÃO SIMPLES (fallback) ────────────────────────────────────────
+      else if(tipo==="mover"){
+        const nextMap={};
         const next=nextMap[o.etapa]||o.etapa;
         if(bordadoId&&ETAPA_STAGE_ID[next]){
           await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`});
@@ -2307,8 +2318,8 @@ function AppInner(){
             {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
-            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
-            {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
+            {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
