@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.5.1";
+const SGP_VERSION = "v2.6.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -98,10 +98,7 @@ const NAV_ITEMS = [
   {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
   {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
   // Análise
-  {id:"gerencial",   label:"Gerencial",          icon:"chart",   grupo:"Análise"},
-  {id:"historico",   label:"Histórico",          icon:"history", grupo:"Análise"},
   {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
-  {id:"ranking",     label:"Ranking / Premiação",icon:"trophy",  grupo:"Análise"},
   // Operações
   {id:"pedidos",                 label:"Todos os Pedidos",         icon:"list",    grupo:"Operações"},
   {id:"direcionamento",          label:"Direcionamento",           icon:"arrow",   grupo:"Operações"},
@@ -132,6 +129,19 @@ const MODULO_ETAPA = {
   bordado_externo:          "Bordado Externo",
   expedicao:                "Expedição",
   faturamento:              "Faturamento",
+};
+// Mapa módulo -> endpoint do Worker (para carregar demandas ao vivo)
+const MODULO_ENDPOINT = {
+  direcionamento:           "/direcionamento",
+  programacao:              "/programacao",
+  amostra_digital:          "/amostra-digital",
+  aprovacao_amostra_digital:"/aprovacao-amostra-digital",
+  amostra_fisica:           "/amostra-fisica",
+  aprovacao_amostra_fisica: "/aprovacao-amostra-fisica",
+  bordado_interno:          "/bordado-interno",
+  bordado_externo:          "/bordado-externo",
+  expedicao:                "/expedicao",
+  faturamento:              "/faturamento",
 };
 
 // Mapa de etapa -> propriedade de arquivo no HubSpot
@@ -253,6 +263,29 @@ const normalizarCard=(o,etapa)=>({
   timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
   chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
 });
+
+// Gera e baixa um arquivo Excel (.xls) com os pedidos finalizados
+function baixarExcelFinalizados(lista,de,ate){
+  const esc=(v)=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const cols=["Pedido","Cliente","CNPJ","Centro de Custo","Bordado","Valor (R$)","Data de Vencimento","Data de Finalização","Vendedor"];
+  const linhas=lista.map(o=>{
+    const venc=o.dataVencimento?new Date(o.dataVencimento).toLocaleDateString("pt-BR"):"";
+    const fin=o.dataFinalizacao?new Date(o.dataFinalizacao).toLocaleDateString("pt-BR"):"";
+    const valor=Number(o.valor||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+    return [o.id,o.client,o.cnpj||"",o.centroCusto||"",o.temBordado===false?"Sem bordado":"Com bordado",valor,venc,fin,o.vendedor||""];
+  });
+  const thead="<tr>"+cols.map(c=>`<th style="background:#9E0B0F;color:#fff;font-weight:bold;padding:6px;border:1px solid #ccc">${esc(c)}</th>`).join("")+"</tr>";
+  const tbody=linhas.map(r=>"<tr>"+r.map(c=>`<td style="padding:5px;border:1px solid #ccc">${esc(c)}</td>`).join("")+"</tr>").join("");
+  const periodo=`Pedidos Finalizados — ${de||"início"} a ${ate||"hoje"} (${lista.length} pedidos)`;
+  const html=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>`+
+    `<h3>${esc(periodo)}</h3><table border="1" cellspacing="0">${thead}${tbody}</table></body></html>`;
+  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`pedidos-finalizados-${de||""}_${ate||""}.xls`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 const hrsIn=(at)=>(Date.now()-new Date(at).getTime())/3600000;
 function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
@@ -1299,54 +1332,85 @@ function OCard({order,onClick,slaCfg}){
 }
 
 // ─── MINHAS DEMANDAS ─────────────────────────────────────────────────────────
-function MinhasDemandas({user,orders,onOpen,slaCfg}){
-  // Junta as etapas dos módulos de operação que o usuário tem acesso
-  const etapas=user.admin
-    ? Object.values(MODULO_ETAPA).filter(Boolean)
-    : (user.modulos||[]).map(m=>MODULO_ETAPA[m]).filter(Boolean);
-  const mine=ordenarPorPrioridade(orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido));
-  const grouped={};etapas.forEach(e=>{grouped[e]=ordenarPorPrioridade(mine.filter(o=>o.etapa===e));});
-  const active=etapas.filter(e=>grouped[e].length>0);
-  const semAm=mine.filter(o=>!o.amOk);
-  const atrasados=mine.filter(o=>getSLA(o,slaCfg).st==="late");
-  const showAmBox=temAcesso(user,"direcionamento")||user.admin;
+function MinhasDemandas({user,onOpen,slaCfg}){
+  // Módulos de operação que o usuário tem acesso (com endpoint)
+  const modulos=(user.admin
+    ? Object.keys(MODULO_ENDPOINT)
+    : (user.modulos||[]).filter(m=>MODULO_ENDPOINT[m]));
+
+  const [dados,setDados]=useState(null);   // { [etapa]: [pedidos] }
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [filtro,setFiltro]=useState("todos"); // "todos" ou nome da etapa
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const pares=await Promise.all(modulos.map(async m=>{
+        const etapa=MODULO_ETAPA[m];
+        const r=await apiFetch(MODULO_ENDPOINT[m]).catch(()=>({data:[]}));
+        return [etapa,ordenarPorPrioridade((r.data||[]).map(o=>normalizarCard(o,etapa)))];
+      }));
+      const obj={};pares.forEach(([etapa,lista])=>{obj[etapa]=lista;});
+      setDados(obj);
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const etapas=modulos.map(m=>MODULO_ETAPA[m]).filter(Boolean);
+  const etapasComDados=etapas.filter(e=>dados&&(dados[e]||[]).length>0);
+  const etapasMostrar=filtro==="todos"?etapasComDados:etapasComDados.filter(e=>e===filtro);
+  const total=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).length,0);
+  const agora=Date.now();
+  const atrasados=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).filter(o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora).length,0);
+
   return(
-    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Minhas Demandas" sub={`${mine.length} pedido${mine.length!==1?"s":""} sob sua responsabilidade`}/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Minhas Demandas" sub={`${total} pedido${total!==1?"s":""} sob sua responsabilidade`} onRefresh={carregar} refreshing={loading}/>
+
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-        <Stat label="Em andamento" value={mine.length} icon="list"/>
-        {atrasados.length>0&&<Stat label="Atrasados" value={atrasados.length} color={C.red} icon="warn"/>}
-        {semAm.length>0&&<Stat label="Sem Amostra" value={semAm.length} color={C.amber} icon="clock"/>}
+        <Stat label="Em andamento" value={total} icon="list"/>
+        {atrasados>0&&<Stat label="Atrasados" value={atrasados} color={C.red} icon="warn"/>}
       </div>
-      {showAmBox&&semAm.length>0&&(
-        <div>
-          <div style={{background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:8}}>
-            <Ic n="warn" s={15} c={C.red}/>
-            <span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>AGUARDANDO APROVAÇÃO DE AMOSTRA — {semAm.length} PEDIDO{semAm.length>1?"S":""}</span>
-          </div>
-          {semAm.map(o=>(
-            <div key={o.id} onClick={()=>onOpen(o)} style={{background:"#fffbeb",border:`1px solid ${C.amber}40`,borderLeft:`3px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",cursor:"pointer",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-              <div><span style={{...F.body,fontWeight:700,fontSize:13}}>{o.id}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
-              <Tag label="Amostra pendente" color={C.amber}/>
-            </div>
-          ))}
-        </div>
-      )}
-      {active.length===0&&(
+
+      {/* Filtro por tipo de demanda */}
+      {etapas.length>1&&<div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        <button onClick={()=>setFiltro("todos")}
+          style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${filtro==="todos"?C.red:C.gray200}`,background:filtro==="todos"?C.red+"0e":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:filtro==="todos"?700:500,color:filtro==="todos"?C.red:C.gray600,whiteSpace:"nowrap"}}>
+          Todos <span style={{background:filtro==="todos"?C.red:C.gray200,color:filtro==="todos"?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{total}</span>
+        </button>
+        {etapas.map(e=>{
+          const n=((dados&&dados[e])||[]).length;
+          const ativo=filtro===e;
+          return(
+            <button key={e} onClick={()=>setFiltro(e)}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${ativo?(STAGE_COLOR[e]||C.red):C.gray200}`,background:ativo?(STAGE_COLOR[e]||C.red)+"12":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:ativo?700:500,color:ativo?(STAGE_COLOR[e]||C.red):C.gray600,whiteSpace:"nowrap"}}>
+              {e} <span style={{background:ativo?(STAGE_COLOR[e]||C.red):C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+            </button>
+          );
+        })}
+      </div>}
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&etapasMostrar.length===0&&(
         <div style={{textAlign:"center",padding:60,...F.body,color:C.gray400,fontSize:14,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
           <Ic n="check" s={36} c={C.gray300} style={{margin:"0 auto 12px",display:"block"}}/>
           Nenhuma demanda pendente no momento.
         </div>
       )}
-      {active.map(etapa=>(
+
+      {etapasMostrar.map(etapa=>(
         <div key={etapa}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
             <div style={{width:8,height:8,borderRadius:"50%",background:STAGE_COLOR[etapa]||C.gray400,flexShrink:0}}/>
             <span style={{...F.title,fontSize:12,fontWeight:700,letterSpacing:"0.08em"}}>{etapa.toUpperCase()}</span>
-            <span style={{...F.body,fontSize:12,color:C.gray400}}>({grouped[etapa].length})</span>
+            <span style={{...F.body,fontSize:12,color:C.gray400}}>({dados[etapa].length})</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-            {grouped[etapa].map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+            {dados[etapa].map(o=><OCard key={(o.id||"")+etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
           </div>
         </div>
       ))}
@@ -1668,29 +1732,67 @@ function Dashboard({onOpen,slaCfg}){
   const [rel,setRel]=useState(null);           // relatórios de finalizados
   const [loading,setLoading]=useState(true);
   const [erro,setErro]=useState("");
+  // Intervalo de datas (default: mês atual)
+  const hoje=new Date();
+  const primeiroDia=new Date(hoje.getFullYear(),hoje.getMonth(),1).toISOString().slice(0,10);
+  const ultimoDia=new Date(hoje.getFullYear(),hoje.getMonth()+1,0).toISOString().slice(0,10);
+  const [de,setDe]=useState(primeiroDia);
+  const [ate,setAte]=useState(ultimoDia);
+  const [relLoading,setRelLoading]=useState(false);
+  const [exportando,setExportando]=useState(false);
 
-  const carregar=async()=>{
-    setLoading(true);setErro("");
-    try{
-      // Em aberto: carrega todos os endpoints de etapa em paralelo
-      const resultados=await Promise.all(
-        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>(r.data||[]).map(o=>normalizarCard(o,e.nome))).catch(()=>[]))
-      );
-      setAberto(resultados.flat());
-      // Finalizados: relatórios do Supabase
-      const r=await apiFetch("/relatorios"+montarQuery()).catch(()=>null);
-      setRel(r);
-    }catch(e){setErro(e.message);}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{carregar();},[]); // recarrega manualmente ou ao trocar centro (abaixo)
   const montarQuery=()=>{
     const p=[];
     if(centro)p.push("centro="+encodeURIComponent(centro));
     if(bordadoF)p.push("bordado="+bordadoF);
+    if(de)p.push("de="+de);
+    if(ate)p.push("ate="+ate);
     return p.length?"?"+p.join("&"):"";
   };
-  useEffect(()=>{ if(grupo==="finalizados"){ apiFetch("/relatorios"+montarQuery()).then(setRel).catch(()=>{}); } },[centro,bordadoF,grupo]);
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>(r.data||[]).map(o=>normalizarCard(o,e.nome))).catch(()=>[]))
+      );
+      setAberto(resultados.flat());
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  // Carrega o relatório de finalizados (por botão ou ao entrar na aba)
+  const carregarRel=async()=>{
+    setRelLoading(true);
+    try{ const r=await apiFetch("/relatorios"+montarQuery()); setRel(r); }
+    catch(e){ setRel({slaPorEtapa:[],faturadosPorMes:[],totais:{}}); }
+    finally{ setRelLoading(false); }
+  };
+  useEffect(()=>{ if(grupo==="finalizados"&&!rel){ carregarRel(); } },[grupo]);
+
+  // Exporta todos os pedidos finalizados do período para Excel
+  const exportarExcel=async()=>{
+    setExportando(true);
+    try{
+      const r=await apiFetch("/finalizados");
+      let lista=(r.data||[]);
+      // Filtra por data de finalização dentro do intervalo + centro + bordado
+      lista=lista.filter(o=>{
+        if(centro&&o.centroCusto!==centro)return false;
+        if(bordadoF==="com"&&o.temBordado===false)return false;
+        if(bordadoF==="sem"&&o.temBordado!==false)return false;
+        if(o.dataFinalizacao){
+          const d=o.dataFinalizacao.slice(0,10);
+          if(de&&d<de)return false;
+          if(ate&&d>ate)return false;
+        }
+        return true;
+      });
+      baixarExcelFinalizados(lista,de,ate);
+    }catch(e){ alert("Erro ao exportar: "+e.message); }
+    finally{ setExportando(false); }
+  };
 
   // Filtros aplicados ao "em aberto"
   const q=busca.trim().toLowerCase();
@@ -1793,7 +1895,31 @@ function Dashboard({onOpen,slaCfg}){
 
       {/* ───── GRUPO: FINALIZADOS ───── */}
       {grupo==="finalizados"&&!loading&&<>
-        {!rel?<div style={{...F.body,color:C.gray400,fontSize:13}}>Carregando relatórios...</div>:<>
+        {/* Intervalo de datas + ações */}
+        <Card>
+          <div style={{display:"flex",gap:14,flexWrap:"wrap",alignItems:"flex-end"}}>
+            <div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:6}}>De (finalização)</label>
+              <input type="date" value={de} onChange={e=>setDe(e.target.value)}
+                style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 12px",...F.body,fontSize:13,outline:"none"}}/>
+            </div>
+            <div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:6}}>Até</label>
+              <input type="date" value={ate} onChange={e=>setAte(e.target.value)}
+                style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 12px",...F.body,fontSize:13,outline:"none"}}/>
+            </div>
+            <button onClick={carregarRel} disabled={relLoading}
+              style={{background:relLoading?"#ccc":C.red,color:C.white,border:"none",borderRadius:8,padding:"10px 20px",cursor:relLoading?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
+              <Ic n="refresh" s={14} c={C.white}/> {relLoading?"Carregando...":"Carregar relatório"}
+            </button>
+            <button onClick={exportarExcel} disabled={exportando}
+              style={{background:C.white,color:C.green,border:`1.5px solid ${C.green}`,borderRadius:8,padding:"10px 20px",cursor:exportando?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
+              <Ic n="download" s={14} c={C.green}/> {exportando?"Gerando...":"Exportar relatório completo"}
+            </button>
+          </div>
+        </Card>
+
+        {relLoading?<div style={{...F.body,color:C.gray400,fontSize:13}}>Carregando relatórios...</div>:!rel?<div style={{...F.body,color:C.gray400,fontSize:13}}>Selecione o período e clique em "Carregar relatório".</div>:<>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
             <Stat label="Total faturados" value={rel.totais?.faturados||0} icon="dollar"/>
             <Stat label="Faturados com atraso" value={rel.totais?.faturadosAtrasados||0} color={C.red} icon="warn"/>
@@ -1838,52 +1964,98 @@ function Dashboard({onOpen,slaCfg}){
   );
 }
 
-// ─── FUNIL ───────────────────────────────────────────────────────────────────
-function Funil({orders,onOpen,slaCfg}){
-  const[sel,setSel]=useState(null);
-  const stats=Object.keys(SLA_DEF).map(e=>{
-    const ords=orders.filter(o=>o.etapa===e&&!o.concluido);
-    return{etapa:e,count:ords.length,val:ords.reduce((s,o)=>s+o.valor,0),pecas:ords.reduce((s,o)=>s+o.items.reduce((ss,i)=>ss+i.qty,0),0),tMed:ords.length?ords.reduce((s,o)=>s+hrsIn(o.etapaAt),0)/ords.length:0,atrasados:ords.filter(o=>getSLA(o,slaCfg).st==="late").length,ords};
+// ─── FUNIL EM TEMPO REAL ──────────────────────────────────────────────────────
+function Funil({onOpen,slaCfg}){
+  const [aberto,setAberto]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [sel,setSel]=useState(null);
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>(r.data||[]).map(o=>normalizarCard(o,e.nome))).catch(()=>[]))
+      );
+      setAberto(resultados.flat());
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const agora=Date.now();
+  const isAtrasado=o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora;
+  const stats=ABERTO_ETAPAS.map(e=>{
+    const ords=ordenarPorPrioridade((aberto||[]).filter(o=>o.etapa===e.nome));
+    const atrasados=ords.filter(isAtrasado).length;
+    return{
+      etapa:e.nome,count:ords.length,
+      val:ords.reduce((s,o)=>s+(o.valor||0),0),
+      atrasados,pctAtraso:ords.length?Math.round((atrasados/ords.length)*100):0,
+      ords,
+    };
   }).filter(s=>s.count>0);
+
+  const totalAberto=stats.reduce((s,x)=>s+x.count,0);
+  const totalValor=stats.reduce((s,x)=>s+x.val,0);
+
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Funil em Tempo Real" sub="Pedidos por etapa com valor, peças e tempo médio"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:12}}>
-        {stats.map(s=>{
-          const c=STAGE_COLOR[s.etapa]||C.gray500;const isSel=sel===s.etapa;
-          return(
-            <div key={s.etapa} onClick={()=>setSel(isSel?null:s.etapa)}
-              style={{background:C.white,border:`1.5px solid ${isSel?c:C.gray200}`,borderRadius:8,padding:16,cursor:"pointer"}}
-              onMouseEnter={e=>{if(!isSel)e.currentTarget.style.borderColor=c+"80";}}
-              onMouseLeave={e=>{if(!isSel)e.currentTarget.style.borderColor=C.gray200;}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-                <div>
-                  <div style={{width:8,height:8,borderRadius:"50%",background:c,marginBottom:6}}/>
-                  <div style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.08em"}}>{s.etapa.toUpperCase()}</div>
-                </div>
-                <div style={{...F.title,fontSize:24,fontWeight:700,color:c}}>{s.count}</div>
-              </div>
-              <div style={{height:1,background:C.gray200,marginBottom:10}}/>
-              <div style={{display:"flex",flexDirection:"column",gap:5}}>
-                {[["Valor retido",fmtR(s.val),"dollar"],["Peças",String(s.pecas),"box"],["Tempo médio",`${s.tMed.toFixed(1)}h`,"clock"]].map(([k,v,ic])=>(
-                  <div key={k} style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
-                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n={ic} s={11} c={C.gray400}/>{k}</span>
-                    <span style={{fontWeight:700,color:k==="Valor retido"?C.green:k==="Tempo médio"&&s.tMed>slaCfg[s.etapa]?C.red:C.black}}>{v}</span>
-                  </div>
-                ))}
-                {s.atrasados>0&&<div style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:C.red,fontWeight:700,marginTop:2}}><Ic n="warn" s={11} c={C.red}/>{s.atrasados} atrasado{s.atrasados>1?"s":""}</div>}
-              </div>
-              <div style={{...F.body,fontSize:11,color:isSel?c:C.gray400,fontWeight:600,textAlign:"center",marginTop:10}}>{isSel?"▲ Fechar":"▼ Ver pedidos"}</div>
-            </div>
-          );
-        })}
-      </div>
-      {sel&&<Card style={{border:`1px solid ${STAGE_COLOR[sel]||C.gray200}40`}}>
-        <SecH>{sel} — pedidos em aberto</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {stats.find(s=>s.etapa===sel)?.ords.map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+      <PageH title="Funil em Tempo Real" sub="Pedidos em aberto por etapa, com atrasos e valor" onRefresh={carregar} refreshing={loading}/>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&<>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+          <Stat label="Pedidos em aberto" value={totalAberto} icon="list"/>
+          <Stat label="Valor total em aberto" value={fmtR(totalValor)} color={C.green} icon="dollar"/>
         </div>
-      </Card>}
+
+        {stats.length===0?<div style={{...F.body,color:C.gray400,fontSize:14,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido em aberto no momento.</div>
+        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:12}}>
+          {stats.map(s=>{
+            const c=STAGE_COLOR[s.etapa]||C.gray500;const isSel=sel===s.etapa;
+            return(
+              <div key={s.etapa} onClick={()=>setSel(isSel?null:s.etapa)}
+                style={{background:C.white,border:`1.5px solid ${isSel?c:C.gray200}`,borderRadius:8,padding:16,cursor:"pointer"}}
+                onMouseEnter={e=>{if(!isSel)e.currentTarget.style.borderColor=c+"80";}}
+                onMouseLeave={e=>{if(!isSel)e.currentTarget.style.borderColor=C.gray200;}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:c,marginBottom:6}}/>
+                    <div style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.06em"}}>{s.etapa.toUpperCase()}</div>
+                  </div>
+                  <div style={{...F.title,fontSize:26,fontWeight:700,color:c,marginLeft:8}}>{s.count}</div>
+                </div>
+                {/* barra no prazo vs atraso */}
+                <div style={{height:8,background:C.gray100,borderRadius:4,overflow:"hidden",display:"flex",marginBottom:10}}>
+                  <div style={{width:`${100-s.pctAtraso}%`,background:C.green,height:"100%"}}/>
+                  <div style={{width:`${s.pctAtraso}%`,background:C.red,height:"100%"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
+                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n="warn" s={11} c={s.atrasados>0?C.red:C.gray400}/>Atrasados</span>
+                    <span style={{fontWeight:700,color:s.atrasados>0?C.red:C.gray600}}>{s.atrasados} ({s.pctAtraso}%)</span>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
+                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n="dollar" s={11} c={C.gray400}/>Valor</span>
+                    <span style={{fontWeight:700,color:C.green}}>{fmtR(s.val)}</span>
+                  </div>
+                </div>
+                <div style={{...F.body,fontSize:11,color:isSel?c:C.gray400,fontWeight:600,textAlign:"center",marginTop:10}}>{isSel?"▲ Fechar":"▼ Ver pedidos"}</div>
+              </div>
+            );
+          })}
+        </div>}
+
+        {sel&&<Card style={{border:`1px solid ${STAGE_COLOR[sel]||C.gray200}40`}}>
+          <SecH>{sel} — pedidos em aberto (por prioridade)</SecH>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+            {stats.find(s=>s.etapa===sel)?.ords.map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+          </div>
+        </Card>}
+      </>}
     </div>
   );
 }
@@ -2843,12 +3015,9 @@ function AppInner(){
           <Topbar user={user} title={TITLES[page]||""} notifs={notifs} onBell={()=>setShowN(!showN)} onLogout={doLogout} isMobile={isMobile}/>
           {showN&&<NotifPanel notifs={notifs} user={user} onClose={()=>setShowN(false)}/>}
           <div className="sgp-scroll" style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
-            {page==="demandas"&&<MinhasDemandas user={user} orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
+            {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="funil"&&<Funil orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="gerencial"&&<Gerencial isMobile={isMobile}/>}
-            {page==="historico"&&<Historico hist={HIST} onOpen={setSel}/>}
-            {page==="ranking"&&<Ranking hist={HIST}/>}
+            {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="pedidos"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
