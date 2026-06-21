@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.7.1";
+const SGP_VERSION = "v1.8.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -557,19 +557,20 @@ function Timeline({order}){
 
 
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
-function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
+function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
 
   // Ação já confirmada
   if(actionDone){
+    const aguardando=actionMsg&&actionMsg.includes("Aguardando");
     return(
       <div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-        <div style={{width:52,height:52,borderRadius:"50%",background:C.green+"14",display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <Ic n="check" s={26} c={C.green}/>
+        <div style={{width:52,height:52,borderRadius:"50%",background:(aguardando?C.amber:C.green)+"14",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <Ic n={aguardando?"clock":"check"} s={26} c={aguardando?C.amber:C.green}/>
         </div>
-        <div style={{...F.title,fontSize:18,fontWeight:700,color:C.green}}>AÇÃO CONFIRMADA</div>
-        <div style={{...F.body,fontSize:13,color:C.gray500}}>O pedido foi movimentado com sucesso.</div>
+        <div style={{...F.title,fontSize:18,fontWeight:700,color:aguardando?C.amber:C.green,textAlign:"center"}}>{aguardando?"LADO CONCLUÍDO":"AÇÃO CONFIRMADA"}</div>
+        <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>{actionMsg||"O pedido foi movimentado com sucesso."}</div>
       </div>
     );
   }
@@ -744,12 +745,12 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
                 r.onerror=rej;
                 r.readAsDataURL(uploadFile);
               });
-              await onAction(order.id,"upload",{
+              const m=await onAction(order.id,"upload",{
                 arquivo:uploadName,obs:obsText,
                 fileBase64:base64,fileName:uploadName,
                 propriedade:ETAPA_PROPRIEDADE[etapa],
               });
-              setActionDone(true);
+              setActionMsg(m||"");setActionDone(true);
             }catch(e){alert("Erro no upload: "+e.message);}
             finally{setUploading(false);}
           }}
@@ -790,11 +791,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         </div>
         {/* Botões de decisão */}
         <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-          <button onClick={async()=>{try{await onAction(order.id,"aprovar_amostra",{obs:obsText});setActionDone(true);}catch(e){}}}
+          <button onClick={async()=>{try{const m=await onAction(order.id,"aprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
             style={{flex:1,minWidth:140,background:C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="check" s={16} c={C.white}/> Amostra Aprovada
           </button>
-          <button onClick={async()=>{try{await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionDone(true);}catch(e){}}}
+          <button onClick={async()=>{try{const m=await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
             style={{flex:1,minWidth:140,background:C.white,color:C.red,border:`2px solid ${C.red}`,borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="close" s={16} c={C.red}/> Reprovar — Refazer
           </button>
@@ -861,8 +862,8 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         <Ic n="arrow" s={12} c={C.gray300}/> Próxima etapa: <strong style={{color:C.gray600,marginLeft:2}}>{moveConfig.next}</strong>
       </div>}
       <button onClick={async()=>{
-          try{ await onAction(order.id,"mover",{obs:obsText}); setActionDone(true); }
-          catch(e){ /* erro já exibido no handleAction */ }
+          try{ const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true); }
+          catch(e){ alert("Erro ao processar: "+e.message); }
         }}
         style={{background:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
         <Ic n={moveConfig.icon} s={16} c={C.white}/> {moveConfig.btn}
@@ -880,6 +881,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
   const[uploadName,setUploadName]=useState("");
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
+  const[actionMsg,setActionMsg]=useState("");
   // Direcionamento local state
   const skus=order.items.map(it=>it.sku);
   const itemKeys=order.items.map((it,i)=>it.id||i);
@@ -1070,6 +1072,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             uploadName={uploadName} setUploadName={setUploadName}
             obsText={obsText} setObsText={setObsText}
             actionDone={actionDone} setActionDone={setActionDone}
+            actionMsg={actionMsg} setActionMsg={setActionMsg}
             itemSel={itemSel} itemDest={itemDest} nSel={nSel}
             allDestDefined={allDestDefined} skus={skus}
             toggleItemSel={toggleItemSel} selAllItems={selAllItems}
@@ -2164,6 +2167,7 @@ function AppInner(){
     // O pedido aberto no modal (vem do HubSpot via Fila/Direcionamento)
     const o = sel && sel.id===orderId ? sel : null;
     if(!o){ setSel(null); return; }
+    let resultMsg="";
 
     const bordadoId = o.bordadoId;
 
@@ -2228,13 +2232,19 @@ function AppInner(){
 
       // ── CONCLUSÃO DE BORDADO (interno/externo, aguarda ambos) ──────────────────
       else if(tipo==="mover"&&(o.etapa==="Bordado Interno"||o.etapa==="Bordado Externo"||o.etapa==="Bordado Interno e Externo")){
-        if(!bordadoId){ alert("Pedido sem negócio de Bordado."); return; }
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
         // O lado depende de qual fila/etapa o operador está
-        const lado=o.etapa==="Bordado Externo"?"externo":"interno";
+        const lado=payload.lado||(o.etapa==="Bordado Externo"?"externo":"interno");
         const res=await apiFetch(`/concluir-bordado/${bordadoId}`,"PATCH",{lado});
         if(res.error) throw new Error(res.error);
-        if(!res.totalmenteConcluido){
-          alert(`Lado ${lado} concluído! Aguardando o outro lado (${lado==="interno"?"externo":"interno"}) para finalizar.`);
+        // Monta a mensagem de retorno conforme o resultado
+        if(res.totalmenteConcluido){
+          resultMsg=res.posVendaMovido
+            ? "Bordado finalizado! Ambos os lados concluídos. O pedido foi enviado para Expedição."
+            : "Bordado finalizado! Ambos os lados concluídos.";
+        }else{
+          const falta=lado==="interno"?"externo":"interno";
+          resultMsg=`Lado ${lado} concluído! Aguardando o lado ${falta} para finalizar e enviar à Expedição.`;
         }
       }
 
@@ -2256,9 +2266,10 @@ function AppInner(){
       throw e; // propaga para o botão não marcar como concluído
     }
 
-    // Sucesso — fecha o modal e recarrega as filas
-    setSel(null);
+    // Sucesso — recarrega as filas. NÃO fecha o modal aqui:
+    // o botão exibe a tela de pós-execução com a mensagem.
     setTimeout(()=>triggerRefresh(),900);
+    return resultMsg||"O pedido foi movimentado com sucesso.";
   };
 
   const TITLES={
