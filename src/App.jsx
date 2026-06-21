@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.2.1";
+const SGP_VERSION = "v2.3.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -100,6 +100,7 @@ const NAV_ITEMS = [
   // Análise
   {id:"gerencial",   label:"Gerencial",          icon:"chart",   grupo:"Análise"},
   {id:"historico",   label:"Histórico",          icon:"history", grupo:"Análise"},
+  {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
   {id:"ranking",     label:"Ranking / Premiação",icon:"trophy",  grupo:"Análise"},
   // Operações
   {id:"pedidos",                 label:"Todos os Pedidos",         icon:"list",    grupo:"Operações"},
@@ -535,6 +536,95 @@ function Chat({order,me,onSend}){
   );
 }
 
+// ─── ABA ALTERAÇÃO DE FORMULÁRIO ─────────────────────────────────────────────
+function AlteracaoFormTab({order,onAction,me}){
+  const [novaEtapa,setNovaEtapa]=useState("");
+  const [motivo,setMotivo]=useState("");
+  const [enviando,setEnviando]=useState(false);
+  const [ok,setOk]=useState(false);
+
+  // Bloqueio: não pode alterar se já está em produção de bordado
+  const bloqueado=order.etapa==="Bordado Interno"||order.etapa==="Bordado Externo"||order.etapa==="Bordado Interno e Externo";
+
+  // Etapas para as quais o pedido pode voltar
+  const etapasDestino=[
+    "Programação","Amostra Digital","Aprovação de Amostra Digital",
+    "Amostra Física","Aprovação de Amostra Física","Liberado para bordar",
+  ];
+
+  const enviar=async()=>{
+    if(!novaEtapa){alert("Selecione para qual etapa o pedido deve voltar.");return;}
+    if(!motivo.trim()){alert("Informe o motivo da alteração.");return;}
+    setEnviando(true);
+    try{
+      await onAction(order.id,"alteracao_formulario",{novaEtapa,motivo:motivo.trim()});
+      setOk(true);
+    }catch(e){
+      alert("Erro ao registrar alteração: "+e.message);
+    }finally{setEnviando(false);}
+  };
+
+  return(
+    <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+      {/* Histórico de alteração (se já houve) */}
+      {order.houveAlteracaoForm&&(
+        <div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"14px 16px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <Ic n="warn" s={16} c="#f97316"/>
+            <span style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>JÁ HOUVE ALTERAÇÃO DE FORMULÁRIO</span>
+          </div>
+          <div style={{...F.body,fontSize:10,fontWeight:700,color:"#c2410c",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo registrado</div>
+          <div style={{...F.body,fontSize:13,color:"#7c2d12"}}>{order.motivoAlteracaoForm||"—"}</div>
+        </div>
+      )}
+
+      {ok?(
+        <div style={{padding:30,display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{width:48,height:48,borderRadius:"50%",background:C.green+"14",display:"flex",alignItems:"center",justifyContent:"center"}}><Ic n="check" s={24} c={C.green}/></div>
+          <div style={{...F.title,fontSize:16,fontWeight:700,color:C.green}}>ALTERAÇÃO REGISTRADA</div>
+          <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>O pedido foi retornado para a etapa solicitada e a alteração ficou registrada na timeline.</div>
+        </div>
+      ):bloqueado?(
+        <div style={{background:C.red+"0e",border:`1px solid ${C.red}30`,borderRadius:8,padding:"16px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <Ic n="close" s={16} c={C.red}/>
+            <span style={{...F.title,fontSize:13,fontWeight:700,color:C.red}}>ALTERAÇÃO NÃO PERMITIDA</span>
+          </div>
+          <div style={{...F.body,fontSize:13,color:C.gray600}}>Este pedido já está em produção de bordado ({order.etapa}). Não é possível solicitar alteração de formulário nesta fase.</div>
+        </div>
+      ):(
+        <>
+          <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+            <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>SOLICITAR ALTERAÇÃO DE FORMULÁRIO</div>
+            <div style={{...F.body,fontSize:13,color:C.gray600}}>Use quando o cliente solicitar mudança no pedido. Isso retorna o pedido para a etapa escolhida e gera registro (causa atraso no processo).</div>
+          </div>
+
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Voltar o pedido para a etapa</label>
+            <select value={novaEtapa} onChange={e=>setNovaEtapa(e.target.value)}
+              style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:C.white,cursor:"pointer"}}>
+              <option value="">Selecione a etapa...</option>
+              {etapasDestino.map(e=><option key={e} value={e}>{e}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Motivo da alteração <span style={{color:C.red}}>*</span></label>
+            <textarea value={motivo} onChange={e=>setMotivo(e.target.value)} rows={4} placeholder="Descreva o que o cliente solicitou alterar..."
+              style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
+          </div>
+
+          <button onClick={enviar} disabled={enviando}
+            style={{background:enviando?"#ccc":"#f97316",color:C.white,border:"none",borderRadius:8,padding:"12px 24px",cursor:enviando?"wait":"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+            <Ic n="warn" s={15} c={C.white}/> {enviando?"Registrando...":"Registrar alteração e voltar etapa"}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── ABA ALTERAÇÃO DE FORMULÁRIO (fim) ───────────────────────────────────────
 function Timeline({order}){
   // Usa o histórico real vindo do HubSpot (registra todas as mudanças,
   // inclusive reversões manuais). Fallback para o timeline local antigo.
@@ -939,6 +1029,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
     {id:"bordado",l:"Bordado"},
     {id:"itens",l:"Peças"},
     {id:"tl",l:"Timeline"},
+    {id:"alteracao",l:order.houveAlteracaoForm?"⚠ Alteração de Formulário":"Alteração de Formulário"},
     {id:"chat",l:"Conversa"},
     ...(hasAction?[{id:"acao",l:"▶ Executar"}]:[]),
   ];
@@ -951,6 +1042,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
               <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black}}>{order.id}</span>
               <ETag etapa={order.etapa}/>
+              {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {(sla.st!=="ok"||sla.ft!=="ok")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
             </div>
             <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:3,fontWeight:600}}>{order.client}</div>
@@ -1097,6 +1189,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             </table>
           </div>}
           {tab==="tl"&&<Timeline order={order}/>}
+          {tab==="alteracao"&&<AlteracaoFormTab order={order} onAction={onAction} me={me}/>}
           {tab==="chat"&&<div style={{height:isMobile?380:420}}><Chat order={order} me={me} onSend={onSendChat}/></div>}
           {tab==="acao"&&<AcaoTab
             order={order} me={me}
@@ -1232,6 +1325,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
             arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
             historico:o.historico||[],
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",
             items:(o.items||[]).map(it=>({
               id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
               dest:it.direcionamento?it.direcionamento.toLowerCase():null,
@@ -1793,6 +1887,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             reprogramacao:o.reprogramacao||false,
             historico:o.historico||[],
             arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
@@ -1896,6 +1991,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
+                    {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
                     {/* Badge de status */}
                     {finalizado
                       ?<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.green+"15",color:C.green,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
@@ -1928,6 +2024,77 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 }
 
 // ─── USUÁRIOS (gestão dinâmica por módulo, via Worker + KV) ───────────────────
+// ─── MÓDULO: REGISTROS DE ALTERAÇÃO DE FORMULÁRIO ────────────────────────────
+function AlteracoesFormList(){
+  const[regs,setRegs]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[erro,setErro]=useState("");
+  const[busca,setBusca]=useState("");
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const r=await apiFetch("/alteracoes-formulario");
+      setRegs(r.data||[]);
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const q=busca.trim().toLowerCase();
+  const filtrados=q
+    ?regs.filter(r=>(r.cliente||"").toLowerCase().includes(q)||String(r.pedido_id||"").includes(q)||(r.executor||"").toLowerCase().includes(q))
+    :regs;
+
+  return(
+    <div style={{padding:24}}>
+      <PageH title="Alterações de Formulário" sub={`${regs.length} registro${regs.length!==1?"s":""} de alteração`} onRefresh={carregar} refreshing={loading}/>
+
+      <div style={{position:"relative",marginBottom:16,maxWidth:420}}>
+        <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido ou executor..."
+          style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando registros...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {erro}</div>}
+
+      {!loading&&filtrados.length===0
+        ?<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
+          {q?"Nenhum registro encontrado.":"Nenhuma alteração de formulário registrada ainda."}
+        </div>
+        :filtrados.map((r,i)=>{
+          const det=r.detalhes||{};
+          return(
+            <Card key={r.id||i} style={{marginBottom:10,borderLeft:`4px solid #b45309`}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
+                    <span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>
+                    {r.pedido_id&&<span style={{...F.body,fontWeight:700,fontSize:14}}>PED-{r.pedido_id}</span>}
+                  </div>
+                  <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{r.cliente||"—"}</div>
+                  {(det.etapaOrigem||det.voltouPara)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginBottom:6,display:"flex",alignItems:"center",gap:6}}>
+                    <span>{det.etapaOrigem||"—"}</span><Ic n="arrow" s={12} c={C.gray400}/><strong style={{color:"#b45309"}}>{det.voltouPara||"—"}</strong>
+                  </div>}
+                  <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",marginTop:4}}>
+                    <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo</div>
+                    <div style={{...F.body,fontSize:13,color:C.gray700}}>{det.motivo||"—"}</div>
+                  </div>
+                </div>
+                <div style={{textAlign:"right",...F.body,fontSize:11,color:C.gray500,flexShrink:0}}>
+                  <div style={{fontWeight:600,color:C.gray700}}>{r.executor||"Sistema"}</div>
+                  <div>{r.criado_em?fmtD(r.criado_em):""}</div>
+                </div>
+              </div>
+            </Card>
+          );
+        })
+      }
+    </div>
+  );
+}
+
 function Usuarios(){
   const[users,setUsers]=useState([]);
   const[loading,setLoading]=useState(true);
@@ -2263,6 +2430,20 @@ function AppInner(){
         if(res.error) throw new Error(res.error);
       }
 
+      // ── ALTERAÇÃO DE FORMULÁRIO (pós-venda) ────────────────────────────────────
+      else if(tipo==="alteracao_formulario"){
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        const stageDestino=ETAPA_STAGE_ID[payload.novaEtapa];
+        if(!stageDestino) throw new Error("Etapa de destino inválida.");
+        const res=await apiFetch(`/alteracao-formulario/${bordadoId}`,"PATCH",{
+          novaEtapa:stageDestino,
+          motivo:payload.motivo,
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
+        resultMsg="Alteração de formulário registrada. Pedido retornado para "+payload.novaEtapa+".";
+      }
+
       // ── APROVAR AMOSTRA (pós-venda) ────────────────────────────────────────────
       else if(tipo==="aprovar_amostra"){
         const next=o.etapa==="Aprovação de Amostra Digital"?"Amostra Física":"Liberado para bordar";
@@ -2350,7 +2531,7 @@ function AppInner(){
     pedidos:"Todos os Pedidos",direcionamento:"Direcionamento",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",sla:"Configurar SLA",usuarios:"Usuários",
+    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",sla:"Configurar SLA",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
@@ -2382,6 +2563,7 @@ function AppInner(){
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
+            {page==="alteracoes_form"&&<AlteracoesFormList/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
