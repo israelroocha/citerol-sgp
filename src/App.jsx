@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.9.0";
+const SGP_VERSION = "v2.1.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -203,6 +203,14 @@ function useIsMobile(){
 const fmtD=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
 const fmtDS=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
 const fmtR=(v)=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2});
+// Formata duração em minutos -> "2h 15min" / "45min" / "3d 4h"
+const fmtDur=(min)=>{
+  if(min==null)return null;
+  if(min<1)return "menos de 1min";
+  const d=Math.floor(min/1440),h=Math.floor((min%1440)/60),m=min%60;
+  const p=[];if(d)p.push(d+"d");if(h)p.push(h+"h");if(m&&!d)p.push(m+"min");
+  return p.join(" ")||"0min";
+};
 const hrsIn=(at)=>(Date.now()-new Date(at).getTime())/3600000;
 function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
@@ -527,27 +535,40 @@ function Chat({order,me,onSend}){
 }
 
 function Timeline({order}){
+  // Usa o histórico real vindo do HubSpot (registra todas as mudanças,
+  // inclusive reversões manuais). Fallback para o timeline local antigo.
+  const hist=(order.historico&&order.historico.length>0)
+    ? order.historico
+    : (order.timeline||[]).map(t=>({stage:t.stage,who:t.user,enteredAt:t.enteredAt,exitedAt:t.exitedAt,durMin:t.dH!=null?Math.round(t.dH*60):null,origem:""}));
+
+  if(hist.length===0)return <div style={{padding:40,textAlign:"center",...F.body,color:C.gray400,fontSize:13}}>Nenhum histórico de etapas registrado.</div>;
+
   return(
     <div style={{padding:20}}>
-      {order.timeline.map((t,i)=>{const act=t.ex===null;return(
+      {hist.map((t,i)=>{
+        const act=i===hist.length-1; // última = etapa atual (em andamento)
+        return(
         <div key={i} style={{display:"flex",gap:14,marginBottom:22,position:"relative"}}>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
             <div style={{width:28,height:28,borderRadius:"50%",background:act?C.red:C.green,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1}}>
               <Ic n={act?"up":"check"} s={12} c={C.white}/>
             </div>
-            {i<order.timeline.length-1&&<div style={{width:1,flex:1,background:C.gray200,marginTop:4,minHeight:16}}/>}
+            {i<hist.length-1&&<div style={{width:1,flex:1,background:C.gray200,marginTop:4,minHeight:16}}/>}
           </div>
           <div style={{flex:1,paddingTop:4}}>
-            <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:4}}>
+            <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:4,alignItems:"center"}}>
               <span style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{t.stage}</span>
-              {act&&<Tag label="Em andamento" color={C.red}/>}
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                {t.origem&&<Tag label={t.origem} color={t.origem==="Bordado"?C.purple:C.teal}/>}
+                {act&&<Tag label="Em andamento" color={C.red}/>}
+              </div>
             </div>
-            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>{t.user}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>Por: {t.who||"Sistema"}</div>
             <div style={{...F.body,fontSize:11,color:C.gray600,marginTop:3}}>
               Entrada: {fmtD(t.enteredAt)}{t.exitedAt&&<> · Saída: {fmtD(t.exitedAt)}</>}
-              {t.dH!=null&&<> · <strong style={{color:t.dH>24?C.red:C.green}}>{t.dH.toFixed(1)}h</strong></>}
-              {t.dH==null&&act&&<> · <strong style={{color:C.amber}}>Em andamento</strong></>}
             </div>
+            {t.durMin!=null&&<div style={{...F.body,fontSize:11,marginTop:2}}>Permaneceu: <strong style={{color:t.durMin>1440?C.red:C.green}}>{fmtDur(t.durMin)}</strong></div>}
+            {t.durMin==null&&act&&<div style={{...F.body,fontSize:11,marginTop:2,color:C.amber,fontWeight:600}}>Em andamento</div>}
           </div>
         </div>
       );})}
@@ -981,19 +1002,33 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             </div>
             <Card>
               <SecH>Tempo por etapa</SecH>
-              <table style={{width:"100%",fontSize:12,borderCollapse:"collapse"}}>
-                <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Responsável","Tempo","SLA","Status"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{hd}</th>)}</tr></thead>
-                <tbody>{order.timeline.map((t,i)=>{
-                  const sl=slaCfg[t.stage];const st=t.dH==null?"em andamento":sl&&t.dH>sl?"atrasado":sl&&t.dH>sl*.8?"risco":"ok";
-                  return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                    <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{t.stage}</td>
-                    <td style={{padding:"8px 10px",color:C.gray500,...F.body}}>{t.user}</td>
-                    <td style={{padding:"8px 10px",fontWeight:700,color:st==="atrasado"?C.red:st==="risco"?C.amber:C.green,...F.body}}>{t.dH!=null?`${t.dH.toFixed(1)}h`:<em>Em andamento</em>}</td>
-                    <td style={{padding:"8px 10px",color:C.gray400,...F.body}}>{sl?`${sl}h`:"—"}</td>
-                    <td style={{padding:"8px 10px"}}><Tag label={st==="em andamento"?"Andamento":st==="atrasado"?"Atrasado":st==="risco"?"Em risco":"OK"} color={st==="atrasado"?C.red:st==="risco"?C.amber:st==="em andamento"?C.blue:C.green}/></td>
-                  </tr>);
-                })}</tbody>
-              </table>
+              {(()=>{
+                const hist=(order.historico&&order.historico.length>0)
+                  ? order.historico
+                  : (order.timeline||[]).map(t=>({stage:t.stage,who:t.user,enteredAt:t.enteredAt,exitedAt:t.exitedAt,durMin:t.dH!=null?Math.round(t.dH*60):null}));
+                if(hist.length===0)return <div style={{...F.body,color:C.gray400,fontSize:13,padding:"8px 0"}}>Nenhum histórico registrado.</div>;
+                return(
+                <div style={{overflowX:"auto"}}>
+                <table style={{width:"100%",fontSize:12,borderCollapse:"collapse",minWidth:560}}>
+                  <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Responsável","Entrada","Saída","Permaneceu","Status"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,whiteSpace:"nowrap"}}>{hd}</th>)}</tr></thead>
+                  <tbody>{hist.map((t,i)=>{
+                    const act=i===hist.length-1;
+                    const sl=slaCfg[t.stage];
+                    const durH=t.durMin!=null?t.durMin/60:null;
+                    const st=durH==null?"andamento":sl&&durH>sl?"atrasado":sl&&durH>sl*.8?"risco":"ok";
+                    return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                      <td style={{padding:"8px 10px",fontWeight:600,...F.body,whiteSpace:"nowrap"}}>{t.stage}</td>
+                      <td style={{padding:"8px 10px",color:C.gray500,...F.body,whiteSpace:"nowrap"}}>{t.who||"Sistema"}</td>
+                      <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{fmtD(t.enteredAt)}</td>
+                      <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{t.exitedAt?fmtD(t.exitedAt):"—"}</td>
+                      <td style={{padding:"8px 10px",fontWeight:700,color:st==="atrasado"?C.red:st==="risco"?C.amber:C.green,...F.body,whiteSpace:"nowrap"}}>{durH!=null?fmtDur(t.durMin):<em>Em andamento</em>}</td>
+                      <td style={{padding:"8px 10px"}}><Tag label={st==="andamento"?"Andamento":st==="atrasado"?"Atrasado":st==="risco"?"Em risco":"OK"} color={st==="atrasado"?C.red:st==="risco"?C.amber:st==="andamento"?C.blue:C.green}/></td>
+                    </tr>);
+                  })}</tbody>
+                </table>
+                </div>
+                );
+              })()}
             </Card>
           </div>}
           {/* BORDADO */}
@@ -1007,33 +1042,16 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
               <SecH>Arquivos DTF / Silk</SecH>
               <ArquivosBox fileIds={order.arquivoDtfsilk} emptyText="Nenhum arquivo DTF/Silk."/>
             </div>:null}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
-              {[["Pontos",order.bordado.pts.toLocaleString()],["Arquivo",order.bordado.arq],["Arquivo aprovado",order.bordado.arqOk?"Sim":"Não"],["Cores",order.bordado.cores.join(", ")]].map(([k,v])=>(
-                <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
-                  <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
-                  <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{v}</div>
-                </div>
-              ))}
+            {/* Amostra digital aprovada */}
+            <div>
+              <SecH>Amostra Digital Aprovada</SecH>
+              <ArquivosBox fileIds={order.arqAmostraDigital?[order.arqAmostraDigital]:[]} emptyText="Nenhuma amostra digital anexada ainda."/>
             </div>
-            {[["Amostras Digitais","amDig","amDigObs","monitor"],["Amostras Físicas","amFis","amFisObs","scissors"]].map(([title,key,obsKey,ico])=>(
-              <div key={key}>
-                <SecH>{title}</SecH>
-                {order.bordado[key].length===0?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhuma registrada.</div>
-                  :order.bordado[key].map((a,i)=>(
-                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:6,padding:"10px 14px",marginBottom:8,border:`1px solid ${C.gray200}`,flexWrap:"wrap"}}>
-                      <Ic n={ico} s={18} c={C.gray400}/>
-                      <div style={{flex:1,minWidth:100}}>
-                        <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{a.nome}</div>
-                        <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:1}}>{a.data}</div>
-                      </div>
-                      <Tag label={a.ok?"Aprovada":"Pendente"} color={a.ok?C.green:C.amber}/>
-                      <Btn label="Baixar" icon="download" variant="secondary" size="sm"/>
-                    </div>
-                  ))
-                }
-                {order.bordado[obsKey]&&<div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>Obs: {order.bordado[obsKey]}</div>}
-              </div>
-            ))}
+            {/* Amostra física aprovada */}
+            <div>
+              <SecH>Amostra Física Aprovada</SecH>
+              <ArquivosBox fileIds={order.arqAmostraFisica?[order.arqAmostraFisica]:[]} emptyText="Nenhuma amostra física anexada ainda."/>
+            </div>
           </div>}
           {/* PEÇAS */}
           {tab==="itens"&&<div style={{padding:20,overflowX:"auto"}}>
@@ -1173,7 +1191,7 @@ function MinhasDemandas({user,orders,onOpen,slaCfg}){
 }
 
 // ─── DIRECIONAMENTO (COMPLETO) ────────────────────────────────────────────────
-function Direcionamento({orders,setOrders,onOpen,slaCfg}){
+function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const [loading,setLoading]=useState(false);
   const [loadError,setLoadError]=useState(null);
   const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
@@ -1199,6 +1217,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
             alertas:o.alertas||[],concluido:false,
             bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
             arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
+            historico:o.historico||[],
             items:(o.items||[]).map(it=>({
               id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
               dest:it.direcionamento?it.direcionamento.toLowerCase():null,
@@ -1274,6 +1293,15 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       const res=await apiFetch(`/direcionamento/${ordem.posvendaId}`,"PATCH",{
         bordadoId:ordem.bordadoId,
         destinos:destinos,
+        ctx:{
+          executor:user?.nome||user?.name||"Sistema",
+          executorEmail:user?.email||"",
+          vendasId:ordem.vendasId||null,
+          posvendaId:ordem.posvendaId||null,
+          bordadoId:ordem.bordadoId||null,
+          cliente:ordem.client||"",
+          etapa:"Direcionamento",
+        },
       });
       if(res.error) throw new Error(res.error);
       setConfirmed(prev=>({...prev,[oid]:true}));
@@ -1749,6 +1777,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
             motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
             reprogramacao:o.reprogramacao||false,
+            historico:o.historico||[],
+            arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
@@ -2168,6 +2198,16 @@ function AppInner(){
     const o = sel && sel.id===orderId ? sel : null;
     if(!o){ setSel(null); return; }
     let resultMsg="";
+    // Contexto enviado em toda ação (executor + IDs) para nota e Supabase
+    const ctx={
+      executor:user?.nome||user?.name||"Sistema",
+      executorEmail:user?.email||"",
+      vendasId:o.vendasId||null,
+      posvendaId:o.posvendaId||null,
+      bordadoId:o.bordadoId||null,
+      cliente:o.client||"",
+      etapa:o.etapa||"",
+    };
 
     const bordadoId = o.bordadoId;
 
@@ -2178,6 +2218,7 @@ function AppInner(){
           await apiFetch(`/direcionamento/${o.posvendaId}`,"PATCH",{
             bordadoId:o.bordadoId,
             destinos:payload.destinos,
+            ctx,
           });
         }
       }
@@ -2199,6 +2240,7 @@ function AppInner(){
           fileName:payload.fileName,
           novaEtapa:ETAPA_STAGE_ID[next],
           nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
+          ctx,
         });
         if(res.error) throw new Error(res.error);
       }
@@ -2207,7 +2249,7 @@ function AppInner(){
       else if(tipo==="aprovar_amostra"){
         const next=o.etapa==="Aprovação de Amostra Digital"?"Amostra Física":"Liberado para bordar";
         if(bordadoId&&ETAPA_STAGE_ID[next]){
-          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`});
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`,ctx});
         }
       }
 
@@ -2226,6 +2268,7 @@ function AppInner(){
             propMotivo:propMotivo,
             motivo:payload.obs||"",
             novaEtapa:ETAPA_STAGE_ID[volta],
+            ctx,
           });
         }
       }
@@ -2235,7 +2278,7 @@ function AppInner(){
         if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
         // O lado depende de qual fila/etapa o operador está
         const lado=payload.lado||(o.etapa==="Bordado Externo"?"externo":"interno");
-        const res=await apiFetch(`/concluir-bordado/${bordadoId}`,"PATCH",{lado});
+        const res=await apiFetch(`/concluir-bordado/${bordadoId}`,"PATCH",{lado,ctx});
         if(res.error) throw new Error(res.error);
         // Monta a mensagem de retorno conforme o resultado
         if(res.totalmenteConcluido){
@@ -2256,7 +2299,7 @@ function AppInner(){
           "Faturamento":"1377587762", // Faturado
         };
         const novaEtapa=stageMap[o.etapa];
-        await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`});
+        await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`,ctx});
         resultMsg=o.etapa==="Expedição"
           ?"Pedido enviado para Faturamento."
           :"Pedido faturado! Processo de pós-venda concluído.";
@@ -2267,7 +2310,7 @@ function AppInner(){
         const nextMap={};
         const next=nextMap[o.etapa]||o.etapa;
         if(bordadoId&&ETAPA_STAGE_ID[next]){
-          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`});
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`,ctx});
         }
       }
 
@@ -2310,7 +2353,7 @@ function AppInner(){
             {page==="historico"&&<Historico hist={HIST} onOpen={setSel}/>}
             {page==="ranking"&&<Ranking hist={HIST}/>}
             {page==="pedidos"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg}/>}
+            {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
             {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
