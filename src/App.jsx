@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.5.1";
+const SGP_VERSION = "v1.6.0";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -1154,6 +1154,9 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
   const carregarDir=()=>{
     setLoading(true);
     setLoadError(null);
+    setConfirmed({});
+    setDestMap({});
+    setSel({});
     apiFetch("/direcionamento")
       .then(res=>{
         if(res.success){
@@ -2258,8 +2261,8 @@ function AppInner(){
             {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
             {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
-            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/etapa-bordado/1377706615" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
-            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/etapa-bordado/1377887842" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
