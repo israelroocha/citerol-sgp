@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.3.1";
+const SGP_VERSION = "v2.5.1";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -213,6 +213,46 @@ const fmtDur=(min)=>{
   const p=[];if(d)p.push(d+"d");if(h)p.push(h+"h");if(m&&!d)p.push(m+"min");
   return p.join(" ")||"0min";
 };
+
+// ─── PRIORIDADE: ordena pela DATA DE VENCIMENTO do pedido ─────────────────────
+// Quanto mais próxima a data de vencimento, maior a prioridade (vem primeiro).
+// Por enquanto usamos prazoFinal como vencimento; quando a regra definitiva da
+// data de vencimento for criada, basta trocar dataVencimento() abaixo.
+const dataVencimento=(o)=>o.dataVencimento||o.prazoFinal||null;
+const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
+  const da=dataVencimento(a), db=dataVencimento(b);
+  if(!da&&!db)return 0;
+  if(!da)return 1;          // sem data vai para o fim
+  if(!db)return -1;
+  return new Date(da)-new Date(db); // mais cedo primeiro
+});
+
+// Normaliza um card cru do Worker para o formato que o modal/cards esperam
+const normalizarCard=(o,etapa)=>({
+  id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+  client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
+  cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
+  obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+  condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
+  arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+  motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
+  reprogramacao:o.reprogramacao||false,
+  historico:o.historico||[],
+  houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+  temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+  prazoFinal:o.prazoFinal||null,
+  etapa:o.etapa||etapa,amOk:false,sepOk:true,
+  entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+  alertas:o.alertas||[],concluido:false,
+  bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+  items:(o.items||[]).map(it=>({
+    id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
+    qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+    status:"separado",
+  })),
+  timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+  chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
+});
 const hrsIn=(at)=>(Date.now()-new Date(at).getTime())/3600000;
 function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
@@ -1059,6 +1099,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
               <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black}}>{order.id}</span>
               <ETag etapa={order.etapa}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
+              {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
               {(sla.st!=="ok"||sla.ft!=="ok")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
             </div>
             <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:3,fontWeight:600}}>{order.client}</div>
@@ -1263,8 +1304,8 @@ function MinhasDemandas({user,orders,onOpen,slaCfg}){
   const etapas=user.admin
     ? Object.values(MODULO_ETAPA).filter(Boolean)
     : (user.modulos||[]).map(m=>MODULO_ETAPA[m]).filter(Boolean);
-  const mine=orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido);
-  const grouped={};etapas.forEach(e=>{grouped[e]=mine.filter(o=>o.etapa===e);});
+  const mine=ordenarPorPrioridade(orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido));
+  const grouped={};etapas.forEach(e=>{grouped[e]=ordenarPorPrioridade(mine.filter(o=>o.etapa===e));});
   const active=etapas.filter(e=>grouped[e].length>0);
   const semAm=mine.filter(o=>!o.amOk);
   const atrasados=mine.filter(o=>getSLA(o,slaCfg).st==="late");
@@ -1341,7 +1382,8 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
             arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
             historico:o.historico||[],
-            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
             items:(o.items||[]).map(it=>({
               id:it.id,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
               dest:it.direcionamento?it.direcionamento.toLowerCase():null,
@@ -1595,32 +1637,203 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
 }
 
 // ─── DASHBOARD ───────────────────────────────────────────────────────────────
-function Dashboard({orders,onOpen,slaCfg}){
-  const atrasados=orders.filter(o=>!o.concluido&&getSLA(o,slaCfg).st==="late");
-  const semAm=orders.filter(o=>!o.amOk&&!o.concluido);
+// Opções de Centro de Custo (da propriedade do HubSpot)
+const CENTRO_OPTIONS=[
+  {value:"27",label:"27 - Corporativo"},
+  {value:"10 - Concessionária",label:"10 - Concessionária"},
+  {value:"31 - B2B",label:"31 - B2B"},
+  {value:"03 - Licitação",label:"03 - Licitação"},
+  {value:"29 - Comercial Diretoria",label:"29 - Comercial Diretoria"},
+];
+// Etapas em aberto, na ordem do funil, com endpoint
+const ABERTO_ETAPAS=[
+  {nome:"Direcionamento",endpoint:"/direcionamento"},
+  {nome:"Programação",endpoint:"/programacao"},
+  {nome:"Amostra Digital",endpoint:"/amostra-digital"},
+  {nome:"Aprovação de Amostra Digital",endpoint:"/aprovacao-amostra-digital"},
+  {nome:"Amostra Física",endpoint:"/amostra-fisica"},
+  {nome:"Aprovação de Amostra Física",endpoint:"/aprovacao-amostra-fisica"},
+  {nome:"Bordado Interno",endpoint:"/bordado-interno"},
+  {nome:"Bordado Externo",endpoint:"/bordado-externo"},
+  {nome:"Expedição",endpoint:"/expedicao"},
+  {nome:"Faturamento",endpoint:"/faturamento"},
+];
+
+function Dashboard({onOpen,slaCfg}){
+  const [grupo,setGrupo]=useState("aberto");   // aberto | finalizados
+  const [centro,setCentro]=useState("");
+  const [bordadoF,setBordadoF]=useState("");   // "" | com | sem
+  const [busca,setBusca]=useState("");
+  const [aberto,setAberto]=useState(null);     // array de pedidos em aberto
+  const [rel,setRel]=useState(null);           // relatórios de finalizados
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      // Em aberto: carrega todos os endpoints de etapa em paralelo
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>(r.data||[]).map(o=>normalizarCard(o,e.nome))).catch(()=>[]))
+      );
+      setAberto(resultados.flat());
+      // Finalizados: relatórios do Supabase
+      const r=await apiFetch("/relatorios"+montarQuery()).catch(()=>null);
+      setRel(r);
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]); // recarrega manualmente ou ao trocar centro (abaixo)
+  const montarQuery=()=>{
+    const p=[];
+    if(centro)p.push("centro="+encodeURIComponent(centro));
+    if(bordadoF)p.push("bordado="+bordadoF);
+    return p.length?"?"+p.join("&"):"";
+  };
+  useEffect(()=>{ if(grupo==="finalizados"){ apiFetch("/relatorios"+montarQuery()).then(setRel).catch(()=>{}); } },[centro,bordadoF,grupo]);
+
+  // Filtros aplicados ao "em aberto"
+  const q=busca.trim().toLowerCase();
+  const abertoFiltrado=(aberto||[]).filter(o=>{
+    if(centro&&o.centroCusto!==centro)return false;
+    if(bordadoF==="com"&&o.temBordado===false)return false;
+    if(bordadoF==="sem"&&o.temBordado!==false)return false;
+    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const agora=Date.now();
+  const isAtrasado=o=>o.prazoFinal&&new Date(o.prazoFinal).getTime()<agora;
+  const totalAberto=abertoFiltrado.length;
+  const totalAtrasado=abertoFiltrado.filter(isAtrasado).length;
+  const totalNoPrazo=totalAberto-totalAtrasado;
+  // Por etapa
+  const porEtapa=ABERTO_ETAPAS.map(e=>{
+    const ords=ordenarPorPrioridade(abertoFiltrado.filter(o=>o.etapa===e.nome));
+    return {etapa:e.nome,total:ords.length,atrasados:ords.filter(isAtrasado).length,ords};
+  }).filter(s=>s.total>0);
+
   return(
-    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Dashboard" sub="Visão geral de todos os pedidos ativos"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-        <Stat label="Pedidos Ativos" value={orders.filter(o=>!o.concluido).length} icon="list"/>
-        <Stat label="Atrasados" value={atrasados.length} color={C.red} icon="warn"/>
-        <Stat label="Sem Amostra" value={semAm.length} color={C.amber} icon="clock"/>
-        <Stat label="P/ Faturar" value={orders.filter(o=>o.etapa==="Faturamento").length} color={C.green} icon="dollar"/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Dashboard" sub="Visão geral de pedidos em aberto e finalizados" onRefresh={carregar} refreshing={loading}/>
+
+      {/* Alternância de grupo */}
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {[["aberto","Pedidos em Aberto"],["finalizados","Pedidos Finalizados"]].map(([id,lbl])=>(
+          <button key={id} onClick={()=>setGrupo(id)}
+            style={{padding:"9px 18px",borderRadius:8,border:`1.5px solid ${grupo===id?C.red:C.gray200}`,background:grupo===id?C.red:C.white,color:grupo===id?C.white:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:700}}>
+            {lbl}
+          </button>
+        ))}
       </div>
-      {atrasados.length>0&&<div>
-        <div style={{display:"flex",alignItems:"center",gap:8,background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12}}>
-          <Ic n="warn" s={15} c={C.red}/><span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>PEDIDOS ATRASADOS</span>
-        </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {atrasados.map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
-        </div>
-      </div>}
-      <div>
-        <SecH>Todos os pedidos ativos</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {orders.filter(o=>!o.concluido).map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
-        </div>
+
+      {/* Filtros */}
+      <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <select value={centro} onChange={e=>setCentro(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:200}}>
+          <option value="">Todos os centros de custo</option>
+          {CENTRO_OPTIONS.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <select value={bordadoF} onChange={e=>setBordadoF(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:160}}>
+          <option value="">Com e sem bordado</option>
+          <option value="com">Somente com bordado</option>
+          <option value="sem">Somente sem bordado</option>
+        </select>
+        {grupo==="aberto"&&<div style={{position:"relative",flex:1,minWidth:200,maxWidth:340}}>
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente ou código..."
+            style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px 9px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+        </div>}
       </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {/* ───── GRUPO: EM ABERTO ───── */}
+      {grupo==="aberto"&&!loading&&<>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+          <Stat label="Pedidos em aberto" value={totalAberto} icon="list"/>
+          <Stat label="No prazo" value={totalNoPrazo} color={C.green} icon="check"/>
+          <Stat label="Atrasados" value={totalAtrasado} color={C.red} icon="warn"/>
+        </div>
+        <Card>
+          <SecH>Pedidos por etapa</SecH>
+          {porEtapa.length===0?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido em aberto.</div>
+          :<div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {porEtapa.map(s=>{
+              const c=STAGE_COLOR[s.etapa]||C.gray400;
+              const pctAtraso=s.total?Math.round((s.atrasados/s.total)*100):0;
+              return(
+                <div key={s.etapa} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 0",borderBottom:`1px solid ${C.gray100}`}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:c,flexShrink:0}}/>
+                  <div style={{flex:1,minWidth:0,...F.body,fontSize:13,fontWeight:600,color:C.black}}>{s.etapa}</div>
+                  {/* barra */}
+                  <div style={{flex:2,minWidth:80,height:8,background:C.gray100,borderRadius:4,overflow:"hidden",display:"flex"}}>
+                    <div style={{width:`${100-pctAtraso}%`,background:C.green,height:"100%"}}/>
+                    <div style={{width:`${pctAtraso}%`,background:C.red,height:"100%"}}/>
+                  </div>
+                  <div style={{...F.body,fontSize:12,color:C.gray600,whiteSpace:"nowrap",minWidth:90,textAlign:"right"}}>
+                    <strong style={{color:C.black}}>{s.total}</strong> total
+                    {s.atrasados>0&&<span style={{color:C.red,fontWeight:700}}> · {s.atrasados} atrasado{s.atrasados>1?"s":""}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>}
+        </Card>
+        {totalAtrasado>0&&<div>
+          <div style={{display:"flex",alignItems:"center",gap:8,background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12}}>
+            <Ic n="warn" s={15} c={C.red}/><span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>PEDIDOS ATRASADOS ({totalAtrasado})</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+            {ordenarPorPrioridade(abertoFiltrado.filter(isAtrasado)).map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+          </div>
+        </div>}
+      </>}
+
+      {/* ───── GRUPO: FINALIZADOS ───── */}
+      {grupo==="finalizados"&&!loading&&<>
+        {!rel?<div style={{...F.body,color:C.gray400,fontSize:13}}>Carregando relatórios...</div>:<>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+            <Stat label="Total faturados" value={rel.totais?.faturados||0} icon="dollar"/>
+            <Stat label="Faturados com atraso" value={rel.totais?.faturadosAtrasados||0} color={C.red} icon="warn"/>
+            <Stat label="% em atraso" value={(rel.totais?.pctAtraso||0)+"%"} color={(rel.totais?.pctAtraso||0)>20?C.red:C.amber} icon="clock"/>
+          </div>
+
+          <Card>
+            <SecH>SLA médio por etapa</SecH>
+            {(!rel.slaPorEtapa||rel.slaPorEtapa.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Sem dados suficientes ainda. As médias aparecem conforme os pedidos são executados.</div>
+            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Tempo médio","Execuções"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+              <tbody>{rel.slaPorEtapa.map((s,i)=>(
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{s.etapa}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,color:C.black,...F.body}}>{fmtDur(s.mediaMin)}</td>
+                  <td style={{padding:"8px 10px",color:C.gray500,...F.body}}>{s.qtd}</td>
+                </tr>
+              ))}</tbody>
+            </table>}
+          </Card>
+
+          <Card>
+            <SecH>Faturados por mês</SecH>
+            {(!rel.faturadosPorMes||rel.faturadosPorMes.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido faturado registrado ainda.</div>
+            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Mês","Faturados","Em atraso","% atraso"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+              <tbody>{rel.faturadosPorMes.map((m,i)=>{
+                const [y,mo]=m.mes.split("-");
+                const label=mo?`${mo}/${y}`:m.mes;
+                return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{label}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{m.total}</td>
+                  <td style={{padding:"8px 10px",color:m.atrasados>0?C.red:C.gray500,fontWeight:m.atrasados>0?700:400,...F.body}}>{m.atrasados}</td>
+                  <td style={{padding:"8px 10px",color:m.pctAtraso>20?C.red:C.gray600,...F.body}}>{m.pctAtraso}%</td>
+                </tr>);
+              })}</tbody>
+            </table>}
+          </Card>
+        </>}
+      </>}
     </div>
   );
 }
@@ -1847,13 +2060,68 @@ function Ranking({hist}){
 
 // ─── SLA CONFIG ──────────────────────────────────────────────────────────────
 function SLAConfig({slaCfg,onSave}){
-  const[local,setLocal]=useState({...slaCfg});const[saved,setSaved]=useState(false);
-  const save=()=>{onSave(local);setSaved(true);setTimeout(()=>setSaved(false),2000);};
+  const[local,setLocal]=useState({...slaCfg});
+  const[prazoCom,setPrazoCom]=useState(15);
+  const[prazoSem,setPrazoSem]=useState(7);
+  const[saved,setSaved]=useState(false);
+  const[saving,setSaving]=useState(false);
+  const[loading,setLoading]=useState(true);
+
+  // Carrega a config persistida do Worker (KV)
+  useEffect(()=>{
+    apiFetch("/config-sla").then(r=>{
+      if(r.success&&r.config){
+        if(r.config.etapas)setLocal(prev=>({...prev,...r.config.etapas}));
+        if(r.config.prazoComBordado!=null)setPrazoCom(r.config.prazoComBordado);
+        if(r.config.prazoSemBordado!=null)setPrazoSem(r.config.prazoSemBordado);
+      }
+    }).catch(()=>{}).finally(()=>setLoading(false));
+  },[]);
+
+  const save=async()=>{
+    setSaving(true);
+    try{
+      await apiFetch("/config-sla","PATCH",{etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem)});
+      onSave(local);
+      setSaved(true);setTimeout(()=>setSaved(false),2000);
+    }catch(e){alert("Erro ao salvar: "+e.message);}
+    finally{setSaving(false);}
+  };
+
   return(
-    <div style={{padding:24}}>
-      <PageH title="Configurar SLA" sub="Tempo máximo em horas para cada etapa do processo"/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Configurar SLA" sub="Tempo máximo por etapa e prazos de vencimento dos pedidos"/>
+
+      {/* Prazos de vencimento (data de vencimento do pedido) */}
       <Card>
-        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:20}}>Pedidos que ultrapassarem o tempo definido serão sinalizados como atrasados em todo o sistema.</div>
+        <SecH>Prazo de faturamento (data de vencimento)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:16}}>
+          Define a <strong>data de vencimento</strong> de cada pedido, usada para priorizar a ordem em todos os módulos. Para pedidos <strong>com bordado</strong>, o prazo é contado a partir da aprovação da amostra física. Para pedidos <strong>sem bordado</strong>, a partir da criação do pedido.
+        </div>
+        <div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Pedido com bordado</label>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <input type="number" value={prazoCom} onChange={e=>setPrazoCom(e.target.value)}
+                style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+              <span style={{...F.body,fontSize:12,color:C.gray400}}>dias</span>
+            </div>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Pedido sem bordado</label>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <input type="number" value={prazoSem} onChange={e=>setPrazoSem(e.target.value)}
+                style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+              <span style={{...F.body,fontSize:12,color:C.gray400}}>dias</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Tempo por etapa */}
+      <Card>
+        <SecH>Tempo máximo por etapa</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:20}}>Pedidos que ultrapassarem o tempo definido serão sinalizados como atrasados na etapa.</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:16}}>
           {Object.keys(SLA_DEF).map(e=>(
             <div key={e}>
@@ -1869,11 +2137,13 @@ function SLAConfig({slaCfg,onSave}){
             </div>
           ))}
         </div>
-        <div style={{marginTop:24,display:"flex",gap:10,alignItems:"center"}}>
-          <Btn label="Salvar configurações" icon="check" onClick={save}/>
-          {saved&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
-        </div>
       </Card>
+
+      <div style={{display:"flex",gap:10,alignItems:"center"}}>
+        <Btn label={saving?"Salvando...":"Salvar configurações"} icon="check" onClick={save}/>
+        {saved&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
+        {loading&&<span style={{...F.body,fontSize:12,color:C.gray400}}>Carregando config...</span>}
+      </div>
     </div>
   );
 }
@@ -1903,7 +2173,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             reprogramacao:o.reprogramacao||false,
             historico:o.historico||[],
             arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
-            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:o.etapa||etapa,amOk:false,sepOk:true,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
@@ -1949,6 +2220,9 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       return filtroSLA==="atrasados"?st==="late":filtroSLA==="risco"?st==="risk":st==="ok";
     });
   }
+
+  // Ordena por PRIORIDADE (data de vencimento mais próxima primeiro)
+  mine=ordenarPorPrioridade(mine);
 
   // Contadores para os chips de filtro
   const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
@@ -2008,6 +2282,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
+                    {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
                     {/* Badge de status */}
                     {finalizado
                       ?<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.green+"15",color:C.green,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
@@ -2020,6 +2295,10 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   </div>
                   <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
                   <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{fmtR(o.valor)} · {o.items.length} SKU{o.items.length!==1?"s":""} · {totalPecas} peça{totalPecas!==1?"s":""}</div>
+                  {!finalizado&&<div style={{...F.body,fontSize:11,color:o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray600):C.gray400,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
+                    <Ic n="clock" s={11} c={o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray500):C.gray300}/>
+                    {o.dataVencimento?<>Vence em {fmtDS(o.dataVencimento)}</>:"Vencimento ainda não definido"}
+                  </div>}
                   {!finalizado&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
                     <SLABar pct={sla.pct} st={sla.st}/>
                     <span style={{...F.body,fontSize:10,color:slaColor,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
@@ -2408,6 +2687,9 @@ function AppInner(){
       bordadoId:o.bordadoId||null,
       cliente:o.client||"",
       etapa:o.etapa||"",
+      prazoFinal:o.prazoFinal||null,
+      centroCusto:o.centroCusto||"",
+      temBordado:o.temBordado!==false,
     };
 
     const bordadoId = o.bordadoId;
