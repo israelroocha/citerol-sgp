@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v1.5.0";
+const SGP_VERSION = "v1.5.1";
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -1221,16 +1221,37 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
     const next={};itemSkus.forEach(s=>next[s]=dest);
     setDestMap(prev=>({...prev,[oid]:next}));
   };
-  const confirm=(oid,items)=>{
+  const confirm=async(oid,items)=>{
     const dm=destMap[oid]||{};
-    const allSet=items.every(it=>dm[it.sku]);
+    const allSet=items.every(it=>dm[it.id||it.sku]);
     if(!allSet){alert("Defina o destino (Interno/Externo) para todos os itens antes de confirmar.");return;}
-    setOrders(prev=>prev.map(o=>{
-      if(o.id!==oid)return o;
-      const newItems=o.items.map(it=>({...it,dest:dm[it.sku]||it.dest}));
-      return{...o,items:newItems,etapa:"Bordado Interno",etapaAt:new Date().toISOString()};
-    }));
-    setConfirmed(prev=>({...prev,[oid]:true}));
+
+    // Encontra o pedido para pegar bordadoId e posvendaId
+    const ordem=(hsOrders||[]).find(o=>o.id===oid);
+    if(!ordem||!ordem.bordadoId||!ordem.posvendaId){
+      alert("Pedido sem negócio de Bordado/Pós-venda associado.");return;
+    }
+
+    // Monta destinos por ID do objeto: { "<objetoId>": "Interno"|"Externo" }
+    const destinos={};
+    items.forEach(it=>{
+      const key=it.id||it.sku;
+      const val=dm[key];
+      if(val) destinos[it.id||it.sku]=val==="interno"?"Interno":"Externo";
+    });
+
+    try{
+      const res=await apiFetch(`/direcionamento/${ordem.posvendaId}`,"PATCH",{
+        bordadoId:ordem.bordadoId,
+        destinos:destinos,
+      });
+      if(res.error) throw new Error(res.error);
+      setConfirmed(prev=>({...prev,[oid]:true}));
+      // Recarrega após o HubSpot processar
+      setTimeout(()=>carregarDir(),1000);
+    }catch(e){
+      alert("Erro ao confirmar direcionamento: "+e.message);
+    }
   };
 
   return(
@@ -1273,11 +1294,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       <SecH>Prontos para direcionar — {prontos.length} pedido{prontos.length!==1?"s":""}</SecH>
       {prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando direcionamento.</div>}
       {prontos.map(o=>{
-        const skus=o.items.map(it=>it.sku);
+        const skus=o.items.map(it=>it.id||it.sku);
         const dm=destMap[o.id]||{};
         const sm=sel[o.id]||{};
         const nSel=skus.filter(s=>sm[s]).length;
-        const allDefined=o.items.every(it=>dm[it.sku]);
+        const allDefined=o.items.every(it=>dm[it.id||it.sku]);
         const isConfirmed=confirmed[o.id];
         const sla=getSLA(o,slaCfg);
         return(
@@ -1334,12 +1355,13 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
                   {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
                 </tr></thead>
                 <tbody>{o.items.map((it,idx)=>{
-                  const thisDest=(destMap[o.id]||{})[it.sku]||it.dest;
-                  const isSelected=(sel[o.id]||{})[it.sku]||false;
+                  const k=it.id||it.sku;
+                  const thisDest=(destMap[o.id]||{})[k]||it.dest;
+                  const isSelected=(sel[o.id]||{})[k]||false;
                   return(
                     <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:isSelected?C.red+"06":"transparent"}}>
                       <td style={{padding:"8px 10px"}}>
-                        <input type="checkbox" checked={isSelected} onChange={()=>toggleSel(o.id,it.sku)}
+                        <input type="checkbox" checked={isSelected} onChange={()=>toggleSel(o.id,k)}
                           style={{width:15,height:15,cursor:"pointer",accentColor:C.red}}/>
                       </td>
                       <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
@@ -1348,11 +1370,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
                       <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                       <td style={{padding:"8px 10px"}}>
                         <div style={{display:"flex",gap:5}}>
-                          <button onClick={()=>setDest(o.id,it.sku,"interno")}
+                          <button onClick={()=>setDest(o.id,k,"interno")}
                             style={{background:thisDest==="interno"?C.green:C.white,color:thisDest==="interno"?C.white:C.gray700,border:`1.5px solid ${thisDest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
                             Interno
                           </button>
-                          <button onClick={()=>setDest(o.id,it.sku,"externo")}
+                          <button onClick={()=>setDest(o.id,k,"externo")}
                             style={{background:thisDest==="externo"?C.purple:C.white,color:thisDest==="externo"?C.white:C.gray700,border:`1.5px solid ${thisDest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
                             Externo
                           </button>
