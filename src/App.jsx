@@ -2,7 +2,10 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.6.0";
+const SGP_VERSION = "v2.7.1";
+const BRASAO_SGP = "data:image/png;base64,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";
+const FAVICON_SGP = "data:image/png;base64,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";
+
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -228,7 +231,10 @@ const fmtDur=(min)=>{
 // Quanto mais próxima a data de vencimento, maior a prioridade (vem primeiro).
 // Por enquanto usamos prazoFinal como vencimento; quando a regra definitiva da
 // data de vencimento for criada, basta trocar dataVencimento() abaixo.
-const dataVencimento=(o)=>o.dataVencimento||o.prazoFinal||null;
+// Data limite (vencimento) do pedido — vem calculada do Worker.
+// COM bordado sem amostra aprovada => null (ainda não há prazo).
+// NÃO faz fallback para closedate (prazoFinal), que não reflete a regra.
+const dataVencimento=(o)=>o.dataVencimento||null;
 const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
   const da=dataVencimento(a), db=dataVencimento(b);
   if(!da&&!db)return 0;
@@ -291,8 +297,9 @@ function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
   const hrs=hrsIn(o.etapaAt);
   const pct=sla?hrs/sla:0;
-  const htd=(new Date(o.prazoFinal).getTime()-Date.now())/3600000;
-  return{sla,hrs,pct,htd,st:pct>=1?"late":pct>=0.8?"risk":"ok",ft:htd<0?"late":htd<24?"risk":"ok"};
+  const venc=dataVencimento(o);
+  const htd=venc?(new Date(venc).getTime()-Date.now())/3600000:null;
+  return{sla,hrs,pct,htd,venc,st:pct>=1?"late":pct>=0.8?"risk":"ok",ft:htd==null?"none":htd<0?"late":htd<24?"risk":"ok"};
 }
 
 // ─── BASE COMPONENTS ─────────────────────────────────────────────────────────
@@ -387,12 +394,12 @@ function SLABar({pct,st}){
   return <div style={{background:C.gray200,borderRadius:2,height:4,overflow:"hidden",flex:1}}><div style={{height:"100%",width:`${Math.min(pct*100,100)}%`,background:c,borderRadius:2}}/></div>;
 }
 
-function Stat({label,value,sub,color=C.black,icon}){
+function Stat({label,value,sub,color=C.black,icon,active}){
   return(
-    <Card style={{display:"flex",flexDirection:"column",gap:8}}>
+    <Card style={{display:"flex",flexDirection:"column",gap:8,...(active?{borderColor:color,boxShadow:`0 0 0 2px ${color}22`}:{})}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span style={{...F.body,fontSize:11,color:C.gray500,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.06em"}}>{label}</span>
-        <Ic n={icon} s={15} c={C.gray300}/>
+        <Ic n={icon} s={15} c={active?color:C.gray300}/>
       </div>
       <div style={{...F.title,fontSize:30,fontWeight:700,color,lineHeight:1}}>{value}</div>
       {sub&&<div style={{...F.body,fontSize:11,color:C.gray400}}>{sub}</div>}
@@ -445,13 +452,11 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
   return(
     <div style={{width:collapsed?56:240,background:C.white,borderRight:`1px solid ${C.gray200}`,display:"flex",flexDirection:"column",transition:"width 0.2s",overflow:"hidden",flexShrink:0}}>
       <div style={{padding:collapsed?"14px":"16px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",justifyContent:collapsed?"center":"space-between",minHeight:56,gap:8}}>
-        {!collapsed&&<div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:28,height:28,borderRadius:6,background:C.red,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <Ic n="needle" s={14} c={C.white}/>
-          </div>
+        {!collapsed&&<div style={{display:"flex",alignItems:"center",gap:9}}>
+          <img src={BRASAO_SGP} alt="SGP" style={{width:30,height:30,borderRadius:7,border:`1px solid ${C.gray200}`,flexShrink:0,display:"block"}}/>
           <div>
-            <div style={{...F.title,fontSize:13,fontWeight:700,color:C.black,letterSpacing:"0.12em"}}>CITEROL</div>
-            <div style={{...F.body,fontSize:9,color:C.gray400,letterSpacing:"0.04em",marginTop:1}}>PERSONALIZADOS</div>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.black,letterSpacing:"0.14em"}}>SGP</div>
+            <div style={{...F.body,fontSize:9,color:C.gray400,letterSpacing:"0.04em",marginTop:1}}>GESTÃO DE PERSONALIZADOS</div>
           </div>
         </div>}
         <button onClick={onToggle} style={{background:"none",border:`1px solid ${C.gray200}`,borderRadius:5,width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
@@ -1133,7 +1138,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
               <ETag etapa={order.etapa}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
-              {(sla.st!=="ok"||sla.ft!=="ok")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
+              {(sla.st==="late"||sla.st==="risk"||sla.ft==="late"||sla.ft==="risk")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
             </div>
             <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:3,fontWeight:600}}>{order.client}</div>
             <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor} · {total} peças · {fmtR(order.valor)}</div>
@@ -1156,7 +1161,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Prazo Final",fmtD(order.prazoFinal)],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Data limite",dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)"],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,wordBreak:"break-word"}}>{v}</div>
@@ -1183,14 +1188,17 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           {tab==="sla"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
               {[["SLA desta Etapa",sla.st,[`${sla.hrs.toFixed(0)}h`,`/ ${sla.sla}h`],sla.st==="late"?"Etapa ultrapassou o SLA":sla.st==="risk"?"Próximo do limite":"Dentro do SLA"],
-                ["Prazo Final",sla.ft,[sla.ft==="late"?`${Math.abs(sla.htd).toFixed(0)}h atraso`:`${sla.htd.toFixed(0)}h restantes`,""],sla.ft==="late"?"Pedido fora do prazo":sla.ft==="risk"?"Prazo muito próximo":"Dentro do prazo"]
+                ["Data limite",sla.ft==="none"?"none":sla.ft,
+                  sla.htd==null?["A definir",""]:[sla.ft==="late"?`${Math.abs(sla.htd).toFixed(0)}h atraso`:`${sla.htd.toFixed(0)}h restantes`,""],
+                  sla.htd==null?"Sem amostra aprovada — prazo ainda não inicia":sla.ft==="late"?"Pedido fora do prazo":sla.ft==="risk"?"Prazo muito próximo":"Dentro do prazo"]
               ].map(([title,st,vals,msg])=>{
-                const c=st==="late"?C.red:st==="risk"?C.amber:C.green;
+                const c=st==="late"?C.red:st==="risk"?C.amber:st==="none"?C.gray400:C.green;
                 return(
                   <Card key={title} style={{borderLeft:`3px solid ${c}`}}>
                     <SecH>{title}</SecH>
                     <div style={{...F.title,fontSize:26,fontWeight:700,color:c,lineHeight:1}}>{vals[0]} <span style={{fontSize:14,fontWeight:400,color:C.gray400}}>{vals[1]}</span></div>
                     {title==="SLA desta Etapa"&&<div style={{marginTop:8}}><SLABar pct={sla.pct} st={sla.st}/></div>}
+                    {title==="Data limite"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtD(dataVencimento(order))}</div>}
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:6}}>{msg}</div>
                   </Card>
                 );
@@ -1305,7 +1313,12 @@ function OCard({order,onClick,slaCfg}){
   const total=order.items.reduce((s,i)=>s+i.qty,0);
   const falt=order.items.filter(i=>i.status==="faltante").reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
-  const accent=sla.st==="late"||sla.ft==="late"?C.red:sla.st==="risk"||sla.ft==="risk"?C.amber:STAGE_COLOR[order.etapa]||C.gray300;
+  const venc=sla.venc;
+  const vencido=sla.ft==="late";
+  const risco=sla.ft==="risk";
+  // Cor da data limite: vermelho vencido, âmbar <24h, cinza ok, cinza claro indefinido
+  const corLimite=!venc?C.gray400:vencido?C.red:risco?C.amber:C.gray600;
+  const accent=vencido?C.red:risco?C.amber:STAGE_COLOR[order.etapa]||C.gray300;
   return(
     <div onClick={onClick} style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,padding:14,cursor:"pointer",borderLeft:`3px solid ${accent}`}}
       onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.07)";}}
@@ -1321,7 +1334,16 @@ function OCard({order,onClick,slaCfg}){
         <span style={{fontWeight:700,color:C.green}}>{fmtR(order.valor)}</span>
         <span>{total} peças</span>
         {falt>0&&<span style={{color:C.red,fontWeight:600}}>{falt} faltantes</span>}
-        {!order.amOk&&<span style={{color:C.amber,fontWeight:600}}>Sem amostra</span>}
+        {order.temBordado===false&&<span style={{color:C.gray500,fontWeight:600}}>Sem bordado</span>}
+      </div>
+      {/* DATA LIMITE em destaque */}
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 9px",borderRadius:6,marginBottom:8,
+        background:!venc?C.gray100:vencido?C.red+"12":risco?C.amber+"14":C.gray100,
+        border:`1px solid ${!venc?C.gray200:vencido?C.red+"35":risco?C.amber+"40":C.gray200}`}}>
+        <Ic n="clock" s={13} c={corLimite}/>
+        <span style={{...F.body,fontSize:11.5,fontWeight:700,color:corLimite}}>
+          {!venc?"Data limite a definir":vencido?`Vencido em ${fmtDS(venc)}`:`Vence em ${fmtDS(venc)}`}
+        </span>
       </div>
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <SLABar pct={sla.pct} st={sla.st}/>
@@ -1727,6 +1749,7 @@ function Dashboard({onOpen,slaCfg}){
   const [grupo,setGrupo]=useState("aberto");   // aberto | finalizados
   const [centro,setCentro]=useState("");
   const [bordadoF,setBordadoF]=useState("");   // "" | com | sem
+  const [statusF,setStatusF]=useState("todos");// todos | prazo | atraso
   const [busca,setBusca]=useState("");
   const [aberto,setAberto]=useState(null);     // array de pedidos em aberto
   const [rel,setRel]=useState(null);           // relatórios de finalizados
@@ -1804,10 +1827,16 @@ function Dashboard({onOpen,slaCfg}){
     return true;
   });
   const agora=Date.now();
-  const isAtrasado=o=>o.prazoFinal&&new Date(o.prazoFinal).getTime()<agora;
+  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
   const totalAberto=abertoFiltrado.length;
   const totalAtrasado=abertoFiltrado.filter(isAtrasado).length;
   const totalNoPrazo=totalAberto-totalAtrasado;
+  // Lista final conforme a situação escolhida
+  const listaSituacao=ordenarPorPrioridade(abertoFiltrado.filter(o=>{
+    if(statusF==="atraso")return isAtrasado(o);
+    if(statusF==="prazo")return !isAtrasado(o);
+    return true;
+  }));
   // Por etapa
   const porEtapa=ABERTO_ETAPAS.map(e=>{
     const ords=ordenarPorPrioridade(abertoFiltrado.filter(o=>o.etapa===e.nome));
@@ -1854,9 +1883,15 @@ function Dashboard({onOpen,slaCfg}){
       {/* ───── GRUPO: EM ABERTO ───── */}
       {grupo==="aberto"&&!loading&&<>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-          <Stat label="Pedidos em aberto" value={totalAberto} icon="list"/>
-          <Stat label="No prazo" value={totalNoPrazo} color={C.green} icon="check"/>
-          <Stat label="Atrasados" value={totalAtrasado} color={C.red} icon="warn"/>
+          <div onClick={()=>setStatusF("todos")} style={{cursor:"pointer"}}>
+            <Stat label="Pedidos em aberto" value={totalAberto} icon="list" active={statusF==="todos"}/>
+          </div>
+          <div onClick={()=>setStatusF("prazo")} style={{cursor:"pointer"}}>
+            <Stat label="No prazo" value={totalNoPrazo} color={C.green} icon="check" active={statusF==="prazo"}/>
+          </div>
+          <div onClick={()=>setStatusF("atraso")} style={{cursor:"pointer"}}>
+            <Stat label="Atrasados" value={totalAtrasado} color={C.red} icon="warn" active={statusF==="atraso"}/>
+          </div>
         </div>
         <Card>
           <SecH>Pedidos por etapa</SecH>
@@ -1883,13 +1918,22 @@ function Dashboard({onOpen,slaCfg}){
             })}
           </div>}
         </Card>
-        {totalAtrasado>0&&<div>
-          <div style={{display:"flex",alignItems:"center",gap:8,background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12}}>
-            <Ic n="warn" s={15} c={C.red}/><span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>PEDIDOS ATRASADOS ({totalAtrasado})</span>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-            {ordenarPorPrioridade(abertoFiltrado.filter(isAtrasado)).map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
-          </div>
+
+        {/* Filtro de situação + lista de pedidos */}
+        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+          {[["todos","Todos",totalAberto],["prazo","No prazo",totalNoPrazo],["atraso","Em atraso",totalAtrasado]].map(([id,lbl,n])=>{
+            const ativo=statusF===id;const cor=id==="atraso"?C.red:id==="prazo"?C.green:C.gray700;
+            return(
+              <button key={id} onClick={()=>setStatusF(id)}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${ativo?cor:C.gray200}`,background:ativo?cor+"12":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:ativo?700:500,color:ativo?cor:C.gray600}}>
+                {lbl}<span style={{background:ativo?cor:C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+              </button>
+            );
+          })}
+        </div>
+        {listaSituacao.length===0?<div style={{...F.body,color:C.gray400,fontSize:14,textAlign:"center",padding:40,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido nesta situação.</div>
+        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+          {listaSituacao.map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
         </div>}
       </>}
 
@@ -1960,6 +2004,116 @@ function Dashboard({onOpen,slaCfg}){
           </Card>
         </>}
       </>}
+    </div>
+  );
+}
+
+// ─── TODOS OS PEDIDOS (tela operacional: em aberto por fase) ──────────────────
+function TodosPedidos({onOpen,slaCfg}){
+  const [aberto,setAberto]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [busca,setBusca]=useState("");
+  const [centro,setCentro]=useState("");
+  const [bordadoF,setBordadoF]=useState("");    // "" | com | sem
+  const [statusF,setStatusF]=useState("todos");  // todos | prazo | atraso
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>(r.data||[]).map(o=>normalizarCard(o,e.nome))).catch(()=>[]))
+      );
+      setAberto(resultados.flat());
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const agora=Date.now();
+  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
+  const q=busca.trim().toLowerCase();
+  const filtrados=(aberto||[]).filter(o=>{
+    if(centro&&o.centroCusto!==centro)return false;
+    if(bordadoF==="com"&&o.temBordado===false)return false;
+    if(bordadoF==="sem"&&o.temBordado!==false)return false;
+    if(statusF==="atraso"&&!isAtrasado(o))return false;
+    if(statusF==="prazo"&&isAtrasado(o))return false;
+    if(q){
+      const alvo=((o.client||"")+" "+(o.id||"")+" "+(o.razaoSocial||"")).toLowerCase();
+      if(!alvo.includes(q))return false;
+    }
+    return true;
+  });
+  const total=filtrados.length;
+  const atrasados=filtrados.filter(isAtrasado).length;
+  // Agrupado por fase (etapa), na ordem do fluxo
+  const porEtapa=ABERTO_ETAPAS.map(e=>({
+    etapa:e.nome,
+    ords:ordenarPorPrioridade(filtrados.filter(o=>o.etapa===e.nome)),
+  })).filter(s=>s.ords.length>0);
+
+  return(
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:16}}>
+      <PageH title="Todos os Pedidos" sub="Acompanhe em qual fase cada pedido em aberto está" onRefresh={carregar} refreshing={loading}/>
+
+      {/* Busca em destaque */}
+      <div style={{position:"relative"}}>
+        <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={17} c={C.gray400}/></div>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por nome do cliente ou número do pedido..."
+          style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:10,padding:"12px 14px 12px 42px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {/* Filtros */}
+      <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <select value={centro} onChange={e=>setCentro(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:190}}>
+          <option value="">Todos os centros de custo</option>
+          {CENTRO_OPTIONS.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <select value={bordadoF} onChange={e=>setBordadoF(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:150}}>
+          <option value="">Com e sem bordado</option>
+          <option value="com">Somente com bordado</option>
+          <option value="sem">Somente sem bordado</option>
+        </select>
+      </div>
+
+      {/* Situação */}
+      <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {[["todos","Todos",total],["prazo","No prazo",total-atrasados],["atraso","Em atraso",atrasados]].map(([id,lbl,n])=>{
+          const ativo=statusF===id;const cor=id==="atraso"?C.red:id==="prazo"?C.green:C.gray700;
+          return(
+            <button key={id} onClick={()=>setStatusF(id)}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:7,border:`1.5px solid ${ativo?cor:C.gray200}`,background:ativo?cor+"12":C.white,cursor:"pointer",...F.body,fontSize:12.5,fontWeight:ativo?700:500,color:ativo?cor:C.gray600}}>
+              {lbl}<span style={{background:ativo?cor:C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&porEtapa.length===0&&(
+        <div style={{textAlign:"center",padding:60,...F.body,color:C.gray400,fontSize:14,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
+          Nenhum pedido encontrado para esta busca/filtro.
+        </div>
+      )}
+
+      {/* Pedidos agrupados por fase */}
+      {porEtapa.map(s=>(
+        <div key={s.etapa}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,marginTop:2}}>
+            <div style={{width:9,height:9,borderRadius:"50%",background:STAGE_COLOR[s.etapa]||C.gray400,flexShrink:0}}/>
+            <span style={{...F.title,fontSize:12.5,fontWeight:700,letterSpacing:"0.07em"}}>{s.etapa.toUpperCase()}</span>
+            <span style={{...F.body,fontSize:12,color:C.gray400}}>({s.ords.length})</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+            {s.ords.map(o=><OCard key={(o.id||"")+s.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -2748,11 +2902,11 @@ function Login({onLogin}){
       <div style={{width:"100%",maxWidth:400}}>
         <div style={{background:C.white,borderRadius:10,padding:"40px 36px",border:`1px solid ${C.gray200}`}}>
           <div style={{marginBottom:32}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24}}>
-              <div style={{width:36,height:36,borderRadius:8,background:C.red,display:"flex",alignItems:"center",justifyContent:"center"}}><Ic n="needle" s={18} c={C.white}/></div>
+            <div style={{display:"flex",alignItems:"center",gap:11,marginBottom:24}}>
+              <img src={BRASAO_SGP} alt="SGP" style={{width:40,height:40,borderRadius:9,border:`1px solid ${C.gray200}`,display:"block"}}/>
               <div>
-                <div style={{...F.title,fontSize:15,fontWeight:700,color:C.black,letterSpacing:"0.12em"}}>CITEROL</div>
-                <div style={{...F.body,fontSize:10,color:C.gray400,letterSpacing:"0.04em"}}>Sistema de Personalizados</div>
+                <div style={{...F.title,fontSize:16,fontWeight:700,color:C.black,letterSpacing:"0.14em"}}>SGP</div>
+                <div style={{...F.body,fontSize:10,color:C.gray400,letterSpacing:"0.04em"}}>Sistema de Gestão de Personalizados</div>
               </div>
             </div>
             <h1 style={{...F.title,fontSize:22,fontWeight:700,color:C.black}}>ENTRAR</h1>
@@ -3018,7 +3172,7 @@ function AppInner(){
             {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="pedidos"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
+            {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
@@ -3043,5 +3197,15 @@ function AppInner(){
 }
 
 export default function App(){
+  useEffect(()=>{
+    // Define o favicon (ícone da aba) e o título da página
+    try{
+      let link=document.querySelector("link[rel='icon']");
+      if(!link){link=document.createElement("link");link.rel="icon";document.head.appendChild(link);}
+      link.type="image/png";
+      link.href=FAVICON_SGP;
+      document.title="SGP · Gestão de Personalizados";
+    }catch(e){}
+  },[]);
   return <ErrorBoundary><AppInner/></ErrorBoundary>;
 }
