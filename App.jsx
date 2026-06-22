@@ -1,5 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+
+// ─── VERSÃO ───────────────────────────────────────────────────────────────────
+const SGP_VERSION = "v2.9.1";
+const BRASAO_SGP = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAAba0lEQVR42u2deZRcVZ3HP+9V9ZZ0N2kSDCKbqHNAFAVFGRdcBkRBEWVAQWVxPW6g6KDiOMcjruioOMooUQFHDKMzoCOIoMZ9EAQRYRRQlC2GGLKn053urvfmj9/vR90UVd21vPtqu/ecOr3U9t693/v97b8bAd8ClgJzQEQYYfgdCTAK3AicWQQOBHYHZgMAw8gJgOPAJoAiMA1sB0oBgLmP1Pk96iMAFoEdBsAIiPWJAMD8R1wFjL08DG+Re/NhtIcJhlX1KfX77gsj3zEHTAC/Bt7jSKK+G8WAhbaAbwlwK3CqeiCKwExgwDDyYr5bgROBB3UNJvVnGgAYhk/w7api9wRgtYrdvwHbgEJgwDB8gm8Z8FPglcBaBVwKbFYQFgMDhpH1SNXCXQZcAZwMrFfwlXT+54C7AwDD8AG+VMXuV4DTVdTGlN0uNv+3dtBapHluhABAP6OkLDcGfBh4B+L3M4e/u9ioXjjVAeuR6nUP5gXCAEA/+t4iBdpbgPN0UaMK8OH8fQvwF2CojWK4pN9fAm7ICxsBgNnrexPA/Yib5TIFX1IFfC7jTAKrHOC2Y9OM63W8V/XRkTyuJQAwm2ELtRT4AfBi4DpdyNICrGbP/SewhXzdMale+1LgDuAFwG7Ac4CteeAjADAb9hjRxyeAk4C/KpDm6gRvrGL4amWiuZyuewDYBVgJHKW63/uBDXlthADA1ljP2ON+4FVqcJQqLN1GxqeAjZ6NgMSxzjcAbwbepOL305RdRMEK7mBdb04V9jHgG8CLgGsd1kiaAEUM3A58VFmwlDEIE/3MMWXrS5X1VurzbwaekbcaEJIRGrcUi2po3Al8BLhcn2uVORL9jAuBx6kFvY5y/lwrOl6EpMHHwC+U6X7sXPd+wFmq9+UaEuwHAKa0nupk2eK7qKj6N11ESyZIMxJbxoTvRfIE34r4B6ccV069oEN1PNMprwdWAN9xwG6uoXN1U20OAMxW5BRUVO7QyU6bBN64ft7Vqqf9JiPWq2URJ8A5wO/056OR0onpBb4vVv1xWH9fC3xfxewqB5ixY4icoirERtoQDuxVAJqusx34PfCYJsRWQRmvpOLqi+piMeAlnpR1Y+wI8SOuAl4NvBR4rG6Gys1kTDYFPKDAXaXXfY/zOnfDlIB9FODbaVM6WLEHWS9Cgv83AV/TxRtAEj6jOnSlIcQhvFUZ76vAD52FjnKwEi0eW0AyZT4NfB6pYHyCAmdCjYltas3ep3rpXfq3y4p2zSXnPgA+hFREbqJN6WDFHmO9EZ3Iz6me9nngEJ3guGJx3UUe0keChMSuBb4J3OwsWOzBMq3nngxAM3o9N9fp3Ygq9MFKFjwFOE5Fb9tyEXsBgDbJZpm+XwF0MXCkWpJu+lNBGXFAf58G7kXin9cgOXubqgCvXYVDSQX7RnUwZzIPMEuqknyAciY2AYDNL05R9aKVwL+oyLoIqbfYhISW7LU7VLTeDfwJ+C1Sof87tQBdlkg96nmtiOVmh4G3CHxc1ZTcrd5eAmAJWKwK9FmqqwG8UBXvD6uVN6mgW6dW4Wr9OVVDbHUS6LIcxn5nIg7oDXRAGUC3AtCKe24HzlDxCRJM/zISFvtpA3rSfGKrF4apIIcBZyvzxZ2yK7pN3ysh8ddr1TVxg07wPoiPbhESZnqOvmdIn7dHJdMl9HYqvCXBLgU+i/gJO6YLRtxl4IuU+S5UllurxkQE/CuwN+Vg/oXAE1XvwzEkeh1wlXqf+fc+ARxAuSyAAMDGwBerzncu8G4kVDWgP89Q8Wvgm9Idf5GCskR/lj1aStgZSCnoxk5Tu7oBgBaVGATepWLW3CmzwKH6f9eii9Xw2E/dMUsdN0ye7BN1APhegLimtnTienc6AFPK/rq3KaMVnOcWIelLwzy8vVxRQXkIEoRflLPuk5JNIkQrRscBiEM+pUO7n3UyABPHcHgbEpkoOi6SBHg78HRqpxEVVewciURHBh128sl8IH625W0AoblbliPloEsRZ3tHrnWnAtAtD3w78F8KpjnHqjsQyZlbSLQUkbSpk1RUp57v28C2XNk5zlEc29yMIe6oA2hDjl+vMOBipHXZNx3wRc51n0M51y2qAxQzwOMdgPseW4BjKdcEF3IC3wjwJeBwVUE62tfbiQBMkPZlH0OiG25xj03y0Yg3v5H08chxyeQ1t5t1oxyj91D0DL5hxP10DG1OMuhWAFpd7VcpF3S7wXjb4Wc1yWJ56mIWZZlT/fPpnkBoczSuRtqx3QK+TgNgCUkAXYWkpNuuTp1rTYFXAE+hAzI56gThjKoTlwBPzRCEkWOU7YUkrx5Nh8R4uw2Axmx3I3UQ0xW6WuQo12/U57ulpa2lfO0KfB14tmNMxS18Jvo5zwa+jcR5N9Bl8f1OAGDqsN2ZSLaKK3pd9nu5GhJTdFcYMUaydpYoCF9Dua64UOe9RM5rrTrvnUga2l6qD3ddckknLGKiovc84Gfs7Otz2W8IyfHr1gN1CmoEFYHzgQsUOCUWzsQxfdJea6z3QX1+ii4NNbZ7x5jedy3isa9WZWY7/kjgSXRYML2JDV9CfHMnq6vkEnU13VvDRWTgGwSeqZvQ2mhsbIBBAwCriN5BxEn8PkcvSqswJIgjuRcaeZtTehMSpfgg8I9qQKxn54o3U02eoqz5WJUEW9W46foEi3buHDu07jzgj1X0Plf3ezzwrC6xfBsRyTPKYqM1yMBUjb2Bg9WY2Uxr3RICAFUMjSNZyxfz8M6hlQtwLOIf7LUTPc2wmFuA2WfViInosbSydgHQDkk8Vye3lu5jXTuPotzdoBdHPaHEnmwk1Y6bsq4FKymn0yfzXNvBwP50cEZHGN0DQMvve0CV6nr6tTwPyeUrheUKAMzC8BhT18O98+h+xpQFNT7Cae4BgJmw3zDSTfSiBdjPrmtfR/wGAAYAtqz7LUJCUWuofmxBpVJ+MBJDDQwYANgy+w0q8P6jATAdQrlNRhgBgC3pfqPAVUgbsfl0P2PLCHFAd2vsN4wOAmABcaReWsdrDWwTSLeDmQDAAMBW2W8x4vO7mYUbPBrYHoXESoP+FwDYsv5XQNKHkjq+08C2pwI3CcvUu6OYA/gGkZODrnEYsZ6xB+UoSZTBdbSjJ4zbibWZ5wMAMxC/i5BO7X+tw/hwx96I39C6W7UySvpZgznObeRcf6nGJrLI0FC/qhl55QP+oEK81guau8imi6clvq7NcW7nkEaZ87VDS3UNNtCnoUafALTdvQ74X+d/9YAF4JNIP7usRHDkGDQ+9Ur77NVIt9aojutK1UtQ7xwFANa56CNq/d7bxMLbCUE+RGMeI0HKB8JoIwCLyLm5ZgmXOgAoeTJM1KHX1RcAtFYYv+4CoNADYO/KEXuc+AHkyIQ/VOhGYYThnQFTdS3c41ieaRObI8sqONNB89wIjVjvwQr2wIC3N6n/0Qaw+Bghi7uNOiAKwGaYKkVSsZ5MNrUg1lnhL5TPD/Gln9n1jyNt0iydrJYfMNZ7vFKt/og+0h2LHhdhBjkOqxm9tAQ8Fzl6IYuGO9b27TLgJ/gtcDcALUPqXkZYOBLyN+Dn+HE79R0ATeROIuG3ZtnmTqRrwtYMGNBOuczTL5cgRefTdQBwU78aab4YsKDMta4JANprVyuLDpBNo+929FApOIZINM9m7cczTB4Sdz4Y0OKbW5t8P0jm9IP07qnuYXgEYKziZ6YJpdpeu55yMD84dAMAG/7cjfOInnpEVwrcpgwYABgA2PDnbm0BgDZuokNP+AmjswGIWsGtiHGQ08wfDCwYANjosNy7VlwYkRoi/4f40tKMriuMPmHAmQyuLQF+RDbF6RHlVnBh9AEAs8hiBvgh4qjNwlc2GZa8fwDY6smUJobvQHIKWy3RtL7MPkSxNZAsVDzCaCMAixVM1ooYvpxs4rfrPYDN7jFBQm6z+nNTgFf9IMl6pMpYrQ5jvKuRxIY9aa5Vh3VjWNsi6GrVFy8BdnMeuyCt5cyJHoyfGipa0ZNIssPzWmVAi5VuRM4MPgcJ7heauNkdSHy5kWHfU6Kc2zeKnMP7ZOCJwGOQIvoJpAZ6wAHrNoL7qNqaPmQQFnVhYg8AXJIBAN0L/hpwii50Ix2zDMSbHQAudE2xAzyQHjXPAY4ADqXcNiTVa5nTxzTl8kqCHjgvIcwYAEsZ71ITdxNIEqh1t09bAHMBSe26FDlJs5EkBUt5WsPC5QEmag14ByMH5LwA6dRlyaM7kGQLe0/k/B5A1yAApxyREWUIwF2RftBZHBJt1/YV4JVIsme9LGj9af7ksH1SQ9yaqH0q8GaksHxMWW0L5USLALTWjd9J+8XH2Wt2EM2yjHRM66r1APCFJlwyMXBLjWtxWW93JAv7u8jxWYky3Yxj+QaDIhuS2mwLsznjSTUGXKy6UlZGjoHwYuBXagyU6gTfNPCbKuI3cj77JUgTpTeoPrfRYcYAuuyNkE22OOvJvkbCxN5+Hi58Gjngb64O5rbruB+JKbsAdO/5Awrs3Sn7CoOI9QvCB20RfHaM2t+DaC8gzY6+qJb23AKsOYykdW1yQGd64CJgBXC26iQ7CBnYeYjfElKIRazskLWz1Pw8+1dYlVm5eGKke9YNqmuWFthtP66wWFMF35fVqFlf4X4Jw68BskP1eWLKxT9ZA3BGXRe7ZagHuiJ0EjmyfgvV0/ZN/K5l51pgMzo+j5zCuS7oebmK3gKSrLzGBeBkxjqPAXA3JGqQNbuYb/BWFZ/DVQwME7HX6T2a+yRRne8EBV8QufmOos77egPFGvxkHZv+9TRPN2L64LeATyGO76RiEyRIc3QzKkrAccAZ6l4Jhka+I1GpdJ+K4dj8gPeRffWZ6YFPd77cxw0VgI8hJzDZsQ52Lt0fgVWUM7T3BD5M2TkexG7+YwBpOoABECTnbiBjkJiy+QTkzI/Ug5Lvdph/J+JAXqrifwS4QvUNY/f3KwjD2cPt1QNvo0Ivu5XsszZMD3wE8PfsHDPNmgUt2+VNSAb17mplXeYw8eHA8Wq0BL2vPcMMEANg4gJwm6eFiYAj8XsehrlmtgKnAb9AcgjvdqzeM/X+QqPM9up/qyk3rUoNcHchjcT3zVg8xUiywzPUIl6Hv/ZjBsItiG9vmLLD+XnKgFuD4dFW0TuMxOQtASaxAPs0co7bsAdDZAewF/B8D+6YWiDcpCLYvu9UwrGvnTAiykd2RLY4ppf9zDP6j/NoDVfTCY39HgE8i/Yc1dWporAd8zCg0umXDiZ2yo37JeIczNofaLlfz0Sc0j6s4WqANyCuQ/x+a5DYcalPgZhSPrV+MGdd2HzCv0dcYw+dGRM7Yuse4Ldkf0KlmyF9oku/OU7695B0q2uQRNkB+qt/szXIXKYG51dz9gRYi+QfUXFialzx82r89GGJlAVfhvjp8m44VFCL+CTgPUiG8xJ6oxF6PeJ2F/37fN2IQ9SfT5ml++V7rvh1gVdyALgOP1GRaSQ/8PicxHAlA9j3/TvSPPy7ugiL9Pmkx4CX6P0tRhJtX4Y44h+BZHtvI98Dy29CcjJ3OrItdhBpqVk/1QvPekEMhKc5nx/lvCi2G28HXgO8VidlQnWUbgZi6ui3i5FalhvUA3AS0mks0t8brSxs9boGkbJaC51CFZeIXcxKT+CIVfQ9QXXBvFnQXSSz/r8DHA28W3XgJUgIL+kiqzl1dLxxBd+vgdepuL2Scj3LuDLhVE5zbwcW3acSh0qxH1dRVH+COAsXe2ADc0y/UfWSdjWfNHAVdFOsQEov/wk5WmxcH1GHsmLqXNegGlaxGlmnKPCuQBIwCs59HAM8jvJ5JHmoPqNIRtJ6qvhi4yrK4gxwiSLXhxieAh6vorgdLFjNOiwgzusVSCnma1VvSih3PMBZ9LRNm8a+f0DZegwJbV2AJNeeBFxVBXgm+l5J7SMjfIwBpLjr4krjgxruEPt7VE3mfcg+c8Q9G+NIncCoA1imsigdVReOUXY8QOdlFonuzDoTGtFcsoV7qPcRSJ2EG6q0HMZjgW843/lXJNH2apVYG+a5B/uMZyJNnmZy3NxLkTS5t1DjuLZilQkxk3kF8GmyP73HwnN7INnMZ9AZqVGuLmX+0dv08RngSUh7DnOoL1PxZx2xZucR17XOCEmpr2ZmVlWDnyCJFtdTDjXiiLakymcZmF+lUm2KfOLh1g7lC7XYr9bE2P8WI6lN+3lSWi04faJObDMHGvoesSPG3LEX0pjoYOBA4NHAcp2zQWeuEmpnAdk8DynzHYbUr1RL1jAVYHuVa5tPJbCNtK+u5UhOInhO2W8F8K751jaaB70lBccKleNZ7xqr2bhdLdFJ/KZstcra0TwLPorkIO6pjz2UISdUTxupMtdT6ovbrBb4l1m4g2uhAtj1sFBJJc0/k08Zgmvc/YNawDVVrKiO3X85ksq02cPF2045HykU6kQWnG9uGgFDFpsgbeL1Y8p++1JuFOWb/ZYp4M9faE0XAmCiYuYqyk7OyMOOGQZO1onqFhDWYshqel5ax3uyvmebxxOACz0RSC23y+/UeNuxkFSLFxCRBSRP8AIVJz6AYRf4SRVdJbqvXsM1ANzHfOxY+R4fbpuCbuw0pzkw0J9DnWcfx3XcRKzWcD1dCJoVZ9tVRHxG3RK+6kf6ZZhVfChSj5NH3Ncynr6ANI+qS5LVQ8lWXHSLGiUFso9gGAgPUgD+mFC/kYW+eLaCcLtnAJaQyNavgLc77E4WADRqXYM4j4/DTyjHwnSH63fdHEDY9DwmwN7Ah5w19CVRLBy4DXi1upLiLAFoN1BEUmoe5ZnW55DIw61I9mwAYeMATIHXAy/GbyFW6rih3oY4yRsyIhsBkBkH70HqR5bQ2nlwtUSHXfwXkbYec4Q63kbmz/IAj8d/AX6CuNHOQ9x1xUZthLgJtE8iBeB/xk9WrXVUGEWSIg4JIGyY/Sx27TPtag7Jwvk68HGadJ/FTSC+gCSunopESEbw48ParrvrUsQXGUBY3/pEObheLIBwLfAO57tT3wA0UVxAgvSn6S4b8gjCZUiS7GEBhHWx31OQRgA+dfQJpL73DSrmm2420OwFuq1yT0eyNYY9gLCoIn8CSUc6ip1z3cJ4+DgZP8nELvh+40jAuJXvasU6Msv4z0g559FIcsFMxjsv1s8cVhfQenXRuLs+GB8yD3sA55LtuS+V4Lu+GXeLDwC6OuGf9cKO0ouc9gBCs7hfrAbKz5Vxg5umHPk4HXipSo04Y/AtRdLmXoM0NC1kMe9Z+IeMCe9FIhiHI77CrL3vtst3AM9FDgu8Hj+pYt3IfiPAR5UA5jJiP4vT74p0on090l4jzmrTxxnukALSeuHlyk7LyD5VybKV1yMp7FciWReWqdOPQDRxewSSJJuV68Wk2y7A59TgmMwSfGS8YO6plN9Wyj5MDRQfseMpnZyXI63fbnRY11cLuE5mwQ8iFW9ZqD/WQyYB3occX4aPec2aMazGYRapKtuo4tJOzfShF84hdRpHITHkO/uIDY39DkJSoGYdoDS7fnbU7j0qcr/t6JiZb2ofi+SexXEjkiFxKFJhN5WxdWZpW5NITcbLgL9TEK7zeI+dBsB3Ii3oWjE+zLW2BElAPh3x9XpNEPa5OMZC9zoi+amUD3nOmg2tMu0QJA66BElm2OLcay+JZov7Lgc+QrmpVDObew5J3Z/VzzqbchKD1+z0vApUJpHOSHcrGy5XXcUHG04h6UHPReppF+v3uuf9xj0APgPcq5C0+2YiH8Z6E0im05uQpIIoa2OjXQCsFMm3IT1CliHxXUs8yDID2iZuu+7qIxSIyykfypNWsGK3gK7g3J+B45M0doC3q+uN6/s+i9Rn30PZv5eLpMhTPzI23KQgvEPdBnsjkY4sa0HcDgEGRDum4SCd9DWUi2ZwFrcTAQc7FziNqiQ5C2nAXq+BZ8X3Qwq+XyBdCy6jfPxtkvdNtkNxNj/TBHJ8wmt1QlwxmTX4rafKYp3sO5EqvO8jsc3pGpszxW+9clQxL9TQux6pOvThavU/RlWNrXWuo0WNxlUv/yzSKTXJm/XaDUB3gW2in6iK74v0720Oi/kAYoREDkaUIe9EEit+jsSZV8+zeaKKz6v2e605rpzv+Rb9kUhO36H6OBApfrdTDaap0m+vyjBGG9d7vRSp111dobK0jebbLWbc3igvVLHyNBWTk56A6IIxRhIdLKVsnaoHv0XqW+9A8h83epqDIcSRvre6kA5Euoc9Wv8/pIw9Tbk5UVzH2hm4x/TnNUh1400OAbS9B2KnKOCxI+YG1Kp7K9KdappyEZQvHS1xjKUBXXQ7O2+bGi73I20m7ke6U61VUG7VjWJ6rHWfsh4xg8q0u+hjmTLZHkjM/FFqIC3R77WjxWb0kdZg34XuZVTfcx0SSrvGAV5KhyRwdJoF6IrlUaSf3euUFaZVhPgEYjWdr6BgHHCMgtQB26wy1A5dVGOpwYr3DjigdD9jjod31mqm3ZsLvCISBLgA8cEm7NzbpqMsrU50N7hiecwB4gG66NurKO7kCEoXJHEFYKIKnTBxGKeaMdNsb0HXuIgUeJEaVF9S4M1SvWdgAGCTQDweKQN4sv5/G+2P+6ZtmGtXfx3T369DOmxdRTkm3PF9drrBCVsJxCGkB/JpyGHYAwrEuQb0pG4dJrYHlfG2I0miFwE/qFAbuqLJejctViUQI8QJeyrSh27MMQZ864l5DwPTMJImtQ5pz3sJ0hHfnZ+uOhOvG9mimk5zEFKM8xJ1Z5jBUq/LolPZLnH0uyJyrO5/I5GLu+aZDwIA87OaXZfC7kiC6gkKykIXiufEcUeNqnV9I1IVeCUSynQNsK6uh+kVfamyl/OgiuWTkKyYCRXP0w5wO5XtFqmoXYsUfq9EIjS1Nh0BgJ11PwV27lmzP/AKJCPmsQrSSXY+MamdbJc4bJcgR4ddro97ulm/60cAVuqJLlMsQUJ9r0BqVRYrEHe0wWgxph5RxtuAnNF3GbDKYeqeELP9CMD5xDNI+4oTkYq6fRSE2yn71nzMi22GooI/QpIgrlDD4k7ntUV6/yjZvgEg84ix3dRyPhFJdTKf4gzZJava9w0p8LYip9NfpjretoqN0nNiNgBwYVaMgGerK+coJGFgO60lQbghsgGkLOC7wDeRdsc9aVQEADbHiq543k/dOCcgdbaWFlZPyM+AVEAc4yUk/Wkl8D9IQX3fsl0A4MKs6Cr84yqeT0ESQiMVn9WSQN0Q2RiS2f1DpHnjKnY+LLtv2S4AsHnxfCRSNvA81eW2Om6cRP83ivjurkBCZLdViNm+Z7swGt+clUz3DAXX35CIxAMqnv+AHDW2TwWQC2Eaw8hiVFbMPQ05hPkWpGn78nleG0YYmYpnl9UmAvBaG/8PqSn74hqrhpwAAAAASUVORK5CYII=";
+const FAVICON_SGP = "data:image/png;base64,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";
+
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
@@ -7,7 +13,7 @@ const WORKER_URL = "https://citerol-sgp.israel-caetano-lima.workers.dev";
 const SGP_TOKEN  = "sgp_citerol_2024_xK9mP";
 
 async function apiFetch(path, method = "GET", body = null) {
-  const res = await fetch(`${WORKER_URL}${path}`, {
+  const doFetch = () => fetch(`${WORKER_URL}${path}`, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -15,8 +21,40 @@ async function apiFetch(path, method = "GET", body = null) {
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) throw new Error(`Worker ${method} ${path} → ${res.status}`);
-  return res.json();
+  // Retry APENAS em GET (idempotente) e só em falhas transitórias (rede, 5xx, 429).
+  // POST/PATCH nunca são repetidos para não duplicar ação.
+  const maxTentativas = method === "GET" ? 3 : 1;
+  let ultimoErro;
+  for (let i = 0; i < maxTentativas; i++) {
+    try {
+      const res = await doFetch();
+      if (!res.ok) {
+        if (method === "GET" && (res.status >= 500 || res.status === 429) && i < maxTentativas - 1) {
+          await new Promise(r => setTimeout(r, 350 * (i + 1)));
+          continue;
+        }
+        throw new Error(`Worker ${method} ${path} → ${res.status}`);
+      }
+      return res.json();
+    } catch (e) {
+      ultimoErro = e;
+      if (method === "GET" && i < maxTentativas - 1) {
+        await new Promise(r => setTimeout(r, 350 * (i + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw ultimoErro;
+}
+
+// Mescla os resultados das filas mantendo os itens anteriores do grupo que falhou,
+// evitando que itens "sumam" quando um endpoint falha pontualmente numa atualização.
+function mesclarEmAberto(prev, resultados) {
+  const prevArr = prev || [];
+  return resultados.flatMap(res =>
+    res.items !== null ? res.items : prevArr.filter(o => o._grupo === res.nome)
+  );
 }
 
 
@@ -67,6 +105,8 @@ const ICONS = {
   close:     "M6 18L18 6M6 6l12 12",
   up:        "M5 15l7-7 7 7",
   inbox:     "M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4",
+  eye:       "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
+  eyeOff:    "M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94 M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19 M14.12 14.12a3 3 0 11-4.24-4.24 M1 1l22 22",
 };
 
 function Ic({ n, s = 16, c = "currentColor", style = {} }) {
@@ -87,55 +127,99 @@ const SLA_DEF = {
   "Bordado Externo":120,"Expedição":8,"Faturamento":4,
 };
 
-// ─── USUÁRIOS ─────────────────────────────────────────────────────────────────
-const USERS = [
-  {id:1,name:"Israel Rocha",     email:"israel@citerol.com.br",  role:"superadmin",     ini:"IR",pw:""},
-  {id:2,name:"Leidiane Silva",   email:"leidiane@citerol.com.br",role:"supervisao",     ini:"LS",pw:""},
-  {id:3,name:"Ana Pós-venda",    email:"ana@citerol.com.br",     role:"posvenda",       ini:"AP",pw:""},
-  {id:4,name:"Carlos Programador",email:"carlos@citerol.com.br", role:"programador",    ini:"CP",pw:""},
-  {id:5,name:"Julia Digital",    email:"julia@citerol.com.br",   role:"amostra_digital",ini:"JD",pw:""},
-  {id:6,name:"Marcos Físico",    email:"marcos@citerol.com.br",  role:"amostra_fisica", ini:"MF",pw:""},
-  {id:7,name:"Rafael Direcionador",email:"rafael@citerol.com.br",role:"direcionador",   ini:"RD",pw:""},
-  {id:8,name:"Pedro Bordado",    email:"pedro@citerol.com.br",   role:"bordado_interno",ini:"PB",pw:""},
-  {id:9,name:"Fernanda Externo", email:"fernanda@citerol.com.br",role:"bordado_externo",ini:"FE",pw:""},
-  {id:10,name:"Thiago Expedição",email:"thiago@citerol.com.br",  role:"expedicao",      ini:"TE",pw:""},
-  {id:11,name:"Camila Fat.",     email:"camila@citerol.com.br",  role:"faturamento",    ini:"CF",pw:""},
+// ─── MÓDULOS DO SISTEMA ───────────────────────────────────────────────────────
+// Cada módulo é uma permissão individual atribuível a um usuário.
+const NAV_ITEMS = [
+  // Principal
+  {id:"demandas",    label:"Minhas Demandas",    icon:"pin",     grupo:"Principal"},
+  {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
+  {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
+  // Análise
+  {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
+  // Operações
+  {id:"pedidos",                 label:"Todos os Pedidos",         icon:"list",    grupo:"Operações"},
+  {id:"direcionamento",          label:"Direcionamento",           icon:"arrow",   grupo:"Operações"},
+  {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Operações"},
+  {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Operações"},
+  {id:"aprovacao_amostra_digital",label:"Aprovação Amostra Digital",icon:"check",  grupo:"Operações"},
+  {id:"amostra_fisica",          label:"Amostra Física",           icon:"scissors",grupo:"Operações"},
+  {id:"aprovacao_amostra_fisica",label:"Aprovação Amostra Física", icon:"check",   grupo:"Operações"},
+  {id:"bordado_interno",         label:"Bordado Interno",          icon:"needle",  grupo:"Operações"},
+  {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operações"},
+  {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
+  {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
+  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Operações"},
+  // Sistema
+  {id:"sla",         label:"Configurar SLA",     icon:"gear",    grupo:"Sistema"},
+  {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
 ];
-const ROLE_LABEL = {
-  superadmin:"Super Admin",supervisao:"Supervisão",posvenda:"Pós-venda",
-  programador:"Programador de Bordado",amostra_digital:"Amostra Digital",
-  amostra_fisica:"Amostra Física",direcionador:"Direcionador de Bordado",
-  bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-  expedicao:"Expedição",faturamento:"Faturamento",
+
+// Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
+const MODULO_ETAPA = {
+  direcionamento:           "Direcionamento",
+  programacao:              "Programação",
+  amostra_digital:          "Amostra Digital",
+  aprovacao_amostra_digital:"Aprovação de Amostra Digital",
+  amostra_fisica:           "Amostra Física",
+  aprovacao_amostra_fisica: "Aprovação de Amostra Física",
+  bordado_interno:          "Bordado Interno",
+  bordado_externo:          "Bordado Externo",
+  expedicao:                "Expedição",
+  faturamento:              "Faturamento",
 };
-const ROLE_STAGES = {
-  programador:["Programação"],amostra_digital:["Amostra Digital"],
-  amostra_fisica:["Amostra Física"],direcionador:["Direcionamento"],
-  bordado_interno:["Bordado Interno"],bordado_externo:["Bordado Externo"],
-  expedicao:["Expedição"],faturamento:["Faturamento"],
-  posvenda:Object.keys(SLA_DEF),supervisao:Object.keys(SLA_DEF),superadmin:Object.keys(SLA_DEF),
+// Mapa módulo -> endpoint do Worker (para carregar demandas ao vivo)
+const MODULO_ENDPOINT = {
+  direcionamento:           "/direcionamento",
+  programacao:              "/programacao",
+  amostra_digital:          "/amostra-digital",
+  aprovacao_amostra_digital:"/aprovacao-amostra-digital",
+  amostra_fisica:           "/amostra-fisica",
+  aprovacao_amostra_fisica: "/aprovacao-amostra-fisica",
+  bordado_interno:          "/bordado-interno",
+  bordado_externo:          "/bordado-externo",
+  expedicao:                "/expedicao",
+  faturamento:              "/faturamento",
 };
 
-// NAV items
-const NAV_ITEMS = [
-  {id:"demandas",    label:"Minhas Demandas",   icon:"pin",     roles:["superadmin","supervisao","posvenda","programador","amostra_digital","amostra_fisica","direcionador","bordado_interno","bordado_externo","expedicao","faturamento"]},
-  {id:"dashboard",  label:"Dashboard",          icon:"grid",    roles:["superadmin","supervisao","posvenda"]},
-  {id:"funil",      label:"Funil em Tempo Real",icon:"funnel",  roles:["superadmin","supervisao","posvenda"]},
-  {id:"gerencial",  label:"Gerencial",           icon:"chart",   roles:["superadmin","supervisao"]},
-  {id:"historico",  label:"Histórico",           icon:"history", roles:["superadmin","supervisao"]},
-  {id:"ranking",    label:"Ranking / Premiação", icon:"trophy",  roles:["superadmin","supervisao"]},
-  {id:"pedidos",    label:"Todos os Pedidos",    icon:"list",    roles:["superadmin","supervisao","posvenda"]},
-  {id:"direcionamento",label:"Direcionamento",   icon:"arrow",   roles:["superadmin","supervisao","direcionador"]},
-  {id:"programacao",label:"Programação",         icon:"needle",  roles:["superadmin","supervisao","programador"]},
-  {id:"amostra_digital",label:"Amostra Digital", icon:"monitor", roles:["superadmin","supervisao","amostra_digital"]},
-  {id:"amostra_fisica", label:"Amostra Física",  icon:"scissors",roles:["superadmin","supervisao","amostra_fisica"]},
-  {id:"bordado_interno",label:"Bordado Interno", icon:"needle",  roles:["superadmin","supervisao","bordado_interno"]},
-  {id:"bordado_externo",label:"Bordado Externo", icon:"box",     roles:["superadmin","supervisao","bordado_externo"]},
-  {id:"expedicao",  label:"Expedição",           icon:"box",     roles:["superadmin","supervisao","expedicao"]},
-  {id:"faturamento",label:"Faturamento",         icon:"dollar",  roles:["superadmin","supervisao","faturamento"]},
-  {id:"sla",        label:"Configurar SLA",      icon:"gear",    roles:["superadmin","supervisao"]},
-  {id:"usuarios",   label:"Usuários",            icon:"users",   roles:["superadmin"]},
-];
+// Mapa de etapa -> propriedade de arquivo no HubSpot
+const ETAPA_PROPRIEDADE = {
+  "Programação":     "programacao_de_bordado",
+  "Amostra Digital": "amostra_digital",
+  "Amostra Física":  "amostra_fisica",
+};
+
+// Propriedade do motivo de rejeição por etapa que volta
+const ETAPA_PROP_MOTIVO = {
+  "Amostra Digital": "motivo_da_rejeicao_da_amostra_digital",
+  "Amostra Física":  "motivo_da_rejeicao_do_bordado",
+};
+
+// Mapa nome da etapa -> ID da etapa no HubSpot (funil Bordado)
+const ETAPA_STAGE_ID = {
+  "Programação":                "1377887836",
+  "Amostra Digital":            "1377887837",
+  "Aprovação de Amostra Digital":"1377887838",
+  "Amostra Física":             "1377887839",
+  "Aprovação de Amostra Física":"1377887840",
+  "Liberado para bordar":       "1377887841",
+  "Bordado Externo":            "1377887842",
+  "Bordado Interno":            "1377706615",
+  "Bordado Interno e Externo":  "1383604282",
+  "Bordado Finalizado":         "1377706616",
+};
+
+// Helper: usuário tem acesso a um módulo?
+function temAcesso(user, moduloId) {
+  if (!user) return false;
+  if (user.admin) return true; // admin vê tudo
+  return (user.modulos || []).includes(moduloId);
+}
+
+// Lista de usuários para menções no chat — populada via Worker em runtime.
+// Mantida vazia por padrão para não quebrar referências; o chat resolve nomes
+// pelos dados do pedido quando disponível.
+let USERS = [];
+
 
 // ─── MOCK DATA ────────────────────────────────────────────────────────────────
 const NOW = Date.now();
@@ -168,13 +252,103 @@ function useIsMobile(){
 const fmtD=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
 const fmtDS=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
 const fmtR=(v)=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2});
+// Formata duração em minutos -> "2h 15min" / "45min" / "3d 4h"
+const fmtDur=(min)=>{
+  if(min==null)return null;
+  if(min<1)return "menos de 1min";
+  const d=Math.floor(min/1440),h=Math.floor((min%1440)/60),m=min%60;
+  const p=[];if(d)p.push(d+"d");if(h)p.push(h+"h");if(m&&!d)p.push(m+"min");
+  return p.join(" ")||"0min";
+};
+
+// ─── PRIORIDADE: ordena pela DATA DE VENCIMENTO do pedido ─────────────────────
+// Quanto mais próxima a data de vencimento, maior a prioridade (vem primeiro).
+// Por enquanto usamos prazoFinal como vencimento; quando a regra definitiva da
+// data de vencimento for criada, basta trocar dataVencimento() abaixo.
+// Data limite (vencimento) do pedido — vem calculada do Worker.
+// COM bordado sem amostra aprovada => null (ainda não há prazo).
+// NÃO faz fallback para closedate (prazoFinal), que não reflete a regra.
+const dataVencimento=(o)=>o.dataVencimento||null;
+const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
+  const da=dataVencimento(a), db=dataVencimento(b);
+  if(!da&&!db)return 0;
+  if(!da)return 1;          // sem data vai para o fim
+  if(!db)return -1;
+  return new Date(da)-new Date(db); // mais cedo primeiro
+});
+
+// Normaliza um card cru do Worker para o formato que o modal/cards esperam
+const normalizarCard=(o,etapa)=>({
+  id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+  client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
+  cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
+  obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+  condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
+  arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+  motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
+  reprogramacao:o.reprogramacao||false,
+  historico:o.historico||[],
+  houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+  temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+  prazoFinal:o.prazoFinal||null,
+  etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
+  entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+  alertas:o.alertas||[],concluido:false,
+  bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+  items:(o.items||[]).map(it=>({
+    id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
+    qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+    status:"separado",
+  })),
+  timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+  chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
+});
+
+// Filtra os arquivos de bordado por etapa, usando o termo no nome (~PROG / ~AMOSTRA).
+// Retrocompatibilidade: se não houver dados estruturados ou nenhum termo, mostra todos.
+function arquivosBordadoPorEtapa(order, etapa){
+  const json = order.bordadosJson || [];
+  const todos = order.arquivoBordado || [];
+  if(!json.length) return todos;
+  const temTermo = json.some(b => /~(prog|amostra)/i.test(b.fileName||""));
+  if(!temTermo) return todos;
+  const idsDe = (pred) => json.filter(b=>pred(b.fileName||"")).map(b=>String(b.fileId)).filter(Boolean);
+  const ETAPAS_AMOSTRA=["Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física"];
+  if(etapa==="Programação") return idsDe(n=>/~prog/i.test(n));
+  if(ETAPAS_AMOSTRA.includes(etapa)) return idsDe(n=>/~(prog|amostra)/i.test(n));
+  return todos; // execução de bordado e demais etapas → todos os arquivos
+}
+
+
+function baixarExcelFinalizados(lista,de,ate){
+  const esc=(v)=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const cols=["Pedido","Cliente","CNPJ","Centro de Custo","Bordado","Valor (R$)","Data de Vencimento","Data de Finalização","Vendedor"];
+  const linhas=lista.map(o=>{
+    const venc=o.dataVencimento?new Date(o.dataVencimento).toLocaleDateString("pt-BR"):"";
+    const fin=o.dataFinalizacao?new Date(o.dataFinalizacao).toLocaleDateString("pt-BR"):"";
+    const valor=Number(o.valor||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+    return [o.id,o.client,o.cnpj||"",o.centroCusto||"",o.temBordado===false?"Sem bordado":"Com bordado",valor,venc,fin,o.vendedor||""];
+  });
+  const thead="<tr>"+cols.map(c=>`<th style="background:#9E0B0F;color:#fff;font-weight:bold;padding:6px;border:1px solid #ccc">${esc(c)}</th>`).join("")+"</tr>";
+  const tbody=linhas.map(r=>"<tr>"+r.map(c=>`<td style="padding:5px;border:1px solid #ccc">${esc(c)}</td>`).join("")+"</tr>").join("");
+  const periodo=`Pedidos Finalizados — ${de||"início"} a ${ate||"hoje"} (${lista.length} pedidos)`;
+  const html=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>`+
+    `<h3>${esc(periodo)}</h3><table border="1" cellspacing="0">${thead}${tbody}</table></body></html>`;
+  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`pedidos-finalizados-${de||""}_${ate||""}.xls`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 const hrsIn=(at)=>(Date.now()-new Date(at).getTime())/3600000;
 function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
   const hrs=hrsIn(o.etapaAt);
   const pct=sla?hrs/sla:0;
-  const htd=(new Date(o.prazoFinal).getTime()-Date.now())/3600000;
-  return{sla,hrs,pct,htd,st:pct>=1?"late":pct>=0.8?"risk":"ok",ft:htd<0?"late":htd<24?"risk":"ok"};
+  const venc=dataVencimento(o);
+  const htd=venc?(new Date(venc).getTime()-Date.now())/3600000:null;
+  return{sla,hrs,pct,htd,venc,st:pct>=1?"late":pct>=0.8?"risk":"ok",ft:htd==null?"none":htd<0?"late":htd<24?"risk":"ok"};
 }
 
 // ─── BASE COMPONENTS ─────────────────────────────────────────────────────────
@@ -182,6 +356,48 @@ const F = {
   title: { fontFamily:"'Oswald',sans-serif", textTransform:"uppercase", letterSpacing:"0.04em" },
   body:  { fontFamily:"'Montserrat',sans-serif" },
 };
+
+// ─── EXIBIÇÃO DE ARQUIVOS (resolve fileIds do HubSpot) ────────────────────────
+function ArquivosBox({fileIds,titulo,emptyText}){
+  const [arquivos,setArquivos]=useState(null);
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{
+    if(!fileIds||!fileIds.length){setArquivos([]);return;}
+    setLoading(true);
+    apiFetch(`/arquivos?ids=${fileIds.join(";")}`)
+      .then(r=>{if(r.success)setArquivos(r.arquivos);else setArquivos([]);})
+      .catch(()=>setArquivos([]))
+      .finally(()=>setLoading(false));
+  },[JSON.stringify(fileIds)]);
+
+  if(loading)return <div style={{...F.body,fontSize:12,color:C.gray400,padding:"8px 0"}}>Carregando arquivos...</div>;
+  if(!arquivos||arquivos.length===0)return <div style={{...F.body,fontSize:13,color:C.gray400}}>{emptyText||"Nenhum arquivo anexado."}</div>;
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {arquivos.map((a,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:7,padding:"10px 14px",border:`1px solid ${C.gray200}`}}>
+          <div style={{width:32,height:32,borderRadius:6,background:C.red+"12",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <Ic n="download" s={16} c={C.red}/>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.nome}</div>
+            {a.tamanho>0&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:1}}>{(a.tamanho/1024).toFixed(0)} KB</div>}
+          </div>
+          {a.url
+            ?<a href={a.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
+              <span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"7px 14px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                <Ic n="download" s={13} c={C.white}/> Baixar
+              </span>
+            </a>
+            :<span style={{...F.body,fontSize:11,color:C.gray400}}>indisponível</span>
+          }
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function Av({ini,size=32,bg=C.red}){
   return <div style={{width:size,height:size,borderRadius:"50%",background:bg,color:C.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*.34,fontWeight:700,...F.title,flexShrink:0}}>{ini}</div>;
@@ -199,14 +415,25 @@ function SecH({children,style={}}){
   return <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:12,...style}}>{children}</div>;
 }
 
-function PageH({title,sub,bc}){
+function PageH({title,sub,bc,onRefresh,refreshing}){
   return (
-    <div style={{marginBottom:24}}>
-      {bc&&<div style={{...F.body,fontSize:12,color:C.gray400,marginBottom:4,display:"flex",gap:6,alignItems:"center"}}>
-        SGP <Ic n="chevR" s={11} c={C.gray400}/> <span style={{color:C.gray600}}>{bc}</span>
-      </div>}
-      <h1 style={{...F.title,fontSize:24,fontWeight:700,color:C.black,lineHeight:1.1}}>{title}</h1>
-      {sub&&<p style={{...F.body,fontSize:13,color:C.gray500,marginTop:4}}>{sub}</p>}
+    <div style={{marginBottom:24,display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+      <div>
+        {bc&&<div style={{...F.body,fontSize:12,color:C.gray400,marginBottom:4,display:"flex",gap:6,alignItems:"center"}}>
+          SGP <Ic n="chevR" s={11} c={C.gray400}/> <span style={{color:C.gray600}}>{bc}</span>
+        </div>}
+        <h1 style={{...F.title,fontSize:24,fontWeight:700,color:C.black,lineHeight:1.1}}>{title}</h1>
+        {sub&&<p style={{...F.body,fontSize:13,color:C.gray500,marginTop:4}}>{sub}</p>}
+      </div>
+      {onRefresh&&<button onClick={onRefresh} disabled={refreshing}
+        style={{display:"flex",alignItems:"center",gap:7,padding:"9px 16px",borderRadius:8,border:`1.5px solid ${C.gray200}`,background:C.white,cursor:refreshing?"wait":"pointer",...F.body,fontSize:13,fontWeight:600,color:refreshing?C.gray400:C.gray700,whiteSpace:"nowrap",flexShrink:0}}
+        onMouseEnter={e=>{if(!refreshing)e.currentTarget.style.borderColor=C.red;}}
+        onMouseLeave={e=>e.currentTarget.style.borderColor=C.gray200}>
+        <span style={{display:"inline-block",transition:"transform 0.5s",transform:refreshing?"rotate(360deg)":"none"}}>
+          <Ic n="refresh" s={15} c={refreshing?C.gray400:C.red}/>
+        </span>
+        {refreshing?"Atualizando...":"Atualizar"}
+      </button>}
     </div>
   );
 }
@@ -216,12 +443,12 @@ function SLABar({pct,st}){
   return <div style={{background:C.gray200,borderRadius:2,height:4,overflow:"hidden",flex:1}}><div style={{height:"100%",width:`${Math.min(pct*100,100)}%`,background:c,borderRadius:2}}/></div>;
 }
 
-function Stat({label,value,sub,color=C.black,icon}){
+function Stat({label,value,sub,color=C.black,icon,active}){
   return(
-    <Card style={{display:"flex",flexDirection:"column",gap:8}}>
+    <Card style={{display:"flex",flexDirection:"column",gap:8,...(active?{borderColor:color,boxShadow:`0 0 0 2px ${color}22`}:{})}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span style={{...F.body,fontSize:11,color:C.gray500,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.06em"}}>{label}</span>
-        <Ic n={icon} s={15} c={C.gray300}/>
+        <Ic n={icon} s={15} c={active?color:C.gray300}/>
       </div>
       <div style={{...F.title,fontSize:30,fontWeight:700,color,lineHeight:1}}>{value}</div>
       {sub&&<div style={{...F.body,fontSize:11,color:C.gray400}}>{sub}</div>}
@@ -231,7 +458,7 @@ function Stat({label,value,sub,color=C.black,icon}){
 
 function ETag({etapa}){
   const c=STAGE_COLOR[etapa]||C.gray600;
-  return <span style={{background:c+"14",color:c,borderRadius:3,padding:"3px 9px",fontSize:11,fontWeight:700,...F.body,whiteSpace:"nowrap"}}>{etapa}</span>;
+  return <span style={{display:"inline-flex",alignItems:"center",background:c+"14",color:c,borderRadius:3,padding:"4px 9px",fontSize:11,fontWeight:700,...F.body,whiteSpace:"nowrap",flexShrink:0,lineHeight:1}}>{etapa}</span>;
 }
 
 function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
@@ -252,32 +479,42 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle}){
-  const items=NAV_ITEMS.filter(n=>n.roles.includes(user.role));
-  const groups=[
-    {label:"Principal",ids:["demandas","dashboard","funil"]},
-    {label:"Análise",ids:["gerencial","historico","ranking"]},
-    {label:"Operações",ids:["pedidos","direcionamento","programacao","amostra_digital","amostra_fisica","bordado_interno","bordado_externo","expedicao","faturamento"]},
-    {label:"Sistema",ids:["sla","usuarios"]},
-  ];
+  const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
+  // Injeta o CSS da scrollbar sutil uma única vez
+  useEffect(()=>{
+    if(document.getElementById("sgp-scroll-style"))return;
+    const st=document.createElement("style");
+    st.id="sgp-scroll-style";
+    st.textContent=`
+      .sgp-scroll{scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .25s;}
+      .sgp-scroll:hover{scrollbar-color:rgba(158,11,15,0.28) transparent;}
+      .sgp-scroll::-webkit-scrollbar{width:6px;height:6px;}
+      .sgp-scroll::-webkit-scrollbar-track{background:transparent;}
+      .sgp-scroll::-webkit-scrollbar-thumb{background-color:transparent;border-radius:8px;border:1px solid transparent;background-clip:content-box;transition:background-color .25s;}
+      .sgp-scroll:hover::-webkit-scrollbar-thumb{background-color:rgba(158,11,15,0.22);}
+      .sgp-scroll::-webkit-scrollbar-thumb:hover{background-color:rgba(158,11,15,0.5);}
+    `;
+    document.head.appendChild(st);
+  },[]);
   return(
     <div style={{width:collapsed?56:240,background:C.white,borderRight:`1px solid ${C.gray200}`,display:"flex",flexDirection:"column",transition:"width 0.2s",overflow:"hidden",flexShrink:0}}>
       <div style={{padding:collapsed?"14px":"16px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",justifyContent:collapsed?"center":"space-between",minHeight:56,gap:8}}>
-        {!collapsed&&<div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:28,height:28,borderRadius:6,background:C.red,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <Ic n="needle" s={14} c={C.white}/>
-          </div>
-          <div>
-            <div style={{...F.title,fontSize:13,fontWeight:700,color:C.black,letterSpacing:"0.12em"}}>CITEROL</div>
-            <div style={{...F.body,fontSize:9,color:C.gray400,letterSpacing:"0.04em",marginTop:1}}>PERSONALIZADOS</div>
+        {!collapsed&&<div style={{display:"flex",alignItems:"center",gap:10}}>
+          <img src={BRASAO_SGP} alt="SGP" style={{height:28,width:"auto",flexShrink:0,display:"block"}}/>
+          <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.black,letterSpacing:"0.05em",lineHeight:1}}>SGP</div>
+            <div style={{...F.body,fontSize:8.5,color:C.gray400,letterSpacing:"0.02em",lineHeight:1.2,marginTop:2}}>GESTÃO DE PERSONALIZADOS</div>
           </div>
         </div>}
         <button onClick={onToggle} style={{background:"none",border:`1px solid ${C.gray200}`,borderRadius:5,width:26,height:26,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>
           <Ic n={collapsed?"chevR":"chevL"} s={12} c={C.gray500}/>
         </button>
       </div>
-      <div style={{flex:1,overflowY:"auto",padding:"6px 0"}}>
+      <div className="sgp-scroll" style={{flex:1,overflowY:"auto",padding:"6px 0"}}>
         {groups.map(g=>{
-          const gi=items.filter(n=>g.ids.includes(n.id));
+          const gi=g.items;
           if(!gi.length)return null;
           return(
             <div key={g.label} style={{marginBottom:2}}>
@@ -301,8 +538,8 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
       {!collapsed&&<div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",gap:10}}>
         <Av ini={user.ini} size={30}/>
         <div style={{flex:1,minWidth:0}}>
-          <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name.split(" ")[0]}</div>
-          <div style={{...F.body,fontSize:10,color:C.gray500}}>{ROLE_LABEL[user.role]}</div>
+          <div style={{...F.body,fontSize:12,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{(user.nome||user.name||"").split(" ")[0]}</div>
+          <div style={{...F.body,fontSize:10,color:C.gray500}}>{user.admin?"Administrador":"Operador"} · {SGP_VERSION}</div>
         </div>
       </div>}
     </div>
@@ -310,16 +547,12 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
 }
 
 function BottomNav({user,active,onNav}){
-  const allItems=NAV_ITEMS.filter(n=>n.roles.includes(user.role));
+  const allItems=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const groups=[
-    {label:"Principal",ids:["demandas","dashboard","funil"]},
-    {label:"Análise",ids:["gerencial","historico","ranking"]},
-    {label:"Operações",ids:["pedidos","direcionamento","programacao","amostra_digital","amostra_fisica","bordado_interno","bordado_externo","expedicao","faturamento"]},
-    {label:"Sistema",ids:["sla","usuarios"]},
-  ];
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const groups=GRUPOS.map(label=>({label,items:allItems.filter(n=>n.grupo===label)}));
 
   return(
     <>
@@ -334,7 +567,7 @@ function BottomNav({user,active,onNav}){
             </div>
             <div style={{padding:"4px 0 16px"}}>
               {groups.map(g=>{
-                const gi=allItems.filter(n=>g.ids.includes(n.id));
+                const gi=g.items;
                 if(!gi.length)return null;
                 return(
                   <div key={g.label}>
@@ -377,15 +610,14 @@ function BottomNav({user,active,onNav}){
   );
 }
 
-function Topbar({user,title,notifs,onBell,onLogout,isMobile}){
-  const unread=notifs.filter(n=>!n.read&&n.toUid===user.id).length;
+function Topbar({user,title,naoLidas,onBell,onLogout,isMobile}){
   return(
     <div style={{height:56,background:C.white,borderBottom:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 24px",flexShrink:0}}>
       <div style={{...F.title,fontSize:isMobile?13:15,fontWeight:600,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{title.toUpperCase()}</div>
       <div style={{display:"flex",alignItems:"center",gap:16,flexShrink:0}}>
         <div onClick={onBell} style={{position:"relative",cursor:"pointer",display:"flex",alignItems:"center"}}>
-          <Ic n="bell" s={19} c={C.gray500}/>
-          {unread>0&&<span style={{position:"absolute",top:-5,right:-5,background:C.red,color:C.white,borderRadius:"50%",width:14,height:14,fontSize:9,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",...F.body}}>{unread}</span>}
+          <Ic n="bell" s={19} c={naoLidas>0?C.red:C.gray500}/>
+          {naoLidas>0&&<span style={{position:"absolute",top:-6,right:-6,background:C.red,color:C.white,borderRadius:9,minWidth:15,height:15,padding:"0 3px",fontSize:9,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",...F.body}}>{naoLidas>9?"9+":naoLidas}</span>}
         </div>
         <Av ini={user.ini} size={30}/>
         {!isMobile&&<button onClick={onLogout} style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center"}}><Ic n="logout" s={16} c={C.gray400}/></button>}
@@ -394,41 +626,96 @@ function Topbar({user,title,notifs,onBell,onLogout,isMobile}){
   );
 }
 
-// ─── CHAT ────────────────────────────────────────────────────────────────────
-function Chat({order,me,onSend}){
-  const[msg,setMsg]=useState("");const[showM,setShowM]=useState(false);const[mq,setMq]=useState("");const eRef=useRef(null);
-  useEffect(()=>eRef.current?.scrollIntoView({behavior:"smooth"}),[order.chat]);
-  const hc=v=>{setMsg(v);const at=v.lastIndexOf("@");if(at!==-1&&v.slice(at+1).match(/^\w*$/)){setShowM(true);setMq(v.slice(at+1).toLowerCase());}else setShowM(false);};
-  const ins=u=>{const at=msg.lastIndexOf("@");setMsg(msg.slice(0,at)+"@"+u.name.split(" ")[0]+" ");setShowM(false);};
-  const fu=USERS.filter(u=>u.id!==me.id&&(mq===""||u.name.toLowerCase().includes(mq)));
-  const send=()=>{if(!msg.trim())return;const mn=USERS.filter(u=>msg.includes("@"+u.name.split(" ")[0])).map(u=>u.id);onSend(order.id,msg,mn);setMsg("");};
+// ─── CHAT (conversa do pedido — persistida no Supabase) ──────────────────────
+function Chat({order,me,usuarios}){
+  const pedidoId=String(order.vendasId||"").replace(/^PED-/,"")||String(order.id||"").replace(/^PED-/,"");
+  const [msgs,setMsgs]=useState(null);
+  const [msg,setMsg]=useState("");
+  const [showM,setShowM]=useState(false);
+  const [mq,setMq]=useState("");
+  const [enviando,setEnviando]=useState(false);
+  const [users,setUsers]=useState(usuarios||[]);
+  const eRef=useRef(null);
+
+  const carregar=()=>apiFetch("/conversa/"+encodeURIComponent(pedidoId))
+    .then(r=>setMsgs(r.data||[])).catch(()=>setMsgs([]));
+  useEffect(()=>{carregar();},[pedidoId]);
+  // Sempre busca a lista de usuários mais atual ao abrir (para a menção)
+  useEffect(()=>{
+    apiFetch("/usuarios").then(r=>{
+      const lista=r?.users||r?.usuarios||r?.data||(Array.isArray(r)?r:[]);
+      if(Array.isArray(lista)&&lista.length)setUsers(lista);
+    }).catch(()=>{});
+  },[]);
+  useEffect(()=>{ if(usuarios&&usuarios.length)setUsers(usuarios); },[usuarios]);
+  useEffect(()=>{eRef.current?.scrollIntoView({behavior:"smooth"});},[msgs]);
+
+  const primeiroNome=u=>(u.nome||u.name||u.email||"").trim().split(" ")[0];
+  const lista=(users||[]).filter(u=>(u.email||"")!==me.email&&u.ativo!==false);
+  const fu=lista.filter(u=>mq===""||(u.nome||"").toLowerCase().includes(mq)||(u.email||"").toLowerCase().includes(mq));
+
+  const hc=v=>{setMsg(v);const at=v.lastIndexOf("@");if(at!==-1&&v.slice(at+1).match(/^[\wÀ-ÿ]*$/)){setShowM(true);setMq(v.slice(at+1).toLowerCase());}else setShowM(false);};
+  const ins=u=>{const at=msg.lastIndexOf("@");setMsg(msg.slice(0,at)+"@"+primeiroNome(u)+" ");setShowM(false);};
+
+  const send=async()=>{
+    if(!msg.trim()||enviando)return;
+    // Mencionados: usuários cujo primeiro nome aparece como @nome no texto.
+    // Boundary unicode-aware: o nome não pode ser seguido de outra letra/número
+    // (evita @Ana casar com "@Anabela") e funciona com acentos.
+    const mencionados=lista.filter(u=>{
+      const fn=primeiroNome(u).toLowerCase();
+      if(!fn)return false;
+      try{ return new RegExp("@"+fn.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\p{L}\\p{N}])","iu").test(msg); }
+      catch{ return msg.toLowerCase().includes("@"+fn); }
+    }).map(u=>u.email);
+    setEnviando(true);
+    try{
+      await apiFetch("/conversa/"+encodeURIComponent(pedidoId),"POST",{
+        autor:me.nome||me.name||me.email, autorEmail:me.email,
+        mensagem:msg.trim(), mencionados, cliente:order.client||"",
+      });
+      setMsg("");setShowM(false);
+      await carregar();
+    }catch(e){alert("Erro ao enviar: "+e.message);}
+    finally{setEnviando(false);}
+  };
+
+  const fmtMsgData=(iso)=>{if(!iso)return"";const d=new Date(iso);return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
+  const ini=(nome)=>(nome||"?").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+
   return(
     <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
-      <div style={{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:12}}>
-        {order.chat.length===0&&<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",marginTop:20}}>Nenhuma mensagem ainda.</div>}
-        {order.chat.map((m,i)=>{const u=USERS.find(x=>x.id===m.uid);const isMe=u?.id===me.id;return(
-          <div key={i} style={{display:"flex",gap:8}}>
-            <Av ini={u?.ini||"?"} size={28} bg={isMe?C.red:C.gray700}/>
-            <div style={{flex:1}}>
-              <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
-                <span style={{...F.body,fontSize:12,fontWeight:700,color:C.black}}>{u?.name}</span>
-                <span style={{...F.body,fontSize:10,color:C.gray400}}>{m.time}</span>
-              </div>
-              <div style={{...F.body,fontSize:13,color:C.gray700,marginTop:4,lineHeight:1.6,background:C.gray50,borderRadius:6,padding:"8px 12px",border:`1px solid ${C.gray200}`}}>
-                {m.text.split(/(@\w+)/).map((p,j)=>p.startsWith("@")?<span key={j} style={{color:C.red,fontWeight:700}}>{p}</span>:p)}
+      <div style={{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:12}} className="sgp-scroll">
+        {msgs===null&&<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",marginTop:20}}>Carregando conversa...</div>}
+        {msgs!==null&&msgs.length===0&&<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",marginTop:20}}>Nenhuma mensagem ainda. Use @ para mencionar alguém.</div>}
+        {(msgs||[]).map((m,i)=>{
+          const isMe=(m.autor_email||"")===me.email;
+          return(
+            <div key={m.id||i} style={{display:"flex",gap:8}}>
+              <Av ini={ini(m.autor)} size={28} bg={isMe?C.red:C.gray700}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontSize:12,fontWeight:700,color:C.black}}>{m.autor||"—"}</span>
+                  <span style={{...F.body,fontSize:10,color:C.gray400}}>{fmtMsgData(m.criado_em)}</span>
+                </div>
+                <div style={{...F.body,fontSize:13,color:C.gray700,marginTop:4,lineHeight:1.6,background:C.gray50,borderRadius:6,padding:"8px 12px",border:`1px solid ${C.gray200}`,wordBreak:"break-word"}}>
+                  {String(m.mensagem||"").split(/(@[\wÀ-ÿ]+)/).map((p,j)=>p.startsWith("@")?<span key={j} style={{color:C.red,fontWeight:700}}>{p}</span>:p)}
+                </div>
               </div>
             </div>
-          </div>
-        );})}
+          );
+        })}
         <div ref={eRef}/>
       </div>
       <div style={{padding:"10px 16px",borderTop:`1px solid ${C.gray200}`,position:"relative"}}>
-        {showM&&fu.length>0&&<div style={{position:"absolute",bottom:70,left:16,right:16,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:10}}>
-          {fu.slice(0,5).map(u=>(
-            <div key={u.id} onClick={()=>ins(u)} style={{padding:"9px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10}}
+        {showM&&fu.length>0&&<div style={{position:"absolute",bottom:70,left:16,right:16,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:10,maxHeight:180,overflowY:"auto"}}>
+          {fu.slice(0,6).map(u=>(
+            <div key={u.email} onClick={()=>ins(u)} style={{padding:"9px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10}}
               onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
               onMouseLeave={e=>e.currentTarget.style.background=C.white}>
-              <Av ini={u.ini} size={22}/><span style={{...F.body,fontSize:13,fontWeight:600}}>{u.name}</span><span style={{...F.body,fontSize:11,color:C.gray400}}>{ROLE_LABEL[u.role]}</span>
+              <Av ini={ini(u.nome||u.name)} size={22}/>
+              <span style={{...F.body,fontSize:13,fontWeight:600}}>{u.nome||u.name}</span>
+              <span style={{...F.body,fontSize:11,color:C.gray400}}>{u.email||""}</span>
             </div>
           ))}
         </div>}
@@ -436,38 +723,140 @@ function Chat({order,me,onSend}){
           <input value={msg} onChange={e=>hc(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Mensagem... @ para mencionar"
             style={{flex:1,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",fontSize:13,outline:"none",...F.body}}/>
-          <button onClick={send} style={{background:C.red,color:C.white,border:"none",borderRadius:6,padding:"9px 14px",cursor:"pointer",display:"flex",alignItems:"center"}}>
+          <button onClick={send} disabled={enviando} style={{background:enviando?C.gray300:C.red,color:C.white,border:"none",borderRadius:6,padding:"9px 14px",cursor:enviando?"wait":"pointer",display:"flex",alignItems:"center"}}>
             <Ic n="send" s={15} c={C.white}/>
           </button>
         </div>
-        <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:5}}>Use @ para mencionar um usuário — Enter para enviar</div>
+        <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:5}}>Todos no pedido veem a conversa. Quem for mencionado com @ recebe uma notificação.</div>
       </div>
     </div>
   );
 }
 
+// ─── ABA ALTERAÇÃO DE FORMULÁRIO ─────────────────────────────────────────────
+function AlteracaoFormTab({order,onAction,me}){
+  const [novaEtapa,setNovaEtapa]=useState("");
+  const [motivo,setMotivo]=useState("");
+  const [enviando,setEnviando]=useState(false);
+  const [ok,setOk]=useState(false);
+
+  // Bloqueio: não pode alterar se já está em produção de bordado
+  const bloqueado=order.etapa==="Bordado Interno"||order.etapa==="Bordado Externo"||order.etapa==="Bordado Interno e Externo";
+
+  // Etapas para as quais o pedido pode voltar
+  const etapasDestino=[
+    "Programação","Amostra Digital","Aprovação de Amostra Digital",
+    "Amostra Física","Aprovação de Amostra Física","Liberado para bordar",
+  ];
+
+  const enviar=async()=>{
+    if(!novaEtapa){alert("Selecione para qual etapa o pedido deve voltar.");return;}
+    if(!motivo.trim()){alert("Informe o motivo da alteração.");return;}
+    setEnviando(true);
+    try{
+      await onAction(order.id,"alteracao_formulario",{novaEtapa,motivo:motivo.trim()});
+      setOk(true);
+    }catch(e){
+      alert("Erro ao registrar alteração: "+e.message);
+    }finally{setEnviando(false);}
+  };
+
+  return(
+    <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+      {/* Histórico de alteração (se já houve) */}
+      {order.houveAlteracaoForm&&(
+        <div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"14px 16px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <Ic n="warn" s={16} c="#f97316"/>
+            <span style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>JÁ HOUVE ALTERAÇÃO DE FORMULÁRIO</span>
+          </div>
+          <div style={{...F.body,fontSize:10,fontWeight:700,color:"#c2410c",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo registrado</div>
+          <div style={{...F.body,fontSize:13,color:"#7c2d12"}}>{order.motivoAlteracaoForm||"—"}</div>
+        </div>
+      )}
+
+      {ok?(
+        <div style={{padding:30,display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+          <div style={{width:48,height:48,borderRadius:"50%",background:C.green+"14",display:"flex",alignItems:"center",justifyContent:"center"}}><Ic n="check" s={24} c={C.green}/></div>
+          <div style={{...F.title,fontSize:16,fontWeight:700,color:C.green}}>ALTERAÇÃO REGISTRADA</div>
+          <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>O pedido foi retornado para a etapa solicitada e a alteração ficou registrada na timeline.</div>
+        </div>
+      ):bloqueado?(
+        <div style={{background:C.red+"0e",border:`1px solid ${C.red}30`,borderRadius:8,padding:"16px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <Ic n="close" s={16} c={C.red}/>
+            <span style={{...F.title,fontSize:13,fontWeight:700,color:C.red}}>ALTERAÇÃO NÃO PERMITIDA</span>
+          </div>
+          <div style={{...F.body,fontSize:13,color:C.gray600}}>Este pedido já está em produção de bordado ({order.etapa}). Não é possível solicitar alteração de formulário nesta fase.</div>
+        </div>
+      ):(
+        <>
+          <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+            <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>SOLICITAR ALTERAÇÃO DE FORMULÁRIO</div>
+            <div style={{...F.body,fontSize:13,color:C.gray600}}>Use quando o cliente solicitar mudança no pedido. Isso retorna o pedido para a etapa escolhida e gera registro (causa atraso no processo).</div>
+          </div>
+
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Voltar o pedido para a etapa</label>
+            <select value={novaEtapa} onChange={e=>setNovaEtapa(e.target.value)}
+              style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:C.white,cursor:"pointer"}}>
+              <option value="">Selecione a etapa...</option>
+              {etapasDestino.map(e=><option key={e} value={e}>{e}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Motivo da alteração <span style={{color:C.red}}>*</span></label>
+            <textarea value={motivo} onChange={e=>setMotivo(e.target.value)} rows={4} placeholder="Descreva o que o cliente solicitou alterar..."
+              style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
+          </div>
+
+          <button onClick={enviar} disabled={enviando}
+            style={{background:enviando?"#ccc":"#f97316",color:C.white,border:"none",borderRadius:8,padding:"12px 24px",cursor:enviando?"wait":"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+            <Ic n="warn" s={15} c={C.white}/> {enviando?"Registrando...":"Registrar alteração e voltar etapa"}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── ABA ALTERAÇÃO DE FORMULÁRIO (fim) ───────────────────────────────────────
 function Timeline({order}){
+  // Usa o histórico real vindo do HubSpot (registra todas as mudanças,
+  // inclusive reversões manuais). Fallback para o timeline local antigo.
+  const hist=(order.historico&&order.historico.length>0)
+    ? order.historico
+    : (order.timeline||[]).map(t=>({stage:t.stage,who:t.user,enteredAt:t.enteredAt,exitedAt:t.exitedAt,durMin:t.dH!=null?Math.round(t.dH*60):null,origem:""}));
+
+  if(hist.length===0)return <div style={{padding:40,textAlign:"center",...F.body,color:C.gray400,fontSize:13}}>Nenhum histórico de etapas registrado.</div>;
+
   return(
     <div style={{padding:20}}>
-      {order.timeline.map((t,i)=>{const act=t.ex===null;return(
+      {hist.map((t,i)=>{
+        const act=i===hist.length-1; // última = etapa atual (em andamento)
+        return(
         <div key={i} style={{display:"flex",gap:14,marginBottom:22,position:"relative"}}>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
             <div style={{width:28,height:28,borderRadius:"50%",background:act?C.red:C.green,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,zIndex:1}}>
               <Ic n={act?"up":"check"} s={12} c={C.white}/>
             </div>
-            {i<order.timeline.length-1&&<div style={{width:1,flex:1,background:C.gray200,marginTop:4,minHeight:16}}/>}
+            {i<hist.length-1&&<div style={{width:1,flex:1,background:C.gray200,marginTop:4,minHeight:16}}/>}
           </div>
           <div style={{flex:1,paddingTop:4}}>
-            <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:4}}>
+            <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:4,alignItems:"center"}}>
               <span style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{t.stage}</span>
-              {act&&<Tag label="Em andamento" color={C.red}/>}
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                {t.origem&&<Tag label={t.origem} color={t.origem==="Bordado"?C.purple:C.teal}/>}
+                {act&&<Tag label="Em andamento" color={C.red}/>}
+              </div>
             </div>
-            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>{t.user}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>Por: {t.who||"Sistema"}</div>
             <div style={{...F.body,fontSize:11,color:C.gray600,marginTop:3}}>
               Entrada: {fmtD(t.enteredAt)}{t.exitedAt&&<> · Saída: {fmtD(t.exitedAt)}</>}
-              {t.dH!=null&&<> · <strong style={{color:t.dH>24?C.red:C.green}}>{t.dH.toFixed(1)}h</strong></>}
-              {t.dH==null&&act&&<> · <strong style={{color:C.amber}}>Em andamento</strong></>}
             </div>
+            {t.durMin!=null&&<div style={{...F.body,fontSize:11,marginTop:2}}>Permaneceu: <strong style={{color:t.durMin>1440?C.red:C.green}}>{fmtDur(t.durMin)}</strong></div>}
+            {t.durMin==null&&act&&<div style={{...F.body,fontSize:11,marginTop:2,color:C.amber,fontWeight:600}}>Em andamento</div>}
           </div>
         </div>
       );})}
@@ -476,34 +865,172 @@ function Timeline({order}){
 }
 
 
-// ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
-function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,itemSel,itemDest,nSel,allDestDefined,skus,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
-  const role=me.role;
-  const etapa=order.etapa;
+// ─── EXECUÇÃO POR BORDADO (Programação: c/ dificuldade · Amostra: s/ dificuldade) ─
+function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setActionDone}){
+  const ehAmostra=etapa!=="Programação";
+  const todos=(order.bordadosJson||[]).filter(b=>b&&(b.fileName||b.fileId));
+  const filtro=ehAmostra?/~(prog|amostra)/i:/~prog/i;
+  let bordados=todos.filter(b=>filtro.test(b.fileName||""));
+  if(!bordados.length) bordados=todos;                                   // legado: sem termo → todos
+  if(!bordados.length) bordados=[{fileName:(comDificuldade?"Programação":"Amostra")+" geral",fileId:"",fileUrl:""}]; // sem json
+  const TITULOS={"Programação":"PROGRAMAÇÃO DE BORDADO","Amostra Digital":"ENVIAR AMOSTRA DIGITAL","Amostra Física":"CONFIRMAR AMOSTRA FÍSICA"};
+  const HINTS={"Programação":"Para cada bordado: baixe a referência, informe a dificuldade e anexe o(s) arquivo(s) programado(s).","Amostra Digital":"Para cada bordado: baixe a referência e anexe a(s) imagem(ns) da amostra digital.","Amostra Física":"Para cada bordado: baixe a referência e anexe a(s) foto(s) da amostra física."};
+  const ACCEPT=comDificuldade?".emb,.dst,.pes,.jef,image/*":"image/*";
+  const BTN=comDificuldade?"Confirmar programação":etapa==="Amostra Digital"?"Enviar amostra digital":"Confirmar amostra";
+  const motivoRej=etapa==="Amostra Digital"?order.motivoRejAmDigital:etapa==="Amostra Física"?order.motivoRejAmFisica:"";
+  const keyOf=(b,i)=>b.fileId||("idx"+i);
+  const [data,setData]=useState(()=>{const m={};bordados.forEach((b,i)=>{m[keyOf(b,i)]={dificuldade:"",files:[]};});return m;});
+  const [enviando,setEnviando]=useState(false);
+  const ehImagem=(n="")=>/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(n);
+  const nomeLimpo=(n="")=>n.replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
+  const setDif=(k,d)=>setData(p=>({...p,[k]:{...p[k],dificuldade:d}}));
+  const addFiles=(k,fl)=>setData(p=>({...p,[k]:{...p[k],files:[...p[k].files,...Array.from(fl)]}}));
+  const rmFile=(k,idx)=>setData(p=>({...p,[k]:{...p[k],files:p[k].files.filter((_,i)=>i!==idx)}}));
+  const DIFS=[["Fácil",C.green],["Médio",C.amber],["Difícil",C.red]];
 
-  // Ação já confirmada
-  if(actionDone){
+  const confirmar=async()=>{
+    for(const [i,b] of bordados.entries()){
+      const st=data[keyOf(b,i)];
+      if(comDificuldade&&!st.dificuldade){alert(`Defina a dificuldade do bordado: ${nomeLimpo(b.fileName)}`);return;}
+      if(!st.files.length){alert(`Anexe ao menos um arquivo para: ${nomeLimpo(b.fileName)}`);return;}
+    }
+    setEnviando(true);
+    try{
+      const toB64=(f)=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
+      const execucoes=[];
+      for(const [i,b] of bordados.entries()){
+        const st=data[keyOf(b,i)];
+        const arquivos=[];
+        for(const f of st.files) arquivos.push({fileBase64:await toB64(f),fileName:f.name});
+        execucoes.push({nomeArquivo:nomeLimpo(b.fileName),dificuldade:comDificuldade?st.dificuldade:"",arquivos});
+      }
+      const m=await onAction(order.id,"exec_bordado",{execucoes});
+      setActionMsg(m||"Registrado.");setActionDone(true);
+    }catch(e){alert("Erro ao enviar: "+e.message);}
+    finally{setEnviando(false);}
+  };
+
+  return(
+    <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+        <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{TITULOS[etapa]||"EXECUÇÃO"}</div>
+        <div style={{...F.body,fontSize:13,color:C.gray600}}>{HINTS[etapa]||"Anexe o(s) arquivo(s) de cada bordado."}</div>
+      </div>
+      {order.reprogramacao&&<div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:10}}>
+        <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
+        <div style={{flex:1}}>
+          <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>REPROGRAMAÇÃO</div>
+          <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:1}}>Este item foi reprovado e voltou para esta etapa. Anexe o novo arquivo.</div>
+          {motivoRej&&<div style={{marginTop:8,padding:"8px 10px",background:C.white,borderRadius:6,border:"1px solid #fed7aa"}}>
+            <div style={{...F.body,fontSize:10,fontWeight:700,color:"#c2410c",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo da reprovação</div>
+            <div style={{...F.body,fontSize:13,color:"#7c2d12"}}>{motivoRej}</div>
+          </div>}
+        </div>
+      </div>}
+      {bordados.map((b,i)=>{
+        const k=keyOf(b,i);const st=data[k];const img=ehImagem(b.fileName||"");
+        return(
+          <div key={k} style={{border:`1px solid ${C.gray200}`,borderRadius:10,padding:14,display:"flex",flexDirection:"column",gap:12}}>
+            <div style={{display:"flex",gap:12,alignItems:"center"}}>
+              {img&&b.fileUrl
+                ?<img src={b.fileUrl} alt="" style={{width:64,height:64,objectFit:"cover",borderRadius:8,border:`1px solid ${C.gray200}`,flexShrink:0}}/>
+                :<div style={{width:64,height:64,borderRadius:8,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="box" s={24} c={C.gray400}/></div>}
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,wordBreak:"break-word"}}>{nomeLimpo(b.fileName)}</div>
+                {b.fileUrl&&<a href={b.fileUrl} target="_blank" rel="noreferrer" download style={{...F.body,fontSize:12,color:C.blue,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4,marginTop:4,textDecoration:"none"}}><Ic n="download" s={13} c={C.blue}/> Baixar referência</a>}
+              </div>
+            </div>
+            {comDificuldade&&<div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Dificuldade</label>
+              <div style={{display:"flex",gap:8}}>
+                {DIFS.map(([d,cor])=>(
+                  <button key={d} onClick={()=>setDif(k,d)}
+                    style={{flex:1,padding:"9px 12px",borderRadius:7,border:`1.5px solid ${st.dificuldade===d?cor:C.gray200}`,background:st.dificuldade===d?cor+"14":C.white,color:st.dificuldade===d?cor:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:700}}>{d}</button>
+                ))}
+              </div>
+            </div>}
+            <div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>{comDificuldade?"Arquivo(s) programado(s)":"Arquivo(s) da amostra"}</label>
+              <input id={`prog-input-${k}`} type="file" multiple accept={ACCEPT} style={{display:"none"}}
+                onChange={e=>{if(e.target.files.length)addFiles(k,e.target.files);e.target.value="";}}/>
+              <button onClick={()=>document.getElementById(`prog-input-${k}`).click()}
+                style={{padding:"9px 14px",borderRadius:7,border:`1.5px dashed ${C.gray300}`,background:C.gray50,color:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6}}>
+                <Ic n="box" s={14} c={C.gray500}/> Anexar arquivo
+              </button>
+              {st.files.length>0&&<div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+                {st.files.map((f,idx)=>(
+                  <div key={idx} style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,background:C.green+"0e",border:`1px solid ${C.green}30`,borderRadius:6,padding:"7px 10px"}}>
+                    <span style={{...F.body,fontSize:12,color:C.gray700,wordBreak:"break-all",display:"inline-flex",alignItems:"center",gap:6}}><Ic n="check" s={12} c={C.green}/> {f.name}</span>
+                    <button onClick={()=>rmFile(k,idx)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,fontSize:15,lineHeight:1,flexShrink:0}}>✕</button>
+                  </div>
+                ))}
+              </div>}
+            </div>
+          </div>
+        );
+      })}
+      <button onClick={confirmar} disabled={enviando}
+        style={{background:enviando?"#ccc":C.red,color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:enviando?"not-allowed":"pointer",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+        <Ic n="send" s={15} c={C.white}/> {enviando?"Enviando...":BTN}
+      </button>
+    </div>
+  );
+}
+
+
+// ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
+function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
+  const etapa=order.etapa;
+  const[uploading,setUploading]=useState(false);
+
+  // Pedido já concluído — apenas consulta, sem ação
+  if(etapa==="Finalizado"){
     return(
       <div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
         <div style={{width:52,height:52,borderRadius:"50%",background:C.green+"14",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <Ic n="check" s={26} c={C.green}/>
         </div>
-        <div style={{...F.title,fontSize:18,fontWeight:700,color:C.green}}>AÇÃO CONFIRMADA</div>
-        <div style={{...F.body,fontSize:13,color:C.gray500}}>O pedido foi movimentado com sucesso.</div>
+        <div style={{...F.title,fontSize:18,fontWeight:700,color:C.green,textAlign:"center"}}>PEDIDO FINALIZADO</div>
+        <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>Este pedido já foi concluído. Consulte o histórico completo nas abas SLA / Prazo e Timeline.</div>
       </div>
     );
   }
 
+  // Ação já confirmada
+  if(actionDone){
+    const aguardando=actionMsg&&actionMsg.includes("Aguardando");
+    return(
+      <div style={{padding:40,display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+        <div style={{width:52,height:52,borderRadius:"50%",background:(aguardando?C.amber:C.green)+"14",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <Ic n={aguardando?"clock":"check"} s={26} c={aguardando?C.amber:C.green}/>
+        </div>
+        <div style={{...F.title,fontSize:18,fontWeight:700,color:aguardando?C.amber:C.green,textAlign:"center"}}>{aguardando?"LADO CONCLUÍDO":"AÇÃO CONFIRMADA"}</div>
+        <div style={{...F.body,fontSize:13,color:C.gray500,textAlign:"center",maxWidth:380}}>{actionMsg||"O pedido foi movimentado com sucesso."}</div>
+      </div>
+    );
+  }
+
+  // ── EXECUÇÃO POR BORDADO: Programação (c/ dificuldade) e Amostras (s/ dificuldade) ─
+  if(etapa==="Programação"||etapa==="Amostra Digital"||etapa==="Amostra Física"){
+    return <ExecPorBordado order={order} etapa={etapa} comDificuldade={etapa==="Programação"} onAction={onAction} setActionMsg={setActionMsg} setActionDone={setActionDone}/>;
+  }
+
   // ── DIRECIONADOR ────────────────────────────────────────────────────────────
-  if(role==="direcionador"||((role==="superadmin"||role==="supervisao")&&etapa==="Direcionamento")){
-    const internos=order.items.filter(it=>itemDest[it.sku]==="interno").length;
-    const externos=order.items.filter(it=>itemDest[it.sku]==="externo").length;
-    const pendentes=order.items.filter(it=>!itemDest[it.sku]).length;
+  if(etapa==="Direcionamento"){
+    const itensDir=itensDirecionaveis||order.items;
+    const internos=itensDir.filter((it,i)=>itemDest[it.id||i]==="interno").length;
+    const externos=itensDir.filter((it,i)=>itemDest[it.id||i]==="externo").length;
+    const pendentes=itensDir.filter((it,i)=>!itemDest[it.id||i]).length;
+    const ocultos=order.items.length-itensDir.length;
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
         <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
           <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:8}}>DIRECIONAR ITENS PARA BORDADO</div>
           <div style={{...F.body,fontSize:13,color:C.gray600}}>Defina para cada SKU se o bordado será executado internamente ou por fornecedor externo.</div>
+        </div>
+        <div style={{background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
+          <Ic n="box" s={14} c={C.blue}/>
+          <div style={{...F.body,fontSize:12,color:C.blue,fontWeight:600}}>Exibindo apenas os <strong>{itensDir.length}</strong> item(ns) com bordado — somente estes precisam de direcionamento.{ocultos>0?` ${ocultos} item(ns) sem bordado ficam na aba "Todos os itens do pedido".`:""}</div>
         </div>
 
         {/* Barra de atalhos */}
@@ -531,15 +1058,15 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
             <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-              {["","SKU","Descrição","Cor","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
+              {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
-            <tbody>{order.items.map((it,idx)=>{
-              const dest=itemDest[it.sku];
-              const sel=itemSel[it.sku]||false;
+            <tbody>{itensDir.map((it,i)=>{
+              const dest=itemDest[it.id||i];
+              const sel=itemSel[it.id||i]||false;
               return(
-                <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:sel?C.red+"06":"transparent"}}>
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`,background:sel?C.red+"06":"transparent"}}>
                   <td style={{padding:"9px 10px"}}>
-                    <input type="checkbox" checked={sel} onChange={()=>toggleItemSel(it.sku)}
+                    <input type="checkbox" checked={sel} onChange={()=>toggleItemSel(it.id||i)}
                       style={{width:15,height:15,cursor:"pointer",accentColor:C.red}}/>
                   </td>
                   <td style={{padding:"9px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
@@ -548,11 +1075,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                   <td style={{padding:"9px 10px"}}>
                     <div style={{display:"flex",gap:5}}>
-                      <button onClick={()=>setDestOne(it.sku,"interno")}
+                      <button onClick={()=>setDestOne(it.id||i,"interno")}
                         style={{background:dest==="interno"?C.green:C.white,color:dest==="interno"?C.white:C.gray700,border:`1.5px solid ${dest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
                         Interno
                       </button>
-                      <button onClick={()=>setDestOne(it.sku,"externo")}
+                      <button onClick={()=>setDestOne(it.id||i,"externo")}
                         style={{background:dest==="externo"?C.purple:C.white,color:dest==="externo"?C.white:C.gray700,border:`1.5px solid ${dest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
                         Externo
                       </button>
@@ -571,7 +1098,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             <span>Externo: <strong style={{color:C.purple}}>{externos}</strong></span>
             {pendentes>0&&<span style={{color:C.amber}}>Pendente: <strong>{pendentes}</strong></span>}
           </div>
-          <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{destinos:itemDest});setActionDone(true);}}
+          <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{
+              destinos: Object.fromEntries(
+                itensDir.map((it,i)=>[it.id||it.sku,(itemDest[it.id||i]||"")])
+              )
+            });setActionDone(true);}}
             disabled={!allDestDefined}
             style={{background:allDestDefined?C.green:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"10px 22px",cursor:allDestDefined?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
             <Ic n="check" s={14} c={C.white}/> Confirmar direcionamento
@@ -585,19 +1116,38 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── UPLOAD DE ARQUIVO (Programador, Amostra Digital, Amostra Física) ────────
-  const uploadRoles=["programador","amostra_digital","amostra_fisica"];
-  if(uploadRoles.includes(role)||((role==="superadmin"||role==="supervisao")&&["Programação","Amostra Digital","Amostra Física"].includes(etapa))){
-    const config={
-      programador:    {title:"Programação de Bordado",    btn:"Confirmar programação",      nextEtapa:"Amostra Digital", hint:"Anexe o arquivo .EMB ou similar com a programação de pontos.",  accept:".emb,.dst,.pes,.jef"},
-      amostra_digital:{title:"Enviar Amostra Digital",    btn:"Enviar amostra digital",      nextEtapa:"Amostra Física",  hint:"Anexe a imagem da amostra digital para aprovação do pós-venda.", accept:"image/*"},
-      amostra_fisica: {title:"Confirmar Amostra Física",  btn:"Confirmar amostra pronta",    nextEtapa:"Aprovação",       hint:"Anexe a foto da amostra física. O pós-venda será notificado.",    accept:"image/*"},
-    }[role]||{title:"Anexar arquivo",btn:"Confirmar",nextEtapa:"",hint:"",accept:"*"};
+  const UPLOAD_ETAPAS={
+    "Programação":    {title:"Programação de Bordado",  btn:"Confirmar programação",   hint:"Anexe o arquivo .EMB ou similar com a programação de pontos.",  accept:".emb,.dst,.pes,.jef"},
+    "Amostra Digital":{title:"Enviar Amostra Digital",  btn:"Enviar amostra digital",   hint:"Anexe a imagem da amostra digital para aprovação do pós-venda.", accept:"image/*"},
+    "Amostra Física": {title:"Confirmar Amostra Física",btn:"Confirmar amostra pronta", hint:"Anexe a foto da amostra física. O pós-venda será notificado.",    accept:"image/*"},
+  };
+  if(UPLOAD_ETAPAS[etapa]){
+    const config=UPLOAD_ETAPAS[etapa];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+        {order.reprogramacao&&(()=>{
+          const motivo=etapa==="Amostra Digital"?order.motivoRejAmDigital:etapa==="Amostra Física"?order.motivoRejAmFisica:"";
+          return <div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:10}}>
+            <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
+            <div style={{flex:1}}>
+              <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>REPROGRAMAÇÃO</div>
+              <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:1}}>Este item foi reprovado e voltou para esta etapa. Anexe o novo arquivo — o anterior foi removido.</div>
+              {motivo&&<div style={{marginTop:8,padding:"8px 10px",background:C.white,borderRadius:6,border:"1px solid #fed7aa"}}>
+                <div style={{...F.body,fontSize:10,fontWeight:700,color:"#c2410c",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo da reprovação</div>
+                <div style={{...F.body,fontSize:13,color:"#7c2d12"}}>{motivo}</div>
+              </div>}
+            </div>
+          </div>;
+        })()}
         <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
           <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{config.title.toUpperCase()}</div>
           <div style={{...F.body,fontSize:13,color:C.gray600}}>{config.hint}</div>
         </div>
+        {/* Arquivos anexados pelo vendedor — referência para a execução (filtrados por etapa) */}
+        {(()=>{ const refIds=arquivosBordadoPorEtapa(order,etapa); return refIds.length>0?<div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivos do vendedor (referência)</label>
+          <ArquivosBox fileIds={refIds}/>
+        </div>:null; })()}
         {/* Upload */}
         <div>
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivo</label>
@@ -630,38 +1180,55 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <textarea value={obsText} onChange={e=>setObsText(e.target.value)} rows={3} placeholder="Informações relevantes sobre este arquivo..."
             style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
         </div>
-        <button onClick={()=>{if(!uploadFile){alert("Anexe um arquivo antes de confirmar.");return;}onAction(order.id,"upload",{arquivo:uploadName,obs:obsText});setActionDone(true);}}
-          style={{background:uploadFile?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFile?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
-          <Ic n="send" s={15} c={C.white}/> {config.btn}
+        <button onClick={async()=>{
+            if(!uploadFile){alert("Anexe um arquivo antes de confirmar.");return;}
+            setUploading(true);
+            try{
+              // Converte o arquivo em base64
+              const base64=await new Promise((res,rej)=>{
+                const r=new FileReader();
+                r.onload=()=>res(r.result.split(",")[1]);
+                r.onerror=rej;
+                r.readAsDataURL(uploadFile);
+              });
+              const m=await onAction(order.id,"upload",{
+                arquivo:uploadName,obs:obsText,
+                fileBase64:base64,fileName:uploadName,
+                propriedade:ETAPA_PROPRIEDADE[etapa],
+              });
+              setActionMsg(m||"");setActionDone(true);
+            }catch(e){alert("Erro no upload: "+e.message);}
+            finally{setUploading(false);}
+          }}
+          disabled={uploading}
+          style={{background:uploading?"#ccc":uploadFile?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFile&&!uploading?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+          <Ic n="send" s={15} c={C.white}/> {uploading?"Enviando...":config.btn}
         </button>
       </div>
     );
   }
 
   // ── PÓS-VENDA / CS — Aprovação de amostra ─────────────────────────────────
-  if((role==="posvenda"||(role==="superadmin"||role==="supervisao"))&&etapa==="Amostra Física"){
+  if(etapa==="Aprovação de Amostra Digital"||etapa==="Aprovação de Amostra Física"){
+    const ehDigital=etapa==="Aprovação de Amostra Digital";
+    const tituloEtapa=ehDigital?"APROVAÇÃO DE AMOSTRA DIGITAL":"APROVAÇÃO DE AMOSTRA FÍSICA";
+    const voltaPara=ehDigital?"Amostra Digital":"Amostra Física";
+    // Arquivo anexado pelo analista (fileId guardado na propriedade da etapa)
+    const fileIdArquivo=ehDigital?order.arqAmostraDigital:order.arqAmostraFisica;
+    const fileIds=fileIdArquivo?String(fileIdArquivo).split(";").filter(Boolean):[];
     return(
       <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
         <div style={{background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:8,padding:"14px 16px"}}>
-          <div style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.1em",marginBottom:4}}>APROVAÇÃO DE AMOSTRA FÍSICA</div>
-          <div style={{...F.body,fontSize:13,color:C.gray700}}>A amostra física está pronta e foi entregue ao vendedor. Após contato com o cliente, registre a decisão abaixo.</div>
+          <div style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.1em",marginBottom:4}}>{tituloEtapa}</div>
+          <div style={{...F.body,fontSize:13,color:C.gray700}}>{ehDigital
+            ?"O analista anexou a amostra digital. Veja o arquivo abaixo e, após contato com o cliente, registre a decisão."
+            :"A amostra física está pronta. Veja o arquivo abaixo e, após contato com o cliente, registre a decisão."}</div>
         </div>
-        {/* Mostrar arquivo da amostra física se existir */}
-        {order.bordado.amFis.length>0&&(
-          <div>
-            <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Arquivo da amostra física</div>
-            {order.bordado.amFis.map((a,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:6,padding:"10px 14px",border:`1px solid ${C.gray200}`,marginBottom:6}}>
-                <Ic n="scissors" s={16} c={C.gray400}/>
-                <div style={{flex:1}}>
-                  <div style={{...F.body,fontSize:13,fontWeight:600}}>{a.nome}</div>
-                  <div style={{...F.body,fontSize:11,color:C.gray400}}>{a.data}</div>
-                </div>
-                <Btn label="Baixar" icon="download" variant="secondary" size="sm"/>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Arquivo da amostra anexado pelo analista */}
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{ehDigital?"Amostra digital anexada":"Amostra física anexada"}</label>
+          <ArquivosBox fileIds={fileIds} emptyText="Nenhum arquivo de amostra anexado ainda."/>
+        </div>
         {/* Observação */}
         <div>
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações do cliente (opcional)</label>
@@ -670,17 +1237,17 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         </div>
         {/* Botões de decisão */}
         <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-          <button onClick={()=>{onAction(order.id,"aprovar_amostra",{obs:obsText});setActionDone(true);}}
+          <button onClick={async()=>{try{const m=await onAction(order.id,"aprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
             style={{flex:1,minWidth:140,background:C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="check" s={16} c={C.white}/> Amostra Aprovada
           </button>
-          <button onClick={()=>{onAction(order.id,"reprovar_amostra",{obs:obsText});setActionDone(true);}}
+          <button onClick={async()=>{try{const m=await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
             style={{flex:1,minWidth:140,background:C.white,color:C.red,border:`2px solid ${C.red}`,borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="close" s={16} c={C.red}/> Reprovar — Refazer
           </button>
         </div>
         <div style={{...F.body,fontSize:11,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
-          <Ic n="warn" s={11} c={C.gray300}/> Reprovar retorna o pedido para a etapa de Programação de Bordado.
+          <Ic n="warn" s={11} c={C.gray300}/> Reprovar retorna o pedido para a etapa de {voltaPara} (reprogramação) e remove o arquivo anterior.
         </div>
       </div>
     );
@@ -688,11 +1255,12 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 
   // ── MOVIMENTAÇÃO SIMPLES (Bordado Interno, Externo, Expedição, Faturamento) ─
   const moveConfig={
-    bordado_interno: {title:"BORDADO CONCLUÍDO",    sub:"Confirme que o bordado interno foi executado e as peças estão prontas.",          btn:"Confirmar bordado concluído",   icon:"check",  color:C.green,  next:"Expedição"},
-    bordado_externo: {title:"RETORNO DO EXTERNO",   sub:"Confirme o recebimento das peças bordadas pelo fornecedor externo.",              btn:"Confirmar retorno das peças",   icon:"inbox",  color:C.purple, next:"Expedição"},
-    expedicao:       {title:"PEDIDO EMBALADO",      sub:"Confirme que o pedido foi embalado e está pronto para faturamento.",             btn:"Enviar para faturamento",       icon:"box",    color:C.teal,   next:"Faturamento"},
-    faturamento:     {title:"FATURAR PEDIDO",       sub:"Confirme que o pedido foi faturado e o processo de pós-venda está encerrado.",   btn:"Confirmar faturamento",         icon:"dollar", color:C.green,  next:"Concluído"},
-  }[role]||{title:"MOVIMENTAR PEDIDO",sub:"Confirme a execução desta etapa para avançar o pedido.",btn:"Confirmar e avançar",icon:"arrow",color:C.red,next:""};
+    "Bordado Interno":          {title:"BORDADO CONCLUÍDO",  sub:"Confirme que o bordado interno foi executado e as peças estão prontas.",        btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
+    "Bordado Externo":          {title:"RETORNO DO EXTERNO", sub:"Confirme o recebimento das peças bordadas pelo fornecedor externo.",            btn:"Confirmar retorno das peças", icon:"inbox",  color:C.purple, next:"Expedição"},
+    "Bordado Interno e Externo":{title:"BORDADO CONCLUÍDO",  sub:"Confirme a execução do bordado interno e o retorno do externo.",                btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
+    "Expedição":                {title:"PEDIDO EMBALADO",    sub:"Confirme que o pedido foi embalado e está pronto para faturamento.",            btn:"Enviar para faturamento",     icon:"box",    color:C.teal,   next:"Faturamento"},
+    "Faturamento":              {title:"FATURAR PEDIDO",     sub:"Confirme que o pedido foi faturado e o processo de pós-venda está encerrado.",  btn:"Confirmar faturamento",       icon:"dollar", color:C.green,  next:"Concluído"},
+  }[etapa]||{title:"MOVIMENTAR PEDIDO",sub:"Confirme a execução desta etapa para avançar o pedido.",btn:"Confirmar e avançar",icon:"arrow",color:C.red,next:""};
 
   return(
     <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
@@ -709,6 +1277,27 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
         ))}
       </div>
+      {/* Itens a executar nesta etapa */}
+      {order.items&&order.items.length>0&&(
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{etapa==="Expedição"||etapa==="Faturamento"?"Todos os itens do pedido":`Itens para ${etapa==="Bordado Externo"?"bordado externo":"bordado"}`} ({order.items.length})</label>
+          <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
+            <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:380}}>
+              <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
+                {["SKU","Descrição","TAM","Qtd",etapa.includes("e Externo")||etapa==="Bordado Interno e Externo"?"Destino":null].filter(Boolean).map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
+              </tr></thead>
+              <tbody>{order.items.map((it,i)=>(
+                <tr key={it.id||i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray700}}>{it.desc}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray500,fontSize:12}}>{it.cor}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {/* Observação */}
       <div>
         <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações (opcional)</label>
@@ -718,7 +1307,10 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       {moveConfig.next&&<div style={{...F.body,fontSize:12,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
         <Ic n="arrow" s={12} c={C.gray300}/> Próxima etapa: <strong style={{color:C.gray600,marginLeft:2}}>{moveConfig.next}</strong>
       </div>}
-      <button onClick={()=>{onAction(order.id,"mover",{obs:obsText});setActionDone(true);}}
+      <button onClick={async()=>{
+          try{ const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true); }
+          catch(e){ alert("Erro ao processar: "+e.message); }
+        }}
         style={{background:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
         <Ic n={moveConfig.icon} s={16} c={C.white}/> {moveConfig.btn}
       </button>
@@ -727,43 +1319,41 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 }
 
 // ─── ORDER MODAL ─────────────────────────────────────────────────────────────
-function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
-  const defaultTab=(()=>{
-    const r=me.role;const e=order.etapa;
-    if((r==="direcionador"||r==="superadmin"||r==="supervisao")&&e==="Direcionamento")return"acao";
-    if((r==="programador")&&e==="Programação")return"acao";
-    if((r==="amostra_digital")&&e==="Amostra Digital")return"acao";
-    if((r==="amostra_fisica")&&e==="Amostra Física")return"acao";
-    if((r==="posvenda")&&e==="Amostra Física"&&order.bordado.amFis.length>0)return"acao";
-    if(["bordado_interno","bordado_externo","expedicao","faturamento"].includes(r))return"acao";
-    return"info";
-  })();
+function OrderModal({order,me,onClose,usuarios,onAction,isMobile,slaCfg}){
+  const ETAPAS_COM_ACAO=["Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Faturamento"];
+  const defaultTab=ETAPAS_COM_ACAO.includes(order.etapa)?"acao":"info";
   const[tab,setTab]=useState(defaultTab);
   const[uploadFile,setUploadFile]=useState(null);
   const[uploadName,setUploadName]=useState("");
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
-  // Direcionamento local state
-  const skus=order.items.map(i=>i.sku);
+  const[actionMsg,setActionMsg]=useState("");
+  // Direcionamento local state — apenas itens COM bordado precisam de direcionamento.
+  // Fallback (pedido legado sem a flag em nenhum item): usa todos os itens.
+  const itensComBordado=order.items.filter(it=>it.bordado);
+  const itensDirecionaveis=itensComBordado.length?itensComBordado:order.items;
+  const skus=itensDirecionaveis.map(it=>it.sku);
+  const itemKeys=itensDirecionaveis.map((it,i)=>it.id||i);
   const[itemSel,setItemSel]=useState({});
-  const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach(it=>{if(it.dest)m[it.sku]=it.dest;});return m;});
+  const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach((it,i)=>{if(it.dest)m[it.id||i]=it.dest;});return m;});
   const nSel=skus.filter(s=>itemSel[s]).length;
-  const allDestDefined=order.items.every(it=>itemDest[it.sku]);
-  const toggleItemSel=(sku)=>setItemSel(p=>({...p,[sku]:!p[sku]}));
-  const selAllItems=()=>{const allOn=skus.every(s=>itemSel[s]);const n={};skus.forEach(s=>n[s]=!allOn);setItemSel(n);};
-  const setDestSel=(dest)=>{const selSkus=skus.filter(s=>itemSel[s]);if(!selSkus.length){alert("Selecione ao menos um item.");return;}setItemDest(p=>{const n={...p};selSkus.forEach(s=>n[s]=dest);return n;});};
-  const setDestAll=(dest)=>{const n={};skus.forEach(s=>n[s]=dest);setItemDest(n);};
-  const setDestOne=(sku,dest)=>setItemDest(p=>({...p,[sku]:dest}));
+  const allDestDefined=itensDirecionaveis.every((it,i)=>itemDest[it.id||i]);
+  const toggleItemSel=(key)=>setItemSel(p=>({...p,[key]:!p[key]}));
+  const selAllItems=()=>{const allOn=itemKeys.every(k=>itemSel[k]);const n={};itemKeys.forEach(k=>n[k]=!allOn);setItemSel(n);};
+  const setDestSel=(dest)=>{const selKeys=itemKeys.filter(k=>itemSel[k]);if(!selKeys.length){alert("Selecione ao menos um item.");return;}setItemDest(p=>{const n={...p};selKeys.forEach(k=>n[k]=dest);return n;});};
+  const setDestAll=(dest)=>{const n={};itemKeys.forEach(k=>n[k]=dest);setItemDest(n);};
+  const setDestOne=(key,dest)=>setItemDest(p=>({...p,[key]:dest}));
   const total=order.items.reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
-  const ACTION_ROLES=["programador","amostra_digital","amostra_fisica","direcionador","posvenda","bordado_interno","bordado_externo","expedicao","faturamento"];
-  const hasAction=ACTION_ROLES.includes(me.role)||["superadmin","supervisao"].includes(me.role);
+  // A aba Executar aparece quando a etapa atual do pedido tem uma ação possível
+  const hasAction=ETAPAS_COM_ACAO.includes(order.etapa);
   const TABS=[
-    {id:"info",l:"Negócio"},
+    ...(order.etapa==="Programação"?[]:[{id:"info",l:"Negócio"}]),
     {id:"sla",l:"SLA / Prazo"},
     {id:"bordado",l:"Bordado"},
-    {id:"itens",l:"Peças"},
+    {id:"itens",l:"Todos os itens"},
     {id:"tl",l:"Timeline"},
+    {id:"alteracao",l:order.houveAlteracaoForm?"⚠ Alteração de Formulário":"Alteração de Formulário"},
     {id:"chat",l:"Conversa"},
     ...(hasAction?[{id:"acao",l:"▶ Executar"}]:[]),
   ];
@@ -771,23 +1361,25 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:isMobile?0:16}}>
       <div style={{background:C.white,borderRadius:isMobile?0:10,width:"100%",maxWidth:900,maxHeight:isMobile?"100dvh":"92vh",display:"flex",flexDirection:"column",boxShadow:"0 20px 60px rgba(0,0,0,0.2)"}}>
         {/* Header */}
-        <div style={{padding:"14px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+        <div style={{padding:"14px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8,flexShrink:0}}>
           <div style={{flex:1,minWidth:0}}>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
               <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black}}>{order.id}</span>
               <ETag etapa={order.etapa}/>
-              {(sla.st!=="ok"||sla.ft!=="ok")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
+              {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
+              {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
+              {(sla.st==="late"||sla.st==="risk"||sla.ft==="late"||sla.ft==="risk")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
             </div>
             <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:3,fontWeight:600}}>{order.client}</div>
-            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor} · {total} peças · {fmtR(order.valor)}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor}{order.etapa!=="Programação"?` · ${total} peças · ${fmtR(order.valor)}`:""}</div>
           </div>
           <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",padding:4}}><Ic n="close" s={18} c={C.gray400}/></button>
         </div>
-        {order.alertas.length>0&&<div style={{padding:"8px 20px",display:"flex",gap:8,flexWrap:"wrap",borderBottom:`1px solid ${C.gray200}`,background:"#fffbeb"}}>
+        {order.alertas.length>0&&<div style={{padding:"8px 20px",display:"flex",gap:8,flexWrap:"wrap",borderBottom:`1px solid ${C.gray200}`,background:"#fffbeb",flexShrink:0}}>
           {order.alertas.map((a,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:6,...F.body,fontSize:12,color:"#92400e",fontWeight:600}}><Ic n="warn" s={13} c={C.amber}/>{a}</div>)}
         </div>}
         {/* Tabs */}
-        <div style={{display:"flex",borderBottom:`1px solid ${C.gray200}`,padding:"0 20px",overflowX:"auto",gap:2}}>
+        <div className="sgp-scroll" style={{display:"flex",borderBottom:`1px solid ${C.gray200}`,padding:"0 20px",overflowX:"auto",gap:2,flexShrink:0}}>
           {TABS.map(t=>(
             <button key={t.id} onClick={()=>setTab(t.id)}
               style={{background:"none",border:"none",padding:"11px 12px",cursor:"pointer",fontSize:13,fontWeight:tab===t.id?700:400,color:tab===t.id?C.red:C.gray500,borderBottom:tab===t.id?`2px solid ${C.red}`:"2px solid transparent",whiteSpace:"nowrap",...F.body}}>
@@ -795,11 +1387,11 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             </button>
           ))}
         </div>
-        <div style={{flex:1,overflow:"auto"}}>
+        <div className="sgp-scroll" style={{flex:1,overflow:"auto",minHeight:0}}>
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Prazo Final",fmtD(order.prazoFinal)],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Data limite",dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)"],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,wordBreak:"break-word"}}>{v}</div>
@@ -826,14 +1418,17 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
           {tab==="sla"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
               {[["SLA desta Etapa",sla.st,[`${sla.hrs.toFixed(0)}h`,`/ ${sla.sla}h`],sla.st==="late"?"Etapa ultrapassou o SLA":sla.st==="risk"?"Próximo do limite":"Dentro do SLA"],
-                ["Prazo Final",sla.ft,[sla.ft==="late"?`${Math.abs(sla.htd).toFixed(0)}h atraso`:`${sla.htd.toFixed(0)}h restantes`,""],sla.ft==="late"?"Pedido fora do prazo":sla.ft==="risk"?"Prazo muito próximo":"Dentro do prazo"]
+                ["Data limite",sla.ft==="none"?"none":sla.ft,
+                  sla.htd==null?["A definir",""]:[sla.ft==="late"?`${Math.abs(sla.htd).toFixed(0)}h atraso`:`${sla.htd.toFixed(0)}h restantes`,""],
+                  sla.htd==null?"Sem amostra aprovada — prazo ainda não inicia":sla.ft==="late"?"Pedido fora do prazo":sla.ft==="risk"?"Prazo muito próximo":"Dentro do prazo"]
               ].map(([title,st,vals,msg])=>{
-                const c=st==="late"?C.red:st==="risk"?C.amber:C.green;
+                const c=st==="late"?C.red:st==="risk"?C.amber:st==="none"?C.gray400:C.green;
                 return(
                   <Card key={title} style={{borderLeft:`3px solid ${c}`}}>
                     <SecH>{title}</SecH>
                     <div style={{...F.title,fontSize:26,fontWeight:700,color:c,lineHeight:1}}>{vals[0]} <span style={{fontSize:14,fontWeight:400,color:C.gray400}}>{vals[1]}</span></div>
                     {title==="SLA desta Etapa"&&<div style={{marginTop:8}}><SLABar pct={sla.pct} st={sla.st}/></div>}
+                    {title==="Data limite"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtD(dataVencimento(order))}</div>}
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:6}}>{msg}</div>
                   </Card>
                 );
@@ -841,54 +1436,60 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             </div>
             <Card>
               <SecH>Tempo por etapa</SecH>
-              <table style={{width:"100%",fontSize:12,borderCollapse:"collapse"}}>
-                <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Responsável","Tempo","SLA","Status"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{hd}</th>)}</tr></thead>
-                <tbody>{order.timeline.map((t,i)=>{
-                  const sl=slaCfg[t.stage];const st=t.dH==null?"em andamento":sl&&t.dH>sl?"atrasado":sl&&t.dH>sl*.8?"risco":"ok";
-                  return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                    <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{t.stage}</td>
-                    <td style={{padding:"8px 10px",color:C.gray500,...F.body}}>{t.user}</td>
-                    <td style={{padding:"8px 10px",fontWeight:700,color:st==="atrasado"?C.red:st==="risco"?C.amber:C.green,...F.body}}>{t.dH!=null?`${t.dH.toFixed(1)}h`:<em>Em andamento</em>}</td>
-                    <td style={{padding:"8px 10px",color:C.gray400,...F.body}}>{sl?`${sl}h`:"—"}</td>
-                    <td style={{padding:"8px 10px"}}><Tag label={st==="em andamento"?"Andamento":st==="atrasado"?"Atrasado":st==="risco"?"Em risco":"OK"} color={st==="atrasado"?C.red:st==="risco"?C.amber:st==="em andamento"?C.blue:C.green}/></td>
-                  </tr>);
-                })}</tbody>
-              </table>
+              {(()=>{
+                const hist=(order.historico&&order.historico.length>0)
+                  ? order.historico
+                  : (order.timeline||[]).map(t=>({stage:t.stage,who:t.user,enteredAt:t.enteredAt,exitedAt:t.exitedAt,durMin:t.dH!=null?Math.round(t.dH*60):null}));
+                if(hist.length===0)return <div style={{...F.body,color:C.gray400,fontSize:13,padding:"8px 0"}}>Nenhum histórico registrado.</div>;
+                return(
+                <div style={{overflowX:"auto"}}>
+                <table style={{width:"100%",fontSize:12,borderCollapse:"collapse",minWidth:560}}>
+                  <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Responsável","Entrada","Saída","Permaneceu","Status"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,whiteSpace:"nowrap"}}>{hd}</th>)}</tr></thead>
+                  <tbody>{hist.map((t,i)=>{
+                    const act=i===hist.length-1;
+                    const sl=slaCfg[t.stage];
+                    const durH=t.durMin!=null?t.durMin/60:null;
+                    const st=durH==null?"andamento":sl&&durH>sl?"atrasado":sl&&durH>sl*.8?"risco":"ok";
+                    return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                      <td style={{padding:"8px 10px",fontWeight:600,...F.body,whiteSpace:"nowrap"}}>{t.stage}</td>
+                      <td style={{padding:"8px 10px",color:C.gray500,...F.body,whiteSpace:"nowrap"}}>{t.who||"Sistema"}</td>
+                      <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{fmtD(t.enteredAt)}</td>
+                      <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{t.exitedAt?fmtD(t.exitedAt):"—"}</td>
+                      <td style={{padding:"8px 10px",fontWeight:700,color:st==="atrasado"?C.red:st==="risco"?C.amber:C.green,...F.body,whiteSpace:"nowrap"}}>{durH!=null?fmtDur(t.durMin):<em>Em andamento</em>}</td>
+                      <td style={{padding:"8px 10px"}}><Tag label={st==="andamento"?"Andamento":st==="atrasado"?"Atrasado":st==="risco"?"Em risco":"OK"} color={st==="atrasado"?C.red:st==="risco"?C.amber:st==="andamento"?C.blue:C.green}/></td>
+                    </tr>);
+                  })}</tbody>
+                </table>
+                </div>
+                );
+              })()}
             </Card>
           </div>}
           {/* BORDADO */}
           {tab==="bordado"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
-              {[["Pontos",order.bordado.pts.toLocaleString()],["Arquivo",order.bordado.arq],["Arquivo aprovado",order.bordado.arqOk?"Sim":"Não"],["Cores",order.bordado.cores.join(", ")]].map(([k,v])=>(
-                <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
-                  <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
-                  <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{v}</div>
-                </div>
-              ))}
+            {/* Arquivos de bordado anexados pelo vendedor */}
+            <div>
+              <SecH>Arquivos de Bordado</SecH>
+              <ArquivosBox fileIds={order.arquivoBordado} emptyText="Nenhum arquivo de bordado anexado ao negócio."/>
             </div>
-            {[["Amostras Digitais","amDig","amDigObs","monitor"],["Amostras Físicas","amFis","amFisObs","scissors"]].map(([title,key,obsKey,ico])=>(
-              <div key={key}>
-                <SecH>{title}</SecH>
-                {order.bordado[key].length===0?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhuma registrada.</div>
-                  :order.bordado[key].map((a,i)=>(
-                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:6,padding:"10px 14px",marginBottom:8,border:`1px solid ${C.gray200}`,flexWrap:"wrap"}}>
-                      <Ic n={ico} s={18} c={C.gray400}/>
-                      <div style={{flex:1,minWidth:100}}>
-                        <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{a.nome}</div>
-                        <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:1}}>{a.data}</div>
-                      </div>
-                      <Tag label={a.ok?"Aprovada":"Pendente"} color={a.ok?C.green:C.amber}/>
-                      <Btn label="Baixar" icon="download" variant="secondary" size="sm"/>
-                    </div>
-                  ))
-                }
-                {order.bordado[obsKey]&&<div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>Obs: {order.bordado[obsKey]}</div>}
-              </div>
-            ))}
+            {(order.arquivoDtfsilk&&order.arquivoDtfsilk.length>0)?<div>
+              <SecH>Arquivos DTF / Silk</SecH>
+              <ArquivosBox fileIds={order.arquivoDtfsilk} emptyText="Nenhum arquivo DTF/Silk."/>
+            </div>:null}
+            {/* Amostra digital aprovada */}
+            <div>
+              <SecH>Amostra Digital Aprovada</SecH>
+              <ArquivosBox fileIds={order.arqAmostraDigital?String(order.arqAmostraDigital).split(";").filter(Boolean):[]} emptyText="Nenhuma amostra digital anexada ainda."/>
+            </div>
+            {/* Amostra física aprovada */}
+            <div>
+              <SecH>Amostra Física Aprovada</SecH>
+              <ArquivosBox fileIds={order.arqAmostraFisica?String(order.arqAmostraFisica).split(";").filter(Boolean):[]} emptyText="Nenhuma amostra física anexada ainda."/>
+            </div>
           </div>}
           {/* PEÇAS */}
           {tab==="itens"&&<div style={{padding:20,overflowX:"auto"}}>
-            {(me.role==="direcionador"||(["superadmin","supervisao"].includes(me.role)&&order.etapa==="Direcionamento"))&&(
+            {(order.etapa==="Direcionamento")&&(
               <div style={{background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:7,padding:"10px 14px",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
                 <Ic n="arrow" s={14} c={C.blue}/>
                 <span style={{...F.body,fontSize:12,color:C.blue,fontWeight:600}}>Para definir Interno/Externo, use a aba <strong>▶ Executar</strong></span>
@@ -896,7 +1497,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             )}
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:460}}>
               <thead><tr style={{borderBottom:`2px solid ${C.gray200}`}}>
-                {["SKU","Descrição","Tamanho","Qtd","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
+                {["SKU","Descrição","TAM","Qtd","Bordado","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
               </tr></thead>
               <tbody>{order.items.map((it,i)=>(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
@@ -904,6 +1505,7 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
                   <td style={{padding:"9px 10px",...F.body,color:C.gray700}}>{it.desc}</td>
                   <td style={{padding:"9px 10px",...F.body,color:C.gray500}}>{it.cor}</td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
+                  <td style={{padding:"9px 10px"}}>{it.bordado?<Tag label="Bordado" color={C.red}/>:<span style={{color:C.gray400}}>—</span>}</td>
                   <td style={{padding:"9px 10px"}}>{it.dest?<Tag label={it.dest==="interno"?"Interno":"Externo"} color={it.dest==="interno"?C.green:C.purple}/>:<span style={{color:C.gray400}}>—</span>}</td>
                   <td style={{padding:"9px 10px"}}><Tag label={it.status==="faltante"?"Faltante":it.status==="bordando"?"Bordando":it.status==="pronto"?"Pronto":"Separado"} color={it.status==="faltante"?C.red:it.status==="pronto"?C.green:C.gray500}/></td>
                 </tr>
@@ -916,15 +1518,17 @@ function OrderModal({order,me,onClose,onSendChat,onAction,isMobile,slaCfg}){
             </table>
           </div>}
           {tab==="tl"&&<Timeline order={order}/>}
-          {tab==="chat"&&<div style={{height:isMobile?380:420}}><Chat order={order} me={me} onSend={onSendChat}/></div>}
+          {tab==="alteracao"&&<AlteracaoFormTab order={order} onAction={onAction} me={me}/>}
+          {tab==="chat"&&<div style={{height:isMobile?380:420}}><Chat order={order} me={me} usuarios={usuarios}/></div>}
           {tab==="acao"&&<AcaoTab
             order={order} me={me}
             uploadFile={uploadFile} setUploadFile={setUploadFile}
             uploadName={uploadName} setUploadName={setUploadName}
             obsText={obsText} setObsText={setObsText}
             actionDone={actionDone} setActionDone={setActionDone}
+            actionMsg={actionMsg} setActionMsg={setActionMsg}
             itemSel={itemSel} itemDest={itemDest} nSel={nSel}
-            allDestDefined={allDestDefined} skus={skus}
+            allDestDefined={allDestDefined} skus={skus} itensDirecionaveis={itensDirecionaveis}
             toggleItemSel={toggleItemSel} selAllItems={selAllItems}
             setDestSel={setDestSel} setDestAll={setDestAll} setDestOne={setDestOne}
             onAction={onAction} isMobile={isMobile}
@@ -940,12 +1544,17 @@ function OCard({order,onClick,slaCfg}){
   const total=order.items.reduce((s,i)=>s+i.qty,0);
   const falt=order.items.filter(i=>i.status==="faltante").reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
-  const accent=sla.st==="late"||sla.ft==="late"?C.red:sla.st==="risk"||sla.ft==="risk"?C.amber:STAGE_COLOR[order.etapa]||C.gray300;
+  const venc=sla.venc;
+  const vencido=sla.ft==="late";
+  const risco=sla.ft==="risk";
+  // Cor da data limite: vermelho vencido, âmbar <24h, cinza ok, cinza claro indefinido
+  const corLimite=!venc?C.gray400:vencido?C.red:risco?C.amber:C.gray600;
+  const accent=vencido?C.red:risco?C.amber:STAGE_COLOR[order.etapa]||C.gray300;
   return(
     <div onClick={onClick} style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,padding:14,cursor:"pointer",borderLeft:`3px solid ${accent}`}}
       onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.07)";}}
       onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8,gap:8}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,gap:8}}>
         <div style={{minWidth:0}}>
           <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{order.id}</div>
           <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{order.client}</div>
@@ -956,7 +1565,16 @@ function OCard({order,onClick,slaCfg}){
         <span style={{fontWeight:700,color:C.green}}>{fmtR(order.valor)}</span>
         <span>{total} peças</span>
         {falt>0&&<span style={{color:C.red,fontWeight:600}}>{falt} faltantes</span>}
-        {!order.amOk&&<span style={{color:C.amber,fontWeight:600}}>Sem amostra</span>}
+        {order.temBordado===false&&<span style={{color:C.gray500,fontWeight:600}}>Sem bordado</span>}
+      </div>
+      {/* DATA LIMITE em destaque */}
+      <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 9px",borderRadius:6,marginBottom:8,
+        background:!venc?C.gray100:vencido?C.red+"12":risco?C.amber+"14":C.gray100,
+        border:`1px solid ${!venc?C.gray200:vencido?C.red+"35":risco?C.amber+"40":C.gray200}`}}>
+        <Ic n="clock" s={13} c={corLimite}/>
+        <span style={{...F.body,fontSize:11.5,fontWeight:700,color:corLimite}}>
+          {!venc?"Data limite a definir":vencido?`Vencido em ${fmtDS(venc)}`:`Vence em ${fmtDS(venc)}`}
+        </span>
       </div>
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <SLABar pct={sla.pct} st={sla.st}/>
@@ -967,51 +1585,85 @@ function OCard({order,onClick,slaCfg}){
 }
 
 // ─── MINHAS DEMANDAS ─────────────────────────────────────────────────────────
-function MinhasDemandas({user,orders,onOpen,slaCfg}){
-  const etapas=ROLE_STAGES[user.role]||[];
-  const mine=orders.filter(o=>etapas.includes(o.etapa)&&!o.concluido);
-  const grouped={};etapas.forEach(e=>{grouped[e]=mine.filter(o=>o.etapa===e);});
-  const active=etapas.filter(e=>grouped[e].length>0);
-  const semAm=mine.filter(o=>!o.amOk);
-  const atrasados=mine.filter(o=>getSLA(o,slaCfg).st==="late");
-  const showAmBox=["direcionador","superadmin","supervisao","posvenda"].includes(user.role);
+function MinhasDemandas({user,onOpen,slaCfg}){
+  // Módulos de operação que o usuário tem acesso (com endpoint)
+  const modulos=(user.admin
+    ? Object.keys(MODULO_ENDPOINT)
+    : (user.modulos||[]).filter(m=>MODULO_ENDPOINT[m]));
+
+  const [dados,setDados]=useState(null);   // { [etapa]: [pedidos] }
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [filtro,setFiltro]=useState("todos"); // "todos" ou nome da etapa
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const pares=await Promise.all(modulos.map(async m=>{
+        const etapa=MODULO_ETAPA[m];
+        const r=await apiFetch(MODULO_ENDPOINT[m]).catch(()=>({data:[]}));
+        return [etapa,ordenarPorPrioridade((r.data||[]).map(o=>normalizarCard(o,etapa)))];
+      }));
+      const obj={};pares.forEach(([etapa,lista])=>{obj[etapa]=lista;});
+      setDados(obj);
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const etapas=modulos.map(m=>MODULO_ETAPA[m]).filter(Boolean);
+  const etapasComDados=etapas.filter(e=>dados&&(dados[e]||[]).length>0);
+  const etapasMostrar=filtro==="todos"?etapasComDados:etapasComDados.filter(e=>e===filtro);
+  const total=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).length,0);
+  const agora=Date.now();
+  const atrasados=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).filter(o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora).length,0);
+
   return(
-    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Minhas Demandas" sub={`${mine.length} pedido${mine.length!==1?"s":""} sob sua responsabilidade`}/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Minhas Demandas" sub={`${total} pedido${total!==1?"s":""} sob sua responsabilidade`} onRefresh={carregar} refreshing={loading}/>
+
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-        <Stat label="Em andamento" value={mine.length} icon="list"/>
-        {atrasados.length>0&&<Stat label="Atrasados" value={atrasados.length} color={C.red} icon="warn"/>}
-        {semAm.length>0&&<Stat label="Sem Amostra" value={semAm.length} color={C.amber} icon="clock"/>}
+        <Stat label="Em andamento" value={total} icon="list"/>
+        {atrasados>0&&<Stat label="Atrasados" value={atrasados} color={C.red} icon="warn"/>}
       </div>
-      {showAmBox&&semAm.length>0&&(
-        <div>
-          <div style={{background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12,display:"flex",alignItems:"center",gap:8}}>
-            <Ic n="warn" s={15} c={C.red}/>
-            <span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>AGUARDANDO APROVAÇÃO DE AMOSTRA — {semAm.length} PEDIDO{semAm.length>1?"S":""}</span>
-          </div>
-          {semAm.map(o=>(
-            <div key={o.id} onClick={()=>onOpen(o)} style={{background:"#fffbeb",border:`1px solid ${C.amber}40`,borderLeft:`3px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",cursor:"pointer",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-              <div><span style={{...F.body,fontWeight:700,fontSize:13}}>{o.id}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
-              <Tag label="Amostra pendente" color={C.amber}/>
-            </div>
-          ))}
-        </div>
-      )}
-      {active.length===0&&(
+
+      {/* Filtro por tipo de demanda */}
+      {etapas.length>1&&<div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        <button onClick={()=>setFiltro("todos")}
+          style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${filtro==="todos"?C.red:C.gray200}`,background:filtro==="todos"?C.red+"0e":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:filtro==="todos"?700:500,color:filtro==="todos"?C.red:C.gray600,whiteSpace:"nowrap"}}>
+          Todos <span style={{background:filtro==="todos"?C.red:C.gray200,color:filtro==="todos"?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{total}</span>
+        </button>
+        {etapas.map(e=>{
+          const n=((dados&&dados[e])||[]).length;
+          const ativo=filtro===e;
+          return(
+            <button key={e} onClick={()=>setFiltro(e)}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${ativo?(STAGE_COLOR[e]||C.red):C.gray200}`,background:ativo?(STAGE_COLOR[e]||C.red)+"12":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:ativo?700:500,color:ativo?(STAGE_COLOR[e]||C.red):C.gray600,whiteSpace:"nowrap"}}>
+              {e} <span style={{background:ativo?(STAGE_COLOR[e]||C.red):C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+            </button>
+          );
+        })}
+      </div>}
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&etapasMostrar.length===0&&(
         <div style={{textAlign:"center",padding:60,...F.body,color:C.gray400,fontSize:14,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
           <Ic n="check" s={36} c={C.gray300} style={{margin:"0 auto 12px",display:"block"}}/>
           Nenhuma demanda pendente no momento.
         </div>
       )}
-      {active.map(etapa=>(
+
+      {etapasMostrar.map(etapa=>(
         <div key={etapa}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
             <div style={{width:8,height:8,borderRadius:"50%",background:STAGE_COLOR[etapa]||C.gray400,flexShrink:0}}/>
             <span style={{...F.title,fontSize:12,fontWeight:700,letterSpacing:"0.08em"}}>{etapa.toUpperCase()}</span>
-            <span style={{...F.body,fontSize:12,color:C.gray400}}>({grouped[etapa].length})</span>
+            <span style={{...F.body,fontSize:12,color:C.gray400}}>({dados[etapa].length})</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-            {grouped[etapa].map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+            {dados[etapa].map(o=><OCard key={(o.id||"")+etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
           </div>
         </div>
       ))}
@@ -1020,49 +1672,40 @@ function MinhasDemandas({user,orders,onOpen,slaCfg}){
 }
 
 // ─── DIRECIONAMENTO (COMPLETO) ────────────────────────────────────────────────
-function Direcionamento({orders,setOrders,onOpen,slaCfg}){
+function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const [loading,setLoading]=useState(false);
   const [loadError,setLoadError]=useState(null);
   const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
 
-  useEffect(()=>{
+  const carregarDir=()=>{
     setLoading(true);
     setLoadError(null);
+    setConfirmed({});
+    setDestMap({});
+    setSel({});
     apiFetch("/direcionamento")
       .then(res=>{
         if(res.success){
-          // Converte formato HubSpot para formato do portal
           const converted=res.data.map(o=>({
-            id:           o.id,
-            posvendaId:   o.posvendaId,
-            bordadoId:    o.bordadoId,
-            client:       o.client,
-            vendedor:     o.vendedor,
-            valor:        o.valor,
-            prazoFinal:   o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
-            obs:          "",
-            etapa:        "Direcionamento",
-            amOk:         o.amostrasAprovada,
-            sepOk:        o.separacaoCompleta,
-            entradaAt:    o.dataEntrada,
-            etapaAt:      o.etapaAt||o.dataEntrada,
-            alertas:      o.alertas||[],
-            concluido:    false,
-            bordado:{
-              pts:0,cores:[],arq:"",arqOk:false,
-              amDig:[],amDigObs:"",amFis:[],amFisObs:"",
-            },
-            items: o.items.length>0
-              ? o.items.map(it=>({
-                  sku:    it.sku||it.nome,
-                  desc:   it.nome,
-                  cor:    it.tamanho,
-                  qty:    it.quantidade,
-                  dest:   null,
-                  status: it.status==="Aguardando bordado"?"separado":
-                          it.status==="faltante"?"faltante":"separado",
-                }))
-              : [{sku:"SEM-ITENS",desc:"Itens não carregados (objeto customizado)",cor:"—",qty:0,dest:null,status:"separado"}],
+            id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+            client:o.client,cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",
+            tel:o.telefone||"",email:o.email||"",
+            obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+            condicaoPagamento:o.condicaoPagamento||"",vendedor:o.vendedor,valor:o.valor,
+            prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
+            etapa:"Direcionamento",amOk:o.amostrasAprovada,sepOk:o.separacaoCompleta,
+            entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+            alertas:o.alertas||[],concluido:false,
+            bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+            arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
+            historico:o.historico||[],
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+            items:(o.items||[]).map(it=>({
+              id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
+              dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+              status:it.status==="faltante"?"faltante":"separado",
+            })),
             timeline:[{stage:"Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
             chat:[],
           }));
@@ -1071,6 +1714,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       })
       .catch(e=>setLoadError(e.message))
       .finally(()=>setLoading(false));
+  };
+  useEffect(carregarDir,[]);
+  useEffect(()=>{
+    _refreshListeners.push(carregarDir);
+    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==carregarDir);};
   },[]);
 
   // Usa dados reais se carregados, senão usa mock
@@ -1081,6 +1729,9 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
   const[confirmed,setConfirmed]=useState({});// orderId: bool
+  const[pendentesAberto,setPendentesAberto]=useState(false);// caixa recolhível
+  const[itensAbertos,setItensAbertos]=useState({});// {orderId: bool} — itens recolhidos por padrão
+  const toggleItens=(oid)=>setItensAbertos(p=>({...p,[oid]:!p[oid]}));
 
   const toggleSel=(oid,sku)=>{
     setSel(prev=>({...prev,[oid]:{...(prev[oid]||{}),[sku]:!(prev[oid]||{})[sku]}}));
@@ -1104,21 +1755,51 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
     const next={};itemSkus.forEach(s=>next[s]=dest);
     setDestMap(prev=>({...prev,[oid]:next}));
   };
-  const confirm=(oid,items)=>{
+  const confirm=async(oid,items)=>{
     const dm=destMap[oid]||{};
-    const allSet=items.every(it=>dm[it.sku]);
+    const allSet=items.every(it=>dm[it.id||it.sku]);
     if(!allSet){alert("Defina o destino (Interno/Externo) para todos os itens antes de confirmar.");return;}
-    setOrders(prev=>prev.map(o=>{
-      if(o.id!==oid)return o;
-      const newItems=o.items.map(it=>({...it,dest:dm[it.sku]||it.dest}));
-      return{...o,items:newItems,etapa:"Bordado Interno",etapaAt:new Date().toISOString()};
-    }));
-    setConfirmed(prev=>({...prev,[oid]:true}));
+
+    // Encontra o pedido para pegar bordadoId e posvendaId
+    const ordem=(hsOrders||[]).find(o=>o.id===oid);
+    if(!ordem||!ordem.bordadoId||!ordem.posvendaId){
+      alert("Pedido sem negócio de Bordado/Pós-venda associado.");return;
+    }
+
+    // Monta destinos por ID do objeto: { "<objetoId>": "Interno"|"Externo" }
+    const destinos={};
+    items.forEach(it=>{
+      const key=it.id||it.sku;
+      const val=dm[key];
+      if(val) destinos[it.id||it.sku]=val==="interno"?"Interno":"Externo";
+    });
+
+    try{
+      const res=await apiFetch(`/direcionamento/${ordem.posvendaId}`,"PATCH",{
+        bordadoId:ordem.bordadoId,
+        destinos:destinos,
+        ctx:{
+          executor:user?.nome||user?.name||"Sistema",
+          executorEmail:user?.email||"",
+          vendasId:ordem.vendasId||null,
+          posvendaId:ordem.posvendaId||null,
+          bordadoId:ordem.bordadoId||null,
+          cliente:ordem.client||"",
+          etapa:"Direcionamento",
+        },
+      });
+      if(res.error) throw new Error(res.error);
+      setConfirmed(prev=>({...prev,[oid]:true}));
+      // Recarrega após o HubSpot processar
+      setTimeout(()=>carregarDir(),1000);
+    }catch(e){
+      alert("Erro ao confirmar direcionamento: "+e.message);
+    }
   };
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo"/>
+      <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo" onRefresh={carregarDir} refreshing={loading}/>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         Carregando pedidos do HubSpot...
@@ -1130,14 +1811,21 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       {hsOrders!==null&&!loading&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green}}>
         <Ic n="check" s={13} c={C.green}/> {hsOrders.length} pedido{hsOrders.length!==1?"s":""} carregado{hsOrders.length!==1?"s":""} do HubSpot
       </div>}
-      {/* Pedidos aguardando amostra */}
+      {/* Pedidos aguardando amostra — caixa recolhível */}
       {pendentes.length>0&&(
         <div>
-          <div style={{background:C.amber+"10",border:`1px solid ${C.amber}38`,borderRadius:8,padding:"10px 16px",marginBottom:10,display:"flex",alignItems:"center",gap:8}}>
+          <div onClick={()=>setPendentesAberto(v=>!v)}
+            style={{background:C.amber+"10",border:`1px solid ${C.amber}38`,borderRadius:8,padding:"10px 16px",marginBottom:pendentesAberto?10:0,display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
             <Ic n="warn" s={15} c={C.amber}/>
             <span style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.08em"}}>AGUARDANDO APROVAÇÃO DE AMOSTRA — {pendentes.length}</span>
+            <span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,...F.body,fontSize:11,color:C.amber,fontWeight:600}}>
+              {pendentesAberto?"Recolher":"Ver"}
+              <span style={{display:"inline-block",transition:"transform 0.2s",transform:pendentesAberto?"rotate(180deg)":"none"}}>
+                <Ic n="chevDown" s={14} c={C.amber}/>
+              </span>
+            </span>
           </div>
-          {pendentes.map(o=>(
+          {pendentesAberto&&pendentes.map(o=>(
             <div key={o.id} onClick={()=>onOpen(o)} style={{background:"#fffbeb",border:`1px solid ${C.amber}40`,borderLeft:`3px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",cursor:"pointer",marginBottom:8,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
               <div><span style={{...F.body,fontWeight:700}}>{o.id}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
               <Tag label="Amostra pendente" color={C.amber}/>
@@ -1149,11 +1837,15 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
       <SecH>Prontos para direcionar — {prontos.length} pedido{prontos.length!==1?"s":""}</SecH>
       {prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando direcionamento.</div>}
       {prontos.map(o=>{
-        const skus=o.items.map(it=>it.sku);
+        // Só itens COM bordado precisam de direcionamento. Fallback legado: sem flag em nenhum → todos.
+        const itensComBordado=o.items.filter(it=>it.bordado);
+        const itensCard=itensComBordado.length?itensComBordado:o.items;
+        const skus=itensCard.map(it=>it.id||it.sku);
         const dm=destMap[o.id]||{};
         const sm=sel[o.id]||{};
         const nSel=skus.filter(s=>sm[s]).length;
-        const allDefined=o.items.every(it=>dm[it.sku]);
+        const allDefined=itensCard.every(it=>dm[it.id||it.sku]);
+        const ocultos=o.items.length-itensCard.length;
         const isConfirmed=confirmed[o.id];
         const sla=getSLA(o,slaCfg);
         return(
@@ -1203,19 +1895,32 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
               </div>
             </div>
 
+            {/* Itens — recolhíveis (padrão: recolhido), evita poluir pedidos grandes */}
+            <div onClick={()=>toggleItens(o.id)}
+              style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"9px 12px",background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:7,marginBottom:itensAbertos[o.id]?12:12}}>
+              <Ic n="list" s={14} c={C.gray500}/>
+              <span style={{...F.body,fontSize:12,fontWeight:700,color:C.gray600}}>Itens com bordado — {itensCard.length}</span>
+              <span style={{...F.body,fontSize:11,color:allDefined?C.green:C.amber,fontWeight:600}}>· {itensCard.filter(it=>dm[it.id||it.sku]).length}/{itensCard.length} direcionados</span>
+              {ocultos>0&&<span style={{...F.body,fontSize:11,color:C.gray400}}>· {ocultos} sem bordado ocultos</span>}
+              <span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,...F.body,fontSize:11,color:C.gray500,fontWeight:600}}>
+                {itensAbertos[o.id]?"Recolher":"Ver itens"}
+                <span style={{display:"inline-block",transition:"transform 0.2s",transform:itensAbertos[o.id]?"rotate(180deg)":"none"}}><Ic n="chevDown" s={14} c={C.gray500}/></span>
+              </span>
+            </div>
             {/* Tabela de itens */}
-            <div style={{overflowX:"auto",marginBottom:12}}>
+            {itensAbertos[o.id]&&<div style={{overflowX:"auto",marginBottom:12}}>
               <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
                 <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-                  {["","SKU","Descrição","Cor","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
+                  {["","SKU","Descrição","TAM","Qtd","Destino"].map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
                 </tr></thead>
-                <tbody>{o.items.map((it,idx)=>{
-                  const thisDest=dm[it.sku]||it.dest;
-                  const isSelected=sm[it.sku]||false;
+                <tbody>{itensCard.map((it,idx)=>{
+                  const k=it.id||it.sku;
+                  const thisDest=(destMap[o.id]||{})[k]||it.dest;
+                  const isSelected=(sel[o.id]||{})[k]||false;
                   return(
                     <tr key={idx} style={{borderBottom:`1px solid ${C.gray100}`,background:isSelected?C.red+"06":"transparent"}}>
                       <td style={{padding:"8px 10px"}}>
-                        <input type="checkbox" checked={isSelected} onChange={()=>toggleSel(o.id,it.sku)}
+                        <input type="checkbox" checked={isSelected} onChange={()=>toggleSel(o.id,k)}
                           style={{width:15,height:15,cursor:"pointer",accentColor:C.red}}/>
                       </td>
                       <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
@@ -1224,11 +1929,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
                       <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                       <td style={{padding:"8px 10px"}}>
                         <div style={{display:"flex",gap:5}}>
-                          <button onClick={()=>setDest(o.id,it.sku,"interno")}
+                          <button onClick={()=>setDest(o.id,k,"interno")}
                             style={{background:thisDest==="interno"?C.green:C.white,color:thisDest==="interno"?C.white:C.gray700,border:`1.5px solid ${thisDest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
                             Interno
                           </button>
-                          <button onClick={()=>setDest(o.id,it.sku,"externo")}
+                          <button onClick={()=>setDest(o.id,k,"externo")}
                             style={{background:thisDest==="externo"?C.purple:C.white,color:thisDest==="externo"?C.white:C.gray700,border:`1.5px solid ${thisDest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
                             Externo
                           </button>
@@ -1238,18 +1943,18 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
                   );
                 })}</tbody>
               </table>
-            </div>
+            </div>}
 
             {/* Resumo + confirmar */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
               <div style={{display:"flex",gap:12,...F.body,fontSize:12,color:C.gray600}}>
-                <span>Interno: <strong style={{color:C.green}}>{o.items.filter(it=>dm[it.sku]==="interno").length} itens</strong></span>
-                <span>Externo: <strong style={{color:C.purple}}>{o.items.filter(it=>dm[it.sku]==="externo").length} itens</strong></span>
-                <span style={{color:C.gray400}}>Pendente: {o.items.filter(it=>!dm[it.sku]).length} itens</span>
+                <span>Interno: <strong style={{color:C.green}}>{itensCard.filter(it=>dm[it.id||it.sku]==="interno").length} itens</strong></span>
+                <span>Externo: <strong style={{color:C.purple}}>{itensCard.filter(it=>dm[it.id||it.sku]==="externo").length} itens</strong></span>
+                <span style={{color:C.gray400}}>Pendente: {itensCard.filter(it=>!dm[it.id||it.sku]).length} itens</span>
               </div>
               {isConfirmed
                 ?<div style={{display:"flex",alignItems:"center",gap:6,...F.body,fontSize:13,color:C.green,fontWeight:700}}><Ic n="check" s={16} c={C.green}/>Direcionamento confirmado!</div>
-                :<button onClick={()=>confirm(o.id,o.items)}
+                :<button onClick={()=>confirm(o.id,itensCard)}
                   disabled={!allDefined}
                   style={{background:allDefined?C.green:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"9px 20px",cursor:allDefined?"pointer":"not-allowed",fontWeight:700,fontSize:13,...F.body,display:"flex",alignItems:"center",gap:7}}>
                   <Ic n="check" s={14} c={C.white}/> Confirmar direcionamento
@@ -1267,82 +1972,636 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg}){
 }
 
 // ─── DASHBOARD ───────────────────────────────────────────────────────────────
-function Dashboard({orders,onOpen,slaCfg}){
-  const atrasados=orders.filter(o=>!o.concluido&&getSLA(o,slaCfg).st==="late");
-  const semAm=orders.filter(o=>!o.amOk&&!o.concluido);
+// Opções de Centro de Custo (da propriedade do HubSpot)
+const CENTRO_OPTIONS=[
+  {value:"27",label:"27 - Corporativo"},
+  {value:"10 - Concessionária",label:"10 - Concessionária"},
+  {value:"31 - B2B",label:"31 - B2B"},
+  {value:"03 - Licitação",label:"03 - Licitação"},
+  {value:"29 - Comercial Diretoria",label:"29 - Comercial Diretoria"},
+];
+// Etapas em aberto, na ordem do funil, com endpoint
+const ABERTO_ETAPAS=[
+  {nome:"Direcionamento",endpoint:"/direcionamento"},
+  {nome:"Programação",endpoint:"/programacao"},
+  {nome:"Amostra Digital",endpoint:"/amostra-digital"},
+  {nome:"Aprovação de Amostra Digital",endpoint:"/aprovacao-amostra-digital"},
+  {nome:"Amostra Física",endpoint:"/amostra-fisica"},
+  {nome:"Aprovação de Amostra Física",endpoint:"/aprovacao-amostra-fisica"},
+  {nome:"Bordado Interno",endpoint:"/bordado-interno"},
+  {nome:"Bordado Externo",endpoint:"/bordado-externo"},
+  {nome:"Expedição",endpoint:"/expedicao"},
+  {nome:"Faturamento",endpoint:"/faturamento"},
+];
+
+function Dashboard({onOpen,slaCfg}){
+  const [grupo,setGrupo]=useState("aberto");   // aberto | finalizados
+  const [centro,setCentro]=useState("");
+  const [bordadoF,setBordadoF]=useState("");   // "" | com | sem
+  const [statusF,setStatusF]=useState("todos");// todos | prazo | atraso
+  const [busca,setBusca]=useState("");
+  const [aberto,setAberto]=useState(null);     // array de pedidos em aberto
+  const [rel,setRel]=useState(null);           // relatórios de finalizados
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  // Intervalo de datas (default: mês atual)
+  const hoje=new Date();
+  const primeiroDia=new Date(hoje.getFullYear(),hoje.getMonth(),1).toISOString().slice(0,10);
+  const ultimoDia=new Date(hoje.getFullYear(),hoje.getMonth()+1,0).toISOString().slice(0,10);
+  const [de,setDe]=useState(primeiroDia);
+  const [ate,setAte]=useState(ultimoDia);
+  const [relLoading,setRelLoading]=useState(false);
+  const [exportando,setExportando]=useState(false);
+  // Relatório de programação (Supabase: programacao_execucoes)
+  const [relProg,setRelProg]=useState(null);
+  const [relProgLoading,setRelProgLoading]=useState(false);
+  const [relProgAviso,setRelProgAviso]=useState("");
+  const carregarRelProg=async()=>{
+    setRelProgLoading(true);setRelProgAviso("");
+    try{
+      const q=[]; if(de)q.push("de="+de); if(ate)q.push("ate="+ate);
+      const r=await apiFetch("/relatorio-programacao"+(q.length?"?"+q.join("&"):""));
+      setRelProg(r.data||[]);
+      if(r.aviso)setRelProgAviso(r.aviso);
+    }catch(e){ setRelProg([]); setRelProgAviso(e.message); }
+    finally{ setRelProgLoading(false); }
+  };
+
+  const montarQuery=()=>{
+    const p=[];
+    if(centro)p.push("centro="+encodeURIComponent(centro));
+    if(bordadoF)p.push("bordado="+bordadoF);
+    if(de)p.push("de="+de);
+    if(ate)p.push("ate="+ate);
+    return p.length?"?"+p.join("&"):"";
+  };
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
+      );
+      setAberto(prev=>mesclarEmAberto(prev,resultados));
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  // Carrega o relatório de finalizados.
+  // Fonte dos FATURADOS: HubSpot (pedidos na etapa Faturado), data = entrada na etapa
+  // (dataFinalizacao). Assim conta qualquer pedido em Faturado, sem depender do botão.
+  // Futuro: quando o SQL existir, a dataFinalizacao virá da data real de faturamento.
+  const carregarRel=async()=>{
+    setRelLoading(true);
+    try{
+      const rf=await apiFetch("/finalizados");
+      let fin=(rf.data||[]);
+      // Filtros: período (pela data de finalização), centro de custo e bordado
+      fin=fin.filter(o=>{
+        if(centro&&o.centroCusto!==centro)return false;
+        if(bordadoF==="com"&&o.temBordado===false)return false;
+        if(bordadoF==="sem"&&o.temBordado!==false)return false;
+        const d=(o.dataFinalizacao||"").slice(0,10);
+        if(de&&d&&d<de)return false;
+        if(ate&&d&&d>ate)return false;
+        return true;
+      });
+      // Atrasado = finalizado depois da data limite
+      const atrasadoF=o=>{const v=dataVencimento(o);return !!(v&&o.dataFinalizacao&&new Date(o.dataFinalizacao)>new Date(v));};
+      const totalFaturados=fin.length;
+      const totalAtrasados=fin.filter(atrasadoF).length;
+      // Agrupa por mês da finalização
+      const porMes={};
+      fin.forEach(o=>{
+        const mes=(o.dataFinalizacao||"").slice(0,7);
+        if(!mes)return;
+        if(!porMes[mes])porMes[mes]={total:0,atrasados:0};
+        porMes[mes].total++;
+        if(atrasadoF(o))porMes[mes].atrasados++;
+      });
+      const faturadosPorMes=Object.entries(porMes)
+        .map(([mes,v])=>({mes,total:v.total,atrasados:v.atrasados,pctAtraso:v.total?Math.round(v.atrasados/v.total*100):0}))
+        .sort((a,b)=>a.mes.localeCompare(b.mes));
+      // SLA médio por etapa segue vindo do Supabase (histórico de execução)
+      let slaPorEtapa=[];
+      try{ const rr=await apiFetch("/relatorios"+montarQuery()); slaPorEtapa=rr.slaPorEtapa||[]; }catch{}
+      setRel({
+        totais:{faturados:totalFaturados,faturadosAtrasados:totalAtrasados,pctAtraso:totalFaturados?Math.round(totalAtrasados/totalFaturados*100):0},
+        faturadosPorMes,
+        slaPorEtapa,
+        finalizados:fin,
+      });
+    }
+    catch(e){ setRel({slaPorEtapa:[],faturadosPorMes:[],totais:{}}); }
+    finally{ setRelLoading(false); }
+  };
+  useEffect(()=>{ if(grupo==="finalizados"&&!rel){ carregarRel(); } },[grupo]);
+  useEffect(()=>{ if(grupo==="programacao"&&!relProg){ carregarRelProg(); } },[grupo]);
+
+  // Exporta todos os pedidos finalizados do período para Excel
+  const exportarExcel=async()=>{
+    setExportando(true);
+    try{
+      const r=await apiFetch("/finalizados");
+      let lista=(r.data||[]);
+      // Filtra por data de finalização dentro do intervalo + centro + bordado
+      lista=lista.filter(o=>{
+        if(centro&&o.centroCusto!==centro)return false;
+        if(bordadoF==="com"&&o.temBordado===false)return false;
+        if(bordadoF==="sem"&&o.temBordado!==false)return false;
+        if(o.dataFinalizacao){
+          const d=o.dataFinalizacao.slice(0,10);
+          if(de&&d<de)return false;
+          if(ate&&d>ate)return false;
+        }
+        return true;
+      });
+      baixarExcelFinalizados(lista,de,ate);
+    }catch(e){ alert("Erro ao exportar: "+e.message); }
+    finally{ setExportando(false); }
+  };
+
+  // Filtros aplicados ao "em aberto"
+  const q=busca.trim().toLowerCase();
+  const abertoFiltrado=(aberto||[]).filter(o=>{
+    if(centro&&o.centroCusto!==centro)return false;
+    if(bordadoF==="com"&&o.temBordado===false)return false;
+    if(bordadoF==="sem"&&o.temBordado!==false)return false;
+    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const agora=Date.now();
+  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
+  const totalAberto=abertoFiltrado.length;
+  const totalAtrasado=abertoFiltrado.filter(isAtrasado).length;
+  const totalNoPrazo=totalAberto-totalAtrasado;
+  // Lista final conforme a situação escolhida
+  const listaSituacao=ordenarPorPrioridade(abertoFiltrado.filter(o=>{
+    if(statusF==="atraso")return isAtrasado(o);
+    if(statusF==="prazo")return !isAtrasado(o);
+    return true;
+  }));
+  // Por etapa
+  const porEtapa=ABERTO_ETAPAS.map(e=>{
+    const ords=ordenarPorPrioridade(abertoFiltrado.filter(o=>o.etapa===e.nome));
+    return {etapa:e.nome,total:ords.length,atrasados:ords.filter(isAtrasado).length,ords};
+  }).filter(s=>s.total>0);
+
   return(
-    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Dashboard" sub="Visão geral de todos os pedidos ativos"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-        <Stat label="Pedidos Ativos" value={orders.filter(o=>!o.concluido).length} icon="list"/>
-        <Stat label="Atrasados" value={atrasados.length} color={C.red} icon="warn"/>
-        <Stat label="Sem Amostra" value={semAm.length} color={C.amber} icon="clock"/>
-        <Stat label="P/ Faturar" value={orders.filter(o=>o.etapa==="Faturamento").length} color={C.green} icon="dollar"/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Dashboard" sub="Visão geral de pedidos em aberto e finalizados" onRefresh={carregar} refreshing={loading}/>
+
+      {/* Alternância de grupo */}
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        {[["aberto","Pedidos em Aberto"],["finalizados","Pedidos Finalizados"],["programacao","Relatório de Programação"]].map(([id,lbl])=>(
+          <button key={id} onClick={()=>setGrupo(id)}
+            style={{padding:"9px 18px",borderRadius:8,border:`1.5px solid ${grupo===id?C.red:C.gray200}`,background:grupo===id?C.red:C.white,color:grupo===id?C.white:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:700}}>
+            {lbl}
+          </button>
+        ))}
       </div>
-      {atrasados.length>0&&<div>
-        <div style={{display:"flex",alignItems:"center",gap:8,background:C.red+"0c",border:`1px solid ${C.red}28`,borderRadius:8,padding:"10px 16px",marginBottom:12}}>
-          <Ic n="warn" s={15} c={C.red}/><span style={{...F.title,fontSize:12,fontWeight:700,color:C.red,letterSpacing:"0.08em"}}>PEDIDOS ATRASADOS</span>
-        </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {atrasados.map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
-        </div>
-      </div>}
-      <div>
-        <SecH>Todos os pedidos ativos</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {orders.filter(o=>!o.concluido).map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
-        </div>
+
+      {/* Filtros */}
+      <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <select value={centro} onChange={e=>setCentro(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:200}}>
+          <option value="">Todos os centros de custo</option>
+          {CENTRO_OPTIONS.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <select value={bordadoF} onChange={e=>setBordadoF(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:160}}>
+          <option value="">Com e sem bordado</option>
+          <option value="com">Somente com bordado</option>
+          <option value="sem">Somente sem bordado</option>
+        </select>
+        {grupo==="aberto"&&<div style={{position:"relative",flex:1,minWidth:200,maxWidth:340}}>
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente ou código..."
+            style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px 9px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+        </div>}
       </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {/* ───── GRUPO: EM ABERTO ───── */}
+      {grupo==="aberto"&&!loading&&<>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+          <div onClick={()=>setStatusF("todos")} style={{cursor:"pointer"}}>
+            <Stat label="Pedidos em aberto" value={totalAberto} icon="list" active={statusF==="todos"}/>
+          </div>
+          <div onClick={()=>setStatusF("prazo")} style={{cursor:"pointer"}}>
+            <Stat label="No prazo" value={totalNoPrazo} color={C.green} icon="check" active={statusF==="prazo"}/>
+          </div>
+          <div onClick={()=>setStatusF("atraso")} style={{cursor:"pointer"}}>
+            <Stat label="Atrasados" value={totalAtrasado} color={C.red} icon="warn" active={statusF==="atraso"}/>
+          </div>
+        </div>
+        <Card>
+          <SecH>Pedidos por etapa</SecH>
+          {porEtapa.length===0?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido em aberto.</div>
+          :<div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {porEtapa.map(s=>{
+              const c=STAGE_COLOR[s.etapa]||C.gray400;
+              const pctAtraso=s.total?Math.round((s.atrasados/s.total)*100):0;
+              return(
+                <div key={s.etapa} style={{display:"flex",alignItems:"center",gap:12,padding:"8px 0",borderBottom:`1px solid ${C.gray100}`}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:c,flexShrink:0}}/>
+                  <div style={{flex:1,minWidth:0,...F.body,fontSize:13,fontWeight:600,color:C.black}}>{s.etapa}</div>
+                  {/* barra */}
+                  <div style={{flex:2,minWidth:80,height:8,background:C.gray100,borderRadius:4,overflow:"hidden",display:"flex"}}>
+                    <div style={{width:`${100-pctAtraso}%`,background:C.green,height:"100%"}}/>
+                    <div style={{width:`${pctAtraso}%`,background:C.red,height:"100%"}}/>
+                  </div>
+                  <div style={{...F.body,fontSize:12,color:C.gray600,whiteSpace:"nowrap",minWidth:90,textAlign:"right"}}>
+                    <strong style={{color:C.black}}>{s.total}</strong> total
+                    {s.atrasados>0&&<span style={{color:C.red,fontWeight:700}}> · {s.atrasados} atrasado{s.atrasados>1?"s":""}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>}
+        </Card>
+
+        {/* Filtro de situação + lista de pedidos */}
+        <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+          {[["todos","Todos",totalAberto],["prazo","No prazo",totalNoPrazo],["atraso","Em atraso",totalAtrasado]].map(([id,lbl,n])=>{
+            const ativo=statusF===id;const cor=id==="atraso"?C.red:id==="prazo"?C.green:C.gray700;
+            return(
+              <button key={id} onClick={()=>setStatusF(id)}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${ativo?cor:C.gray200}`,background:ativo?cor+"12":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:ativo?700:500,color:ativo?cor:C.gray600}}>
+                {lbl}<span style={{background:ativo?cor:C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+              </button>
+            );
+          })}
+        </div>
+        {listaSituacao.length===0?<div style={{...F.body,color:C.gray400,fontSize:14,textAlign:"center",padding:40,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido nesta situação.</div>
+        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+          {listaSituacao.map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+        </div>}
+      </>}
+
+      {/* ───── GRUPO: FINALIZADOS ───── */}
+      {grupo==="finalizados"&&!loading&&<>
+        {/* Intervalo de datas + ações */}
+        <Card>
+          <div style={{display:"flex",gap:14,flexWrap:"wrap",alignItems:"flex-end"}}>
+            <div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:6}}>De (finalização)</label>
+              <input type="date" value={de} onChange={e=>setDe(e.target.value)}
+                style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 12px",...F.body,fontSize:13,outline:"none"}}/>
+            </div>
+            <div>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:6}}>Até</label>
+              <input type="date" value={ate} onChange={e=>setAte(e.target.value)}
+                style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 12px",...F.body,fontSize:13,outline:"none"}}/>
+            </div>
+            <button onClick={carregarRel} disabled={relLoading}
+              style={{background:relLoading?"#ccc":C.red,color:C.white,border:"none",borderRadius:8,padding:"10px 20px",cursor:relLoading?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
+              <Ic n="refresh" s={14} c={C.white}/> {relLoading?"Carregando...":"Carregar relatório"}
+            </button>
+            <button onClick={exportarExcel} disabled={exportando}
+              style={{background:C.white,color:C.green,border:`1.5px solid ${C.green}`,borderRadius:8,padding:"10px 20px",cursor:exportando?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:7}}>
+              <Ic n="download" s={14} c={C.green}/> {exportando?"Gerando...":"Exportar relatório completo"}
+            </button>
+          </div>
+        </Card>
+
+        {relLoading?<div style={{...F.body,color:C.gray400,fontSize:13}}>Carregando relatórios...</div>:!rel?<div style={{...F.body,color:C.gray400,fontSize:13}}>Selecione o período e clique em "Carregar relatório".</div>:<>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+            <Stat label="Total faturados" value={rel.totais?.faturados||0} icon="dollar"/>
+            <Stat label="Faturados com atraso" value={rel.totais?.faturadosAtrasados||0} color={C.red} icon="warn"/>
+            <Stat label="% em atraso" value={(rel.totais?.pctAtraso||0)+"%"} color={(rel.totais?.pctAtraso||0)>20?C.red:C.amber} icon="clock"/>
+          </div>
+
+          <Card>
+            <SecH>SLA médio por etapa</SecH>
+            {(!rel.slaPorEtapa||rel.slaPorEtapa.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Sem dados suficientes ainda. As médias aparecem conforme os pedidos são executados.</div>
+            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Tempo médio","Execuções"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+              <tbody>{rel.slaPorEtapa.map((s,i)=>(
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{s.etapa}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,color:C.black,...F.body}}>{fmtDur(s.mediaMin)}</td>
+                  <td style={{padding:"8px 10px",color:C.gray500,...F.body}}>{s.qtd}</td>
+                </tr>
+              ))}</tbody>
+            </table>}
+          </Card>
+
+          <Card>
+            <SecH>Faturados por mês</SecH>
+            {(!rel.faturadosPorMes||rel.faturadosPorMes.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido faturado registrado ainda.</div>
+            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Mês","Faturados","Em atraso","% atraso"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+              <tbody>{rel.faturadosPorMes.map((m,i)=>{
+                const [y,mo]=m.mes.split("-");
+                const label=mo?`${mo}/${y}`:m.mes;
+                return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{label}</td>
+                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{m.total}</td>
+                  <td style={{padding:"8px 10px",color:m.atrasados>0?C.red:C.gray500,fontWeight:m.atrasados>0?700:400,...F.body}}>{m.atrasados}</td>
+                  <td style={{padding:"8px 10px",color:m.pctAtraso>20?C.red:C.gray600,...F.body}}>{m.pctAtraso}%</td>
+                </tr>);
+              })}</tbody>
+            </table>}
+          </Card>
+
+          <Card>
+            <SecH>Pedidos finalizados no período ({rel.finalizados?.length||0})</SecH>
+            {(!rel.finalizados||rel.finalizados.length===0)
+              ?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido finalizado no período.</div>
+              :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+                {rel.finalizados.map(o=>{
+                  const venc=dataVencimento(o);
+                  const atrasado=!!(venc&&o.dataFinalizacao&&new Date(o.dataFinalizacao)>new Date(venc));
+                  return(
+                    <div key={o.id} onClick={()=>onOpen(o)} style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,padding:14,cursor:"pointer",borderLeft:`3px solid ${C.green}`}}
+                      onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.07)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,marginBottom:6}}>
+                        <div style={{minWidth:0}}>
+                          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{o.id}</div>
+                          <div style={{...F.body,fontSize:12,color:C.gray500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{o.client}</div>
+                        </div>
+                        <span style={{display:"inline-flex",alignItems:"center",background:C.green+"15",color:C.green,borderRadius:4,padding:"3px 9px",fontSize:11,fontWeight:700,...F.body,whiteSpace:"nowrap",flexShrink:0}}>FATURADO</span>
+                      </div>
+                      <div style={{display:"flex",gap:12,...F.body,fontSize:12,color:C.gray500,flexWrap:"wrap"}}>
+                        <span style={{fontWeight:700,color:C.green}}>{fmtR(o.valor)}</span>
+                        {o.temBordado===false&&<span style={{color:C.gray500,fontWeight:600}}>Sem bordado</span>}
+                      </div>
+                      <div style={{...F.body,fontSize:11.5,color:atrasado?C.red:C.gray600,marginTop:7,display:"flex",alignItems:"center",gap:5}}>
+                        <Ic n="check" s={13} c={atrasado?C.red:C.green}/>
+                        Finalizado em {o.dataFinalizacao?fmtDS(o.dataFinalizacao):"—"}{atrasado?" · com atraso":""}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>}
+          </Card>
+        </>}
+      </>}
+
+      {/* ───── GRUPO: RELATÓRIO DE PROGRAMAÇÃO ───── */}
+      {grupo==="programacao"&&<>
+        <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"flex-end"}}>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,display:"block",marginBottom:4}}>De</label>
+            <input type="date" value={de} onChange={e=>setDe(e.target.value)} style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 10px",...F.body,fontSize:13,outline:"none"}}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,display:"block",marginBottom:4}}>Até</label>
+            <input type="date" value={ate} onChange={e=>setAte(e.target.value)} style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"8px 10px",...F.body,fontSize:13,outline:"none"}}/>
+          </div>
+          <button onClick={carregarRelProg} disabled={relProgLoading}
+            style={{padding:"9px 18px",borderRadius:8,border:"none",background:C.red,color:C.white,cursor:relProgLoading?"wait":"pointer",...F.body,fontSize:13,fontWeight:700}}>
+            {relProgLoading?"Carregando...":"Atualizar"}
+          </button>
+        </div>
+        {relProgAviso&&<div style={{padding:"10px 14px",background:C.amber+"12",border:`1px solid ${C.amber}40`,borderRadius:8,...F.body,fontSize:12.5,color:"#92400e",display:"flex",alignItems:"flex-start",gap:8}}>
+          <Ic n="warn" s={14} c={C.amber}/>
+          <span>Não foi possível ler o relatório: <strong>{relProgAviso}</strong>. Verifique se a tabela <code>programacao_execucoes</code> existe no Supabase.</span>
+        </div>}
+        <Card>
+          {relProgLoading
+            ?<div style={{padding:24,textAlign:"center",...F.body,fontSize:13,color:C.gray500}}>Carregando...</div>
+            :(!relProg||!relProg.length)
+              ?<div style={{padding:24,textAlign:"center",...F.body,fontSize:13,color:C.gray500}}>Nenhuma programação registrada no período.</div>
+              :<div style={{overflowX:"auto"}}>
+                <table style={{width:"100%",borderCollapse:"collapse",...F.body,fontSize:13}}>
+                  <thead>
+                    <tr style={{borderBottom:`2px solid ${C.gray200}`}}>
+                      {["Arquivo","Dificuldade","Data da execução"].map(h=>(
+                        <th key={h} style={{textAlign:"left",padding:"10px 12px",...F.body,fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {relProg.map((r,i)=>{
+                      const cor=r.dificuldade==="Difícil"?C.red:r.dificuldade==="Médio"?C.amber:C.green;
+                      return(
+                        <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                          <td style={{padding:"10px 12px",color:C.black,fontWeight:600,wordBreak:"break-word"}}>{r.nome_arquivo}</td>
+                          <td style={{padding:"10px 12px"}}><span style={{background:cor+"14",color:cor,padding:"3px 10px",borderRadius:20,fontSize:12,fontWeight:700}}>{r.dificuldade||"—"}</span></td>
+                          <td style={{padding:"10px 12px",color:C.gray600}}>{r.data_execucao?fmtDS(r.data_execucao):"—"}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div style={{padding:"10px 12px",...F.body,fontSize:12,color:C.gray500,borderTop:`1px solid ${C.gray100}`}}>Total: {relProg.length} bordado(s) programado(s) no período.</div>
+              </div>}
+        </Card>
+      </>}
     </div>
   );
 }
 
-// ─── FUNIL ───────────────────────────────────────────────────────────────────
-function Funil({orders,onOpen,slaCfg}){
-  const[sel,setSel]=useState(null);
-  const stats=Object.keys(SLA_DEF).map(e=>{
-    const ords=orders.filter(o=>o.etapa===e&&!o.concluido);
-    return{etapa:e,count:ords.length,val:ords.reduce((s,o)=>s+o.valor,0),pecas:ords.reduce((s,o)=>s+o.items.reduce((ss,i)=>ss+i.qty,0),0),tMed:ords.length?ords.reduce((s,o)=>s+hrsIn(o.etapaAt),0)/ords.length:0,atrasados:ords.filter(o=>getSLA(o,slaCfg).st==="late").length,ords};
-  }).filter(s=>s.count>0);
+// ─── TODOS OS PEDIDOS (tela operacional: em aberto por fase) ──────────────────
+function TodosPedidos({onOpen,slaCfg,initialBusca}){
+  const [aberto,setAberto]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [busca,setBusca]=useState(initialBusca||"");
+  // Atualiza a busca quando vier de uma notificação
+  useEffect(()=>{ if(initialBusca)setBusca(initialBusca); },[initialBusca]);
+  const [centro,setCentro]=useState("");
+  const [bordadoF,setBordadoF]=useState("");    // "" | com | sem
+  const [statusF,setStatusF]=useState("todos");  // todos | prazo | atraso
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
+      );
+      setAberto(prev=>mesclarEmAberto(prev,resultados));
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const agora=Date.now();
+  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
+  const q=busca.trim().toLowerCase();
+  const filtrados=(aberto||[]).filter(o=>{
+    if(centro&&o.centroCusto!==centro)return false;
+    if(bordadoF==="com"&&o.temBordado===false)return false;
+    if(bordadoF==="sem"&&o.temBordado!==false)return false;
+    if(statusF==="atraso"&&!isAtrasado(o))return false;
+    if(statusF==="prazo"&&isAtrasado(o))return false;
+    if(q){
+      const alvo=((o.client||"")+" "+(o.id||"")+" "+(o.razaoSocial||"")).toLowerCase();
+      if(!alvo.includes(q))return false;
+    }
+    return true;
+  });
+  const total=filtrados.length;
+  const atrasados=filtrados.filter(isAtrasado).length;
+  // Agrupado por fase (etapa), na ordem do fluxo
+  const porEtapa=ABERTO_ETAPAS.map(e=>({
+    etapa:e.nome,
+    ords:ordenarPorPrioridade(filtrados.filter(o=>o.etapa===e.nome)),
+  })).filter(s=>s.ords.length>0);
+
   return(
-    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Funil em Tempo Real" sub="Pedidos por etapa com valor, peças e tempo médio"/>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:12}}>
-        {stats.map(s=>{
-          const c=STAGE_COLOR[s.etapa]||C.gray500;const isSel=sel===s.etapa;
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:16}}>
+      <PageH title="Todos os Pedidos" sub="Acompanhe em qual fase cada pedido em aberto está" onRefresh={carregar} refreshing={loading}/>
+
+      {/* Busca em destaque */}
+      <div style={{position:"relative"}}>
+        <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={17} c={C.gray400}/></div>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por nome do cliente ou número do pedido..."
+          style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:10,padding:"12px 14px 12px 42px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {/* Filtros */}
+      <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <select value={centro} onChange={e=>setCentro(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:190}}>
+          <option value="">Todos os centros de custo</option>
+          {CENTRO_OPTIONS.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <select value={bordadoF} onChange={e=>setBordadoF(e.target.value)}
+          style={{border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none",background:C.white,cursor:"pointer",minWidth:150}}>
+          <option value="">Com e sem bordado</option>
+          <option value="com">Somente com bordado</option>
+          <option value="sem">Somente sem bordado</option>
+        </select>
+      </div>
+
+      {/* Situação */}
+      <div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+        {[["todos","Todos",total],["prazo","No prazo",total-atrasados],["atraso","Em atraso",atrasados]].map(([id,lbl,n])=>{
+          const ativo=statusF===id;const cor=id==="atraso"?C.red:id==="prazo"?C.green:C.gray700;
           return(
-            <div key={s.etapa} onClick={()=>setSel(isSel?null:s.etapa)}
-              style={{background:C.white,border:`1.5px solid ${isSel?c:C.gray200}`,borderRadius:8,padding:16,cursor:"pointer"}}
-              onMouseEnter={e=>{if(!isSel)e.currentTarget.style.borderColor=c+"80";}}
-              onMouseLeave={e=>{if(!isSel)e.currentTarget.style.borderColor=C.gray200;}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-                <div>
-                  <div style={{width:8,height:8,borderRadius:"50%",background:c,marginBottom:6}}/>
-                  <div style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.08em"}}>{s.etapa.toUpperCase()}</div>
-                </div>
-                <div style={{...F.title,fontSize:24,fontWeight:700,color:c}}>{s.count}</div>
-              </div>
-              <div style={{height:1,background:C.gray200,marginBottom:10}}/>
-              <div style={{display:"flex",flexDirection:"column",gap:5}}>
-                {[["Valor retido",fmtR(s.val),"dollar"],["Peças",String(s.pecas),"box"],["Tempo médio",`${s.tMed.toFixed(1)}h`,"clock"]].map(([k,v,ic])=>(
-                  <div key={k} style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
-                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n={ic} s={11} c={C.gray400}/>{k}</span>
-                    <span style={{fontWeight:700,color:k==="Valor retido"?C.green:k==="Tempo médio"&&s.tMed>slaCfg[s.etapa]?C.red:C.black}}>{v}</span>
-                  </div>
-                ))}
-                {s.atrasados>0&&<div style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:C.red,fontWeight:700,marginTop:2}}><Ic n="warn" s={11} c={C.red}/>{s.atrasados} atrasado{s.atrasados>1?"s":""}</div>}
-              </div>
-              <div style={{...F.body,fontSize:11,color:isSel?c:C.gray400,fontWeight:600,textAlign:"center",marginTop:10}}>{isSel?"▲ Fechar":"▼ Ver pedidos"}</div>
-            </div>
+            <button key={id} onClick={()=>setStatusF(id)}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:7,border:`1.5px solid ${ativo?cor:C.gray200}`,background:ativo?cor+"12":C.white,cursor:"pointer",...F.body,fontSize:12.5,fontWeight:ativo?700:500,color:ativo?cor:C.gray600}}>
+              {lbl}<span style={{background:ativo?cor:C.gray200,color:ativo?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{n}</span>
+            </button>
           );
         })}
       </div>
-      {sel&&<Card style={{border:`1px solid ${STAGE_COLOR[sel]||C.gray200}40`}}>
-        <SecH>{sel} — pedidos em aberto</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-          {stats.find(s=>s.etapa===sel)?.ords.map(o=><OCard key={o.id} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&porEtapa.length===0&&(
+        <div style={{textAlign:"center",padding:60,...F.body,color:C.gray400,fontSize:14,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
+          Nenhum pedido encontrado para esta busca/filtro.
         </div>
-      </Card>}
+      )}
+
+      {/* Pedidos agrupados por fase */}
+      {porEtapa.map(s=>(
+        <div key={s.etapa}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10,marginTop:2}}>
+            <div style={{width:9,height:9,borderRadius:"50%",background:STAGE_COLOR[s.etapa]||C.gray400,flexShrink:0}}/>
+            <span style={{...F.title,fontSize:12.5,fontWeight:700,letterSpacing:"0.07em"}}>{s.etapa.toUpperCase()}</span>
+            <span style={{...F.body,fontSize:12,color:C.gray400}}>({s.ords.length})</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+            {s.ords.map(o=><OCard key={(o.id||"")+s.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── FUNIL EM TEMPO REAL ──────────────────────────────────────────────────────
+function Funil({onOpen,slaCfg}){
+  const [aberto,setAberto]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [sel,setSel]=useState(null);
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const resultados=await Promise.all(
+        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
+      );
+      setAberto(prev=>mesclarEmAberto(prev,resultados));
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const agora=Date.now();
+  const isAtrasado=o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora;
+  const stats=ABERTO_ETAPAS.map(e=>{
+    const ords=ordenarPorPrioridade((aberto||[]).filter(o=>o.etapa===e.nome));
+    const atrasados=ords.filter(isAtrasado).length;
+    return{
+      etapa:e.nome,count:ords.length,
+      val:ords.reduce((s,o)=>s+(o.valor||0),0),
+      atrasados,pctAtraso:ords.length?Math.round((atrasados/ords.length)*100):0,
+      ords,
+    };
+  }).filter(s=>s.count>0);
+
+  const totalAberto=stats.reduce((s,x)=>s+x.count,0);
+  const totalValor=stats.reduce((s,x)=>s+x.val,0);
+
+  return(
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
+      <PageH title="Funil em Tempo Real" sub="Pedidos em aberto por etapa, com atrasos e valor" onRefresh={carregar} refreshing={loading}/>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {!loading&&<>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+          <Stat label="Pedidos em aberto" value={totalAberto} icon="list"/>
+          <Stat label="Valor total em aberto" value={fmtR(totalValor)} color={C.green} icon="dollar"/>
+        </div>
+
+        {stats.length===0?<div style={{...F.body,color:C.gray400,fontSize:14,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido em aberto no momento.</div>
+        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:12}}>
+          {stats.map(s=>{
+            const c=STAGE_COLOR[s.etapa]||C.gray500;const isSel=sel===s.etapa;
+            return(
+              <div key={s.etapa} onClick={()=>setSel(isSel?null:s.etapa)}
+                style={{background:C.white,border:`1.5px solid ${isSel?c:C.gray200}`,borderRadius:8,padding:16,cursor:"pointer"}}
+                onMouseEnter={e=>{if(!isSel)e.currentTarget.style.borderColor=c+"80";}}
+                onMouseLeave={e=>{if(!isSel)e.currentTarget.style.borderColor=C.gray200;}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:c,marginBottom:6}}/>
+                    <div style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.06em"}}>{s.etapa.toUpperCase()}</div>
+                  </div>
+                  <div style={{...F.title,fontSize:26,fontWeight:700,color:c,marginLeft:8}}>{s.count}</div>
+                </div>
+                {/* barra no prazo vs atraso */}
+                <div style={{height:8,background:C.gray100,borderRadius:4,overflow:"hidden",display:"flex",marginBottom:10}}>
+                  <div style={{width:`${100-s.pctAtraso}%`,background:C.green,height:"100%"}}/>
+                  <div style={{width:`${s.pctAtraso}%`,background:C.red,height:"100%"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
+                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n="warn" s={11} c={s.atrasados>0?C.red:C.gray400}/>Atrasados</span>
+                    <span style={{fontWeight:700,color:s.atrasados>0?C.red:C.gray600}}>{s.atrasados} ({s.pctAtraso}%)</span>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",...F.body,fontSize:12}}>
+                    <span style={{color:C.gray500,display:"flex",alignItems:"center",gap:4}}><Ic n="dollar" s={11} c={C.gray400}/>Valor</span>
+                    <span style={{fontWeight:700,color:C.green}}>{fmtR(s.val)}</span>
+                  </div>
+                </div>
+                <div style={{...F.body,fontSize:11,color:isSel?c:C.gray400,fontWeight:600,textAlign:"center",marginTop:10}}>{isSel?"▲ Fechar":"▼ Ver pedidos"}</div>
+              </div>
+            );
+          })}
+        </div>}
+
+        {sel&&<Card style={{border:`1px solid ${STAGE_COLOR[sel]||C.gray200}40`}}>
+          <SecH>{sel} — pedidos em aberto (por prioridade)</SecH>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
+            {stats.find(s=>s.etapa===sel)?.ords.map(o=><OCard key={(o.id||"")+o.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+          </div>
+        </Card>}
+      </>}
     </div>
   );
 }
@@ -1519,13 +2778,68 @@ function Ranking({hist}){
 
 // ─── SLA CONFIG ──────────────────────────────────────────────────────────────
 function SLAConfig({slaCfg,onSave}){
-  const[local,setLocal]=useState({...slaCfg});const[saved,setSaved]=useState(false);
-  const save=()=>{onSave(local);setSaved(true);setTimeout(()=>setSaved(false),2000);};
+  const[local,setLocal]=useState({...slaCfg});
+  const[prazoCom,setPrazoCom]=useState(15);
+  const[prazoSem,setPrazoSem]=useState(7);
+  const[saved,setSaved]=useState(false);
+  const[saving,setSaving]=useState(false);
+  const[loading,setLoading]=useState(true);
+
+  // Carrega a config persistida do Worker (KV)
+  useEffect(()=>{
+    apiFetch("/config-sla").then(r=>{
+      if(r.success&&r.config){
+        if(r.config.etapas)setLocal(prev=>({...prev,...r.config.etapas}));
+        if(r.config.prazoComBordado!=null)setPrazoCom(r.config.prazoComBordado);
+        if(r.config.prazoSemBordado!=null)setPrazoSem(r.config.prazoSemBordado);
+      }
+    }).catch(()=>{}).finally(()=>setLoading(false));
+  },[]);
+
+  const save=async()=>{
+    setSaving(true);
+    try{
+      await apiFetch("/config-sla","PATCH",{etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem)});
+      onSave(local);
+      setSaved(true);setTimeout(()=>setSaved(false),2000);
+    }catch(e){alert("Erro ao salvar: "+e.message);}
+    finally{setSaving(false);}
+  };
+
   return(
-    <div style={{padding:24}}>
-      <PageH title="Configurar SLA" sub="Tempo máximo em horas para cada etapa do processo"/>
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Configurar SLA" sub="Tempo máximo por etapa e prazos de vencimento dos pedidos"/>
+
+      {/* Prazos de vencimento (data de vencimento do pedido) */}
       <Card>
-        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:20}}>Pedidos que ultrapassarem o tempo definido serão sinalizados como atrasados em todo o sistema.</div>
+        <SecH>Prazo de faturamento (data de vencimento)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:16}}>
+          Define a <strong>data de vencimento</strong> de cada pedido, usada para priorizar a ordem em todos os módulos. Para pedidos <strong>com bordado</strong>, o prazo é contado a partir da aprovação da amostra física. Para pedidos <strong>sem bordado</strong>, a partir da criação do pedido.
+        </div>
+        <div style={{display:"flex",gap:24,flexWrap:"wrap"}}>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Pedido com bordado</label>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <input type="number" value={prazoCom} onChange={e=>setPrazoCom(e.target.value)}
+                style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+              <span style={{...F.body,fontSize:12,color:C.gray400}}>dias</span>
+            </div>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Pedido sem bordado</label>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <input type="number" value={prazoSem} onChange={e=>setPrazoSem(e.target.value)}
+                style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+              <span style={{...F.body,fontSize:12,color:C.gray400}}>dias</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Tempo por etapa */}
+      <Card>
+        <SecH>Tempo máximo por etapa</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:20}}>Pedidos que ultrapassarem o tempo definido serão sinalizados como atrasados na etapa.</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:16}}>
           {Object.keys(SLA_DEF).map(e=>(
             <div key={e}>
@@ -1541,46 +2855,179 @@ function SLAConfig({slaCfg,onSave}){
             </div>
           ))}
         </div>
-        <div style={{marginTop:24,display:"flex",gap:10,alignItems:"center"}}>
-          <Btn label="Salvar configurações" icon="check" onClick={save}/>
-          {saved&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
-        </div>
       </Card>
+
+      <div style={{display:"flex",gap:10,alignItems:"center"}}>
+        <Btn label={saving?"Salvando...":"Salvar configurações"} icon="check" onClick={save}/>
+        {saved&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
+        {loading&&<span style={{...F.body,fontSize:12,color:C.gray400}}>Carregando config...</span>}
+      </div>
     </div>
   );
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg}){
-  const mine=orders.filter(o=>o.etapa===etapa&&!o.concluido);
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado}){
+  const [loading,setLoading]=useState(false);
+  const [hsData,setHsData]=useState(null);
+  const [loadError,setLoadError]=useState(null);
+  const [busca,setBusca]=useState("");
+  const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
+
+  const carregar=()=>{
+    if(!endpoint){setHsData(null);return;}
+    setLoading(true);setLoadError(null);
+    apiFetch(endpoint)
+      .then(res=>{
+        if(res.success){
+          const conv=res.data.map(o=>({
+            id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+            client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
+            cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
+            obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
+            condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
+            arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+            motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
+            reprogramacao:o.reprogramacao||false,
+            historico:o.historico||[],
+            arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
+            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+            prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
+            etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
+            entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+            alertas:o.alertas||[],concluido:false,
+            bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
+            items:(o.items||[]).map(it=>({
+              id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
+              qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+              status:"separado",
+            })),
+            timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+            chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
+          }));
+          setHsData(conv);
+        }
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[endpoint]);
+  useEffect(()=>{
+    _refreshListeners.push(carregar);
+    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==carregar);};
+  },[endpoint]);
+
+  const source=hsData!==null?hsData:orders;
+  let mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
+
+  // Filtro de busca (código do produto/SKU ou nome do cliente)
+  const q=busca.trim().toLowerCase();
+  if(q){
+    mine=mine.filter(o=>
+      (o.client||"").toLowerCase().includes(q) ||
+      (o.id||"").toLowerCase().includes(q) ||
+      (o.items||[]).some(it=>(it.sku||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q))
+    );
+  }
+
+  // Filtro de SLA
+  if(filtroSLA!=="todos"){
+    mine=mine.filter(o=>{
+      const st=getSLA(o,slaCfg).st;
+      return filtroSLA==="atrasados"?st==="late":filtroSLA==="risco"?st==="risk":st==="ok";
+    });
+  }
+
+  // Ordena por PRIORIDADE (data de vencimento mais próxima primeiro)
+  mine=ordenarPorPrioridade(mine);
+
+  // Contadores para os chips de filtro
+  const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
+  const nLate=all.filter(o=>getSLA(o,slaCfg).st==="late").length;
+  const nRisk=all.filter(o=>getSLA(o,slaCfg).st==="risk").length;
+
+  const FilterChip=({id,label,count,color})=>(
+    <button onClick={()=>setFiltroSLA(id)}
+      style={{display:"flex",alignItems:"center",gap:6,padding:"7px 13px",borderRadius:7,border:`1.5px solid ${filtroSLA===id?(color||C.red):C.gray200}`,background:filtroSLA===id?(color||C.red)+"0e":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:filtroSLA===id?700:500,color:filtroSLA===id?(color||C.red):C.gray600,whiteSpace:"nowrap"}}>
+      {label}{count!==undefined&&<span style={{background:filtroSLA===id?(color||C.red):C.gray200,color:filtroSLA===id?C.white:C.gray600,borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>{count}</span>}
+    </button>
+  );
+
   return(
     <div style={{padding:24}}>
-      <PageH title={title} sub={`${mine.length} pedido${mine.length!==1?"s":""} nesta etapa`}/>
+      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}`} onRefresh={carregar} refreshing={loading}/>
+
+      {/* Barra de busca + filtros */}
+      <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
+        <div style={{position:"relative",flex:1,minWidth:220}}>
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>
+            <Ic n="search" s={15} c={C.gray400}/>
+          </div>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, SKU ou código..."
+            style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+        </div>
+        {!finalizado&&<div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
+          <FilterChip id="todos" label="Todos" count={all.length} color={C.gray600}/>
+          <FilterChip id="atrasados" label="Atrasados" count={nLate} color={C.red}/>
+          <FilterChip id="risco" label="Em risco" count={nRisk} color={C.amber}/>
+          <FilterChip id="ok" label="No prazo" color={C.green}/>
+        </div>}
+      </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando do HubSpot...</div>}
+      {loadError&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {loadError}</div>}
+
       {mine.length===0
         ?<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
-          <Ic n="check" s={32} c={C.gray300} style={{display:"block",margin:"0 auto 10px"}}/>Nenhum pedido nesta etapa.
+          <Ic n="check" s={32} c={C.gray300} style={{display:"block",margin:"0 auto 10px"}}/>
+          {q||filtroSLA!=="todos"?"Nenhum pedido encontrado com esses filtros.":"Nenhum pedido nesta etapa."}
         </div>
         :mine.map(o=>{
           const sla=getSLA(o,slaCfg);
-          const ac=sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300;
+          const ac=finalizado?C.green:(sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300);
+          const slaLabel=sla.st==="late"?"ATRASADO":sla.st==="risk"?"EM RISCO":"NO PRAZO";
+          const slaColor=sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green;
+          const totalPecas=o.items.reduce((s,i)=>s+(i.qty||0),0);
           return(
-            <Card key={o.id} style={{marginBottom:10,borderLeft:`3px solid ${ac}`}}>
+            <Card key={o.id} onClick={()=>onOpen(o)}
+              style={{marginBottom:10,borderLeft:`4px solid ${ac}`,cursor:"pointer",transition:"box-shadow 0.15s,transform 0.15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.08)";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.boxShadow="";e.currentTarget.style.transform="";}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
-                    {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Atrasado":"Em risco"} color={sla.st==="late"?C.red:C.amber}/>}
+                    {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
+                    {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
+                    {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
+                    {/* Badge de status */}
+                    {finalizado
+                      ?<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.green+"15",color:C.green,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
+                        <Ic n="check" s={10} c={C.green}/> CONCLUÍDO
+                      </span>
+                      :<span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
+                        <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
+                        {slaLabel}
+                      </span>}
                   </div>
-                  <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{o.client} · {fmtR(o.valor)}</div>
-                  <div style={{...F.body,fontSize:12,color:C.gray600}}>{o.items.length} SKUs · {o.items.reduce((s,i)=>s+i.qty,0)} peças</div>
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
-                    <SLABar pct={sla.pct} st={sla.st}/><span style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
-                  </div>
+                  <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
+                  <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{etapa==="Programação"
+                    ? (()=>{const n=(o.bordadosJson||[]).filter(b=>/~prog/i.test(b.fileName||"")).length||(o.bordadosJson||[]).length; return `${n} programaç${n===1?"ão":"ões"}`;})()
+                    : `${fmtR(o.valor)} · ${o.items.length} SKU${o.items.length!==1?"s":""} · ${totalPecas} peça${totalPecas!==1?"s":""}`}</div>
+                  {!finalizado&&<div style={{...F.body,fontSize:11,color:o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray600):C.gray400,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
+                    <Ic n="clock" s={11} c={o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray500):C.gray300}/>
+                    {o.dataVencimento?<>Vence em {fmtDS(o.dataVencimento)}</>:"Vencimento ainda não definido"}
+                  </div>}
+                  {!finalizado&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
+                    <SLABar pct={sla.pct} st={sla.st}/>
+                    <span style={{...F.body,fontSize:10,color:slaColor,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
+                  </div>}
                   {o.alertas.length>0&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{o.alertas.map((a,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:"#92400e",fontWeight:600}}><Ic n="warn" s={11} c={C.amber}/>{a}</div>)}</div>}
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end"}}>
-                  <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
-                  <button style={{background:actionColor,color:C.white,border:"none",borderRadius:6,padding:"7px 14px",cursor:"pointer",...F.body,fontSize:12,fontWeight:700}}>{actionLabel}</button>
+                <div style={{display:"flex",alignItems:"center",gap:6,color:C.gray400}}>
+                  <span style={{...F.body,fontSize:12,color:C.gray400}}>Abrir</span>
+                  <Ic n="chevR" s={16} c={C.gray400}/>
                 </div>
               </div>
             </Card>
@@ -1591,56 +3038,258 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg}
   );
 }
 
-// ─── USUÁRIOS ─────────────────────────────────────────────────────────────────
+// ─── USUÁRIOS (gestão dinâmica por módulo, via Worker + KV) ───────────────────
+// ─── MÓDULO: REGISTROS DE ALTERAÇÃO DE FORMULÁRIO ────────────────────────────
+function AlteracoesFormList(){
+  const[regs,setRegs]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[erro,setErro]=useState("");
+  const[busca,setBusca]=useState("");
+
+  const carregar=async()=>{
+    setLoading(true);setErro("");
+    try{
+      const r=await apiFetch("/alteracoes-formulario");
+      setRegs(r.data||[]);
+    }catch(e){setErro(e.message);}
+    finally{setLoading(false);}
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const q=busca.trim().toLowerCase();
+  const filtrados=q
+    ?regs.filter(r=>(r.cliente||"").toLowerCase().includes(q)||String(r.pedido_id||"").includes(q)||(r.executor||"").toLowerCase().includes(q))
+    :regs;
+
+  return(
+    <div style={{padding:24}}>
+      <PageH title="Alterações de Formulário" sub={`${regs.length} registro${regs.length!==1?"s":""} de alteração`} onRefresh={carregar} refreshing={loading}/>
+
+      <div style={{position:"relative",marginBottom:16,maxWidth:420}}>
+        <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido ou executor..."
+          style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando registros...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {erro}</div>}
+
+      {!loading&&filtrados.length===0
+        ?<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
+          {q?"Nenhum registro encontrado.":"Nenhuma alteração de formulário registrada ainda."}
+        </div>
+        :filtrados.map((r,i)=>{
+          const det=r.detalhes||{};
+          return(
+            <Card key={r.id||i} style={{marginBottom:10,borderLeft:`4px solid #b45309`}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
+                    <span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>
+                    {r.pedido_id&&<span style={{...F.body,fontWeight:700,fontSize:14}}>PED-{r.pedido_id}</span>}
+                  </div>
+                  <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{r.cliente||"—"}</div>
+                  {(det.etapaOrigem||det.voltouPara)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginBottom:6,display:"flex",alignItems:"center",gap:6}}>
+                    <span>{det.etapaOrigem||"—"}</span><Ic n="arrow" s={12} c={C.gray400}/><strong style={{color:"#b45309"}}>{det.voltouPara||"—"}</strong>
+                  </div>}
+                  <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",marginTop:4}}>
+                    <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>Motivo</div>
+                    <div style={{...F.body,fontSize:13,color:C.gray700}}>{det.motivo||"—"}</div>
+                  </div>
+                </div>
+                <div style={{textAlign:"right",...F.body,fontSize:11,color:C.gray500,flexShrink:0}}>
+                  <div style={{fontWeight:600,color:C.gray700}}>{r.executor||"Sistema"}</div>
+                  <div>{r.criado_em?fmtD(r.criado_em):""}</div>
+                </div>
+              </div>
+            </Card>
+          );
+        })
+      }
+    </div>
+  );
+}
+
 function Usuarios(){
-  const[users,setUsers]=useState(USERS);const[show,setShow]=useState(false);
-  const[form,setForm]=useState({name:"",email:"",role:"posvenda",pw:""});
-  const add=()=>{if(!form.name||!form.email)return;setUsers([...users,{...form,id:Date.now(),ini:form.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase(),password:form.pw}]);setShow(false);setForm({name:"",email:"",role:"posvenda",pw:""});};
+  const[users,setUsers]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[err,setErr]=useState(null);
+  const[show,setShow]=useState(false);
+  const[editId,setEditId]=useState(null);
+  const[form,setForm]=useState({nome:"",email:"",senha:"",modulos:[]});
+  // Diagnóstico de login
+  const[diag,setDiag]=useState({email:"",senha:"",ver:false,resultado:null,carregando:false});
+  const testarLogin=()=>{
+    if(!diag.email||!diag.senha){alert("Preencha e-mail e senha para testar.");return;}
+    setDiag(d=>({...d,carregando:true,resultado:null}));
+    apiFetch("/diagnostico-login","POST",{email:diag.email,senha:diag.senha})
+      .then(r=>setDiag(d=>({...d,resultado:r})))
+      .catch(e=>setDiag(d=>({...d,resultado:{erro:e.message}})))
+      .finally(()=>setDiag(d=>({...d,carregando:false})));
+  };
+
+  const carregar=()=>{
+    setLoading(true);setErr(null);
+    apiFetch("/usuarios")
+      .then(r=>{if(r.success)setUsers(r.users);})
+      .catch(e=>setErr(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[]);
+
+  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+
+  const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
+  const toggleGrupo=(grupo)=>{
+    const ids=NAV_ITEMS.filter(n=>n.grupo===grupo).map(n=>n.id);
+    const allOn=ids.every(id=>form.modulos.includes(id));
+    setForm(f=>({...f,modulos:allOn?f.modulos.filter(m=>!ids.includes(m)):[...new Set([...f.modulos,...ids])]}));
+  };
+
+  const abrirNovo=()=>{setEditId(null);setForm({nome:"",email:"",senha:"",modulos:[]});setShow(true);};
+  const abrirEdit=(u)=>{setEditId(u.id);setForm({nome:u.nome,email:u.email,senha:"",modulos:u.modulos||[]});setShow(true);};
+
+  const salvar=()=>{
+    if(!form.nome||!form.email||(!editId&&!form.senha)){alert("Preencha nome, e-mail e senha.");return;}
+    const req = editId
+      ? apiFetch(`/usuarios/${encodeURIComponent(editId)}`,"PATCH",{nome:form.nome,modulos:form.modulos,...(form.senha?{senha:form.senha}:{})})
+      : apiFetch("/usuarios","POST",{nome:form.nome,email:form.email,senha:form.senha,modulos:form.modulos});
+    req.then(r=>{if(r.success){setShow(false);carregar();}else alert(r.error||"Erro");})
+       .catch(e=>alert(e.message));
+  };
+
+  const excluir=(u)=>{
+    if(!confirm(`Excluir o acesso de ${u.nome}?`))return;
+    apiFetch(`/usuarios/${encodeURIComponent(u.id)}`,"DELETE")
+      .then(()=>carregar()).catch(e=>alert(e.message));
+  };
+
+  const ini=(nome)=>(nome||"").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+
   return(
     <div style={{padding:24}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,flexWrap:"wrap",gap:12}}>
-        <PageH title="Usuários" sub="Gerencie os acessos do sistema"/>
-        <Btn label="Novo usuário" icon="users" onClick={()=>setShow(!show)}/>
+        <PageH title="Usuários" sub="Crie acessos e defina quais módulos cada pessoa enxerga" onRefresh={carregar} refreshing={loading}/>
+        <Btn label="Novo acesso" icon="users" onClick={abrirNovo}/>
       </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:20}}>Carregando usuários...</div>}
+      {err&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:16}}>Erro: {err}</div>}
+
       {show&&<Card style={{marginBottom:16}}>
-        <SecH>Novo usuário</SecH>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10,marginBottom:12}}>
-          {[["name","Nome"],["email","E-mail"],["pw","Senha"]].map(([k,p])=>(
-            <div key={k}>
-              <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>{p}</label>
-              <input placeholder={p} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})}
-                style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
-            </div>
-          ))}
+        <SecH>{editId?"Editar acesso":"Novo acesso"}</SecH>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10,marginBottom:16}}>
           <div>
-            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Perfil</label>
-            <select value={form.role} onChange={e=>setForm({...form,role:e.target.value})} style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}>
-              {Object.entries(ROLE_LABEL).filter(([k])=>k!=="superadmin").map(([k,v])=><option key={k} value={k}>{v}</option>)}
-            </select>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Nome do acesso</label>
+            <input placeholder="Ex: Analista de Bordado" value={form.nome} onChange={e=>setForm({...form,nome:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>E-mail</label>
+            <input placeholder="email@citerol.com.br" value={form.email} disabled={!!editId} onChange={e=>setForm({...form,email:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:editId?C.gray100:C.white}}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>{editId?"Nova senha (deixe vazio p/ manter)":"Senha"}</label>
+            <input type="password" placeholder="••••••" value={form.senha} onChange={e=>setForm({...form,senha:e.target.value})}
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
           </div>
         </div>
+
+        {/* Seleção de módulos por grupo */}
+        <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10}}>Módulos com acesso</div>
+        <div style={{display:"flex",flexDirection:"column",gap:14,marginBottom:16}}>
+          {GRUPOS.map(grupo=>{
+            const itensGrupo=NAV_ITEMS.filter(n=>n.grupo===grupo);
+            const allOn=itensGrupo.every(n=>form.modulos.includes(n.id));
+            return(
+              <div key={grupo}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                  <span style={{...F.title,fontSize:11,fontWeight:700,color:C.black,letterSpacing:"0.08em"}}>{grupo.toUpperCase()}</span>
+                  <button onClick={()=>toggleGrupo(grupo)} style={{background:"none",border:`1px solid ${C.gray200}`,borderRadius:4,padding:"2px 8px",...F.body,fontSize:10,color:C.gray500,cursor:"pointer"}}>
+                    {allOn?"Desmarcar todos":"Marcar todos"}
+                  </button>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:6}}>
+                  {itensGrupo.map(n=>{
+                    const on=form.modulos.includes(n.id);
+                    return(
+                      <div key={n.id} onClick={()=>toggleMod(n.id)}
+                        style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",borderRadius:6,border:`1.5px solid ${on?C.red:C.gray200}`,background:on?C.red+"08":C.white,cursor:"pointer"}}>
+                        <div style={{width:16,height:16,borderRadius:4,border:`1.5px solid ${on?C.red:C.gray300}`,background:on?C.red:C.white,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                          {on&&<Ic n="check" s={11} c={C.white}/>}
+                        </div>
+                        <Ic n={n.icon} s={14} c={on?C.red:C.gray400}/>
+                        <span style={{...F.body,fontSize:12,color:on?C.black:C.gray600,fontWeight:on?600:400}}>{n.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         <div style={{display:"flex",gap:8}}>
-          <Btn label="Salvar" icon="check" variant="success" onClick={add}/>
+          <Btn label={editId?"Salvar alterações":"Criar acesso"} icon="check" variant="success" onClick={salvar}/>
           <Btn label="Cancelar" variant="secondary" onClick={()=>setShow(false)}/>
         </div>
       </Card>}
+
+      <Card style={{marginBottom:16,background:C.gray50}}>
+        <SecH>Diagnóstico de login</SecH>
+        <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>Teste um e-mail e senha para ver exatamente o que acontece (sem precisar sair da sua conta).</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"flex-end"}}>
+          <div style={{flex:"1 1 200px"}}>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>E-mail</label>
+            <input value={diag.email} onChange={e=>setDiag(d=>({...d,email:e.target.value}))} placeholder="email@citerol.com.br"
+              style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <div style={{flex:"1 1 200px"}}>
+            <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Senha</label>
+            <div style={{position:"relative"}}>
+              <input type={diag.ver?"text":"password"} value={diag.senha} onChange={e=>setDiag(d=>({...d,senha:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&testarLogin()} placeholder="senha"
+                style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 38px 9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+              <button type="button" onClick={()=>setDiag(d=>({...d,ver:!d.ver}))} style={{position:"absolute",right:6,top:0,bottom:0,background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center"}}>
+                <Ic n={diag.ver?"eyeOff":"eye"} s={17} c={C.gray400}/>
+              </button>
+            </div>
+          </div>
+          <Btn label={diag.carregando?"Testando...":"Testar login"} icon="check" onClick={testarLogin}/>
+        </div>
+        {diag.resultado&&(()=>{
+          const r=diag.resultado;
+          if(r.erro)return<div style={{marginTop:12,padding:"10px 14px",borderRadius:6,background:C.red+"0e",border:`1px solid ${C.red}28`,...F.body,fontSize:13,color:C.red}}>Erro ao testar: {r.erro}</div>;
+          const mapa={
+            ok:{cor:C.green,txt:"Tudo certo! Esse e-mail e senha entram normalmente. Se ainda der erro na tela de login, é cache — atualize a página (Ctrl+Shift+R)."},
+            usuario_nao_encontrado:{cor:C.red,txt:`Usuário NÃO encontrado no banco (procurei por "${r.chaveProcurada}"). Confira se o e-mail está exatamente igual ao do cadastro, ou aguarde ~1 min (propagação do KV) e teste de novo.`},
+            usuario_inativo:{cor:C.amber,txt:"O usuário existe, mas está INATIVO. Reative no cadastro."},
+            senha_incorreta:{cor:C.red,txt:`O usuário existe e está ativo, mas a SENHA não confere. E-mail armazenado: "${r.emailArmazenado}". Edite o usuário e defina a senha de novo (ou recrie).`},
+          };
+          const m=mapa[r.etapa]||{cor:C.gray600,txt:JSON.stringify(r)};
+          return<div style={{marginTop:12,padding:"10px 14px",borderRadius:6,background:m.cor+"12",border:`1px solid ${m.cor}33`,...F.body,fontSize:13,color:m.cor,lineHeight:1.5}}>{m.txt}</div>;
+        })()}
+      </Card>
+
       <Card style={{padding:0,overflow:"hidden"}}>
         <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:480}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:520}}>
             <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-              {["Usuário","E-mail","Perfil","Ações"].map(hd=><th key={hd} style={{padding:"11px 16px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
+              {["Acesso","E-mail","Módulos","Ações"].map(hd=><th key={hd} style={{padding:"11px 16px",textAlign:"left",...F.body,fontSize:11,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{hd}</th>)}
             </tr></thead>
             <tbody>{users.map(u=>(
               <tr key={u.id} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                <td style={{padding:"11px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10}}><Av ini={u.ini} size={28}/><span style={{...F.body,fontWeight:600,color:C.black}}>{u.name}</span></div></td>
+                <td style={{padding:"11px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10}}><Av ini={ini(u.nome)} size={28}/><span style={{...F.body,fontWeight:600,color:C.black}}>{u.nome}</span></div></td>
                 <td style={{padding:"11px 16px",...F.body,color:C.gray500,fontSize:12}}>{u.email}</td>
-                <td style={{padding:"11px 16px"}}><Tag label={ROLE_LABEL[u.role]} color={u.role==="superadmin"?C.red:C.gray600}/></td>
+                <td style={{padding:"11px 16px"}}><Tag label={`${(u.modulos||[]).length} módulo${(u.modulos||[]).length!==1?"s":""}`} color={C.gray600}/></td>
                 <td style={{padding:"11px 16px"}}><div style={{display:"flex",gap:6}}>
-                  <Btn label="Editar" variant="secondary" size="sm"/>
-                  {u.role!=="superadmin"&&<Btn label="Remover" variant="danger" size="sm" onClick={()=>setUsers(users.filter(x=>x.id!==u.id))}/>}
+                  <Btn label="Editar" variant="secondary" size="sm" onClick={()=>abrirEdit(u)}/>
+                  <Btn label="Remover" variant="danger" size="sm" onClick={()=>excluir(u)}/>
                 </div></td>
               </tr>
-            ))}</tbody>
+            ))}
+            {!loading&&users.length===0&&<tr><td colSpan={4} style={{padding:30,textAlign:"center",...F.body,color:C.gray400,fontSize:13}}>Nenhum acesso criado ainda.</td></tr>}
+            </tbody>
           </table>
         </div>
       </Card>
@@ -1649,19 +3298,28 @@ function Usuarios(){
 }
 
 // ─── NOTIFICAÇÕES ─────────────────────────────────────────────────────────────
-function NotifPanel({notifs,user,onClose}){
-  const mine=notifs.filter(n=>n.toUid===user.id);
+function NotifPanel({notifs,onClose,onAbrir}){
+  const fmt=(iso)=>{if(!iso)return"";const d=new Date(iso);return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
   return(
-    <div style={{position:"fixed",top:56,right:0,width:320,background:C.white,borderLeft:`1px solid ${C.gray200}`,boxShadow:"-4px 8px 24px rgba(0,0,0,0.08)",zIndex:200,maxHeight:"70vh",overflow:"auto"}}>
-      <div style={{padding:"13px 18px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+    <div style={{position:"fixed",top:56,right:0,width:340,maxWidth:"92vw",background:C.white,borderLeft:`1px solid ${C.gray200}`,boxShadow:"-4px 8px 24px rgba(0,0,0,0.08)",zIndex:200,maxHeight:"75vh",overflow:"auto"}} className="sgp-scroll">
+      <div style={{padding:"13px 18px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,background:C.white}}>
         <span style={{...F.title,fontWeight:700,fontSize:12,letterSpacing:"0.1em"}}>NOTIFICAÇÕES</span>
         <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",display:"flex"}}><Ic n="close" s={16} c={C.gray400}/></button>
       </div>
-      {mine.length===0?<div style={{padding:28,...F.body,color:C.gray400,fontSize:13,textAlign:"center"}}>Nenhuma notificação.</div>
-        :mine.map((n,i)=>(
-          <div key={i} style={{padding:"12px 18px",borderBottom:`1px solid ${C.gray100}`,background:n.read?C.white:C.red+"06"}}>
-            <div style={{...F.body,fontSize:13,color:C.black,fontWeight:n.read?400:600,lineHeight:1.4}}>{n.text}</div>
-            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>{n.time} · {n.orderId}</div>
+      {(!notifs||notifs.length===0)?<div style={{padding:28,...F.body,color:C.gray400,fontSize:13,textAlign:"center"}}>Nenhuma notificação.</div>
+        :notifs.map((n)=>(
+          <div key={n.id} onClick={()=>onAbrir(n)} style={{padding:"12px 18px",borderBottom:`1px solid ${C.gray100}`,background:n.lida?C.white:C.red+"08",cursor:"pointer",display:"flex",gap:10}}
+            onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
+            onMouseLeave={e=>e.currentTarget.style.background=n.lida?C.white:C.red+"08"}>
+            {!n.lida&&<div style={{width:7,height:7,borderRadius:"50%",background:C.red,marginTop:6,flexShrink:0}}/>}
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{...F.body,fontSize:13,color:C.black,lineHeight:1.45}}>
+                <b>{n.autor||"Alguém"}</b> mencionou você: <span style={{color:C.gray600}}>"{n.trecho}"</span>
+              </div>
+              <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>
+                Pedido {n.pedido_id}{n.cliente?` · ${n.cliente}`:""} · {fmt(n.criado_em)}
+              </div>
+            </div>
           </div>
         ))
       }
@@ -1671,18 +3329,33 @@ function NotifPanel({notifs,user,onClose}){
 
 // ─── LOGIN ───────────────────────────────────────────────────────────────────
 function Login({onLogin}){
-  const[email,setE]=useState("");const[pw,setPw]=useState("");const[err,setErr]=useState("");
-  const go=()=>{const u=USERS.find(x=>x.email===email);u?onLogin(u):setErr("E-mail não encontrado.");};
+  const[email,setE]=useState("");const[pw,setPw]=useState("");const[err,setErr]=useState("");const[loading,setLoading]=useState(false);const[verPw,setVerPw]=useState(false);
+  const go=()=>{
+    const em=email.trim().toLowerCase();const pwd=pw.trim();
+    if(!em||!pwd){setErr("Preencha e-mail e senha.");return;}
+    setLoading(true);setErr("");
+    apiFetch("/login","POST",{email:em,senha:pwd})
+      .then(r=>{
+        if(r.success&&r.user){
+          // adiciona ini e admin para o portal
+          const nome=r.user.nome||r.user.name||r.user.email||"Usuário";
+          const u={...r.user,nome,name:nome,ini:nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()};
+          onLogin(u);
+        }else setErr(r.error||"E-mail ou senha incorretos.");
+      })
+      .catch(()=>setErr("E-mail ou senha incorretos."))
+      .finally(()=>setLoading(false));
+  };
   return(
     <div style={{minHeight:"100vh",background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
       <div style={{width:"100%",maxWidth:400}}>
         <div style={{background:C.white,borderRadius:10,padding:"40px 36px",border:`1px solid ${C.gray200}`}}>
           <div style={{marginBottom:32}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24}}>
-              <div style={{width:36,height:36,borderRadius:8,background:C.red,display:"flex",alignItems:"center",justifyContent:"center"}}><Ic n="needle" s={18} c={C.white}/></div>
-              <div>
-                <div style={{...F.title,fontSize:15,fontWeight:700,color:C.black,letterSpacing:"0.12em"}}>CITEROL</div>
-                <div style={{...F.body,fontSize:10,color:C.gray400,letterSpacing:"0.04em"}}>Sistema de Personalizados</div>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:24}}>
+              <img src={BRASAO_SGP} alt="SGP" style={{height:38,width:"auto",display:"block"}}/>
+              <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
+                <div style={{...F.title,fontSize:19,fontWeight:700,color:C.black,letterSpacing:"0.05em",lineHeight:1}}>SGP</div>
+                <div style={{...F.body,fontSize:10.5,color:C.gray500,letterSpacing:"0.01em",lineHeight:1.2,marginTop:3}}>Sistema de Gestão de Personalizados</div>
               </div>
             </div>
             <h1 style={{...F.title,fontSize:22,fontWeight:700,color:C.black}}>ENTRAR</h1>
@@ -1696,11 +3369,17 @@ function Login({onLogin}){
             </div>
             <div>
               <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Senha</label>
-              <input type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&go()} placeholder="••••••••"
-                style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
+              <div style={{position:"relative"}}>
+                <input type={verPw?"text":"password"} value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&go()} placeholder="••••••••"
+                  style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 40px 10px 12px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
+                <button type="button" onClick={()=>setVerPw(v=>!v)} title={verPw?"Ocultar senha":"Mostrar senha"}
+                  style={{position:"absolute",right:8,top:0,bottom:0,background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",padding:"0 4px"}}>
+                  <Ic n={verPw?"eyeOff":"eye"} s={18} c={C.gray400}/>
+                </button>
+              </div>
             </div>
             {err&&<div style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>{err}</div>}
-            <button onClick={go} style={{background:C.red,color:C.white,border:"none",borderRadius:6,padding:"11px",...F.title,fontSize:14,fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",marginTop:4}}>ENTRAR</button>
+            <button onClick={go} disabled={loading} style={{background:loading?C.gray400:C.red,color:C.white,border:"none",borderRadius:6,padding:"11px",...F.title,fontSize:14,fontWeight:700,cursor:loading?"wait":"pointer",letterSpacing:"0.06em",marginTop:4}}>{loading?"ENTRANDO...":"ENTRAR"}</button>
           </div>
   
         </div>
@@ -1709,76 +3388,277 @@ function Login({onLogin}){
   );
 }
 
+// ─── ERROR BOUNDARY ───────────────────────────────────────────────────────────
+class ErrorBoundary extends Component {
+  constructor(props){ super(props); this.state={hasError:false,msg:""}; }
+  static getDerivedStateFromError(error){ return {hasError:true,msg:error?.message||String(error)}; }
+  componentDidCatch(error,info){ console.error("SGP crash:",error,info); }
+  render(){
+    if(this.state.hasError){
+      return (
+        <div style={{padding:40,fontFamily:"sans-serif",maxWidth:600,margin:"40px auto"}}>
+          <h2 style={{color:"#9E0B0F",fontSize:20,marginBottom:12}}>Ops, algo quebrou</h2>
+          <p style={{color:"#666",fontSize:14,marginBottom:16}}>Detalhe técnico do erro:</p>
+          <pre style={{background:"#f5f5f5",padding:16,borderRadius:8,fontSize:12,overflow:"auto",color:"#9E0B0F"}}>{this.state.msg}</pre>
+          <button onClick={()=>{try{sessionStorage.clear();}catch{};window.location.reload();}}
+            style={{marginTop:16,background:"#9E0B0F",color:"#fff",border:"none",borderRadius:6,padding:"10px 20px",cursor:"pointer",fontSize:14,fontWeight:700}}>
+            Limpar sessão e recarregar
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ─── APP ROOT ─────────────────────────────────────────────────────────────────
-export default function App(){
+let _refreshListeners=[];
+function triggerRefresh(){ _refreshListeners.forEach(fn=>fn()); }
+
+function AppInner(){
   const isMobile=useIsMobile();
-  const[user,setUser]=useState(null);
+  const[user,setUser]=useState(()=>{
+    try{
+      const s=sessionStorage.getItem("sgp_user");
+      if(!s)return null;
+      const u=JSON.parse(s);
+      // Migração: se for user da estrutura antiga (sem modulos e sem admin), descarta
+      if(!u.modulos&&!u.admin){sessionStorage.removeItem("sgp_user");return null;}
+      return u;
+    }catch{return null;}
+  });
+  const doLogin=(u)=>{
+    try{sessionStorage.setItem("sgp_user",JSON.stringify(u));}catch{}
+    setUser(u);setPage("demandas");
+  };
+  const doLogout=()=>{
+    try{sessionStorage.removeItem("sgp_user");}catch{}
+    setUser(null);
+  };
   const[page,setPage]=useState("demandas");
   const[orders,setOrders]=useState(ORDERS_INIT);
   const[sel,setSel]=useState(null);
   const[collapsed,setCollapsed]=useState(false);
   const[showN,setShowN]=useState(false);
   const[slaCfg,setSlaCfg]=useState({...SLA_DEF});
-  const[notifs,setNotifs]=useState([
-    {toUid:7,text:'Ana: "peças chegaram, pode direcionar."',orderId:"PED-2024-001",time:"11/06 09:00",read:false},
-    {toUid:3,text:"Rafael: JALECO-P faltantes no WMS.",orderId:"PED-2024-002",time:"13/06 08:20",read:false},
-    {toUid:1,text:"PED-2024-004 entrou em Expedição",orderId:"PED-2024-004",time:"15/06 14:00",read:true},
-  ]);
+  const[notifs,setNotifs]=useState([]);      // notificações do usuário atual
+  const[usuarios,setUsuarios]=useState([]);  // lista para @menção
+  const[buscaPedidos,setBuscaPedidos]=useState(""); // busca inicial em Todos os Pedidos
+  const naoLidas=notifs.filter(n=>!n.lida).length;
 
-  const sendChat=(oid,text,mn)=>{
-    const n=new Date();const t=`${n.getDate().toString().padStart(2,"0")}/${(n.getMonth()+1).toString().padStart(2,"0")} ${n.getHours().toString().padStart(2,"0")}:${n.getMinutes().toString().padStart(2,"0")}`;
-    const upd=o=>o.id===oid?{...o,chat:[...o.chat,{uid:user.id,text,time:t,mn}]}:o;
-    setOrders(p=>p.map(upd));setSel(p=>p?.id===oid?upd(p):p);
-    mn.forEach(uid=>setNotifs(ns=>[...ns,{toUid:uid,text:`${user.name}: "${text.slice(0,50)}..."`,orderId:oid,time:t,read:false}]));
+  // Carrega notificações do usuário (e atualiza a cada 30s)
+  const carregarNotifs=()=>{
+    if(!user?.email)return;
+    apiFetch("/notificacoes?email="+encodeURIComponent(user.email))
+      .then(r=>{if(r&&r.success)setNotifs(r.data||[]);})
+      .catch(()=>{});
+  };
+  const carregarUsuarios=()=>{
+    apiFetch("/usuarios").then(r=>{
+      const lista=r?.users||r?.usuarios||r?.data||(Array.isArray(r)?r:[]);
+      setUsuarios(lista);
+    }).catch(()=>{});
+  };
+  useEffect(()=>{
+    if(!user)return;
+    carregarNotifs();
+    carregarUsuarios();
+    const t=setInterval(()=>{carregarNotifs();carregarUsuarios();},30000);
+    return ()=>clearInterval(t);
+  },[user?.email]);
+
+  // Abre o sino: marca todas como lidas
+  const toggleBell=()=>{
+    setShowN(s=>{
+      const aberto=!s;
+      if(aberto&&naoLidas>0&&user?.email){
+        apiFetch("/notificacoes/marcar-lidas","POST",{email:user.email})
+          .then(()=>setNotifs(list=>list.map(n=>({...n,lida:true}))))
+          .catch(()=>{});
+      }
+      return aberto;
+    });
+  };
+  // Clica numa notificação: vai para Todos os Pedidos já buscando o pedido
+  const abrirPedidoNotif=(n)=>{
+    setBuscaPedidos(String(n.pedido_id||""));
+    setPage("pedidos");
+    setShowN(false);
   };
 
-  const handleAction=(orderId,tipo,payload)=>{
-    setOrders(prev=>prev.map(o=>{
-      if(o.id!==orderId)return o;
-      const now=new Date().toISOString();
+  const handleAction=async(orderId,tipo,payload)=>{
+    // O pedido aberto no modal (vem do HubSpot via Fila/Direcionamento)
+    const o = sel && sel.id===orderId ? sel : null;
+    if(!o){ setSel(null); return; }
+    let resultMsg="";
+    // Contexto enviado em toda ação (executor + IDs) para nota e Supabase
+    const ctx={
+      executor:user?.nome||user?.name||"Sistema",
+      executorEmail:user?.email||"",
+      vendasId:o.vendasId||null,
+      posvendaId:o.posvendaId||null,
+      bordadoId:o.bordadoId||null,
+      cliente:o.client||"",
+      etapa:o.etapa||"",
+      prazoFinal:o.prazoFinal||null,
+      centroCusto:o.centroCusto||"",
+      temBordado:o.temBordado!==false,
+    };
+
+    const bordadoId = o.bordadoId;
+
+    try{
+      // ── DIRECIONAMENTO ────────────────────────────────────────────────────────
       if(tipo==="direcionamento"){
-        const newItems=o.items.map(it=>({...it,dest:payload.destinos[it.sku]||it.dest}));
-        const hasInterno=newItems.some(it=>it.dest==="interno");
-        const hasExterno=newItems.some(it=>it.dest==="externo");
-        const nextEtapa=hasInterno?"Bordado Interno":"Bordado Externo";
-        // Chama Worker para persistir no HubSpot
-        const order=prev.find(x=>x.id===orderId);
-        if(order?.bordadoId){
-          apiFetch(`/direcionamento/${order.posvendaId}`,"PATCH",{
-            bordadoId:order.bordadoId,
+        if(o.bordadoId&&o.posvendaId){
+          await apiFetch(`/direcionamento/${o.posvendaId}`,"PATCH",{
+            bordadoId:o.bordadoId,
             destinos:payload.destinos,
-          }).catch(e=>console.error("Worker patch error:",e));
+            ctx,
+          });
         }
-        return{...o,items:newItems,etapa:nextEtapa,etapaAt:now,
-          timeline:[...o.timeline,{stage:nextEtapa,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
       }
-      if(tipo==="upload"){
-        const nextMap={"Programação":"Amostra Digital","Amostra Digital":"Amostra Física","Amostra Física":"Amostra Física"};
-        const next=nextMap[o.etapa]||o.etapa;
-        return{...o,etapa:next,etapaAt:now,
-          timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
-      }
-      if(tipo==="aprovar_amostra"){
-        return{...o,amOk:true,etapa:"Separação",etapaAt:now,
-          timeline:[...o.timeline,{stage:"Separação",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
-      }
-      if(tipo==="reprovar_amostra"){
-        return{...o,amOk:false,etapa:"Programação",etapaAt:now,
-          timeline:[...o.timeline,{stage:"Programação (retrabalho)",user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
-      }
-      if(tipo==="mover"){
+
+      // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ──────────────────
+      else if(tipo==="upload"){
         const nextMap={
-          "Bordado Interno":"Expedição","Bordado Externo":"Expedição",
-          "Expedição":"Faturamento","Faturamento":"Concluído"
+          "Programação":"Amostra Digital",
+          "Amostra Digital":"Aprovação de Amostra Digital",
+          "Amostra Física":"Aprovação de Amostra Física",
         };
         const next=nextMap[o.etapa]||o.etapa;
-        const concluido=next==="Concluído";
-        return{...o,etapa:next,etapaAt:now,concluido,dataConclusao:concluido?now:null,
-          timeline:[...o.timeline,{stage:next,user:"Sistema",enteredAt:now,exitedAt:null,dH:null}]};
+        if(!bordadoId){ alert("Pedido sem negócio de Bordado associado."); return; }
+        if(!payload.fileBase64||!payload.propriedade){ alert("Arquivo ou propriedade ausente."); return; }
+        const res=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
+          propriedade:payload.propriedade,
+          propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
+          fileBase64:payload.fileBase64,
+          fileName:payload.fileName,
+          novaEtapa:ETAPA_STAGE_ID[next],
+          nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
       }
-      return o;
-    }));
-    setSel(null);
+
+      // ── EXECUÇÃO POR BORDADO (Programação c/ dificuldade · Amostras s/ dificuldade) ─
+      else if(tipo==="exec_bordado"){
+        if(!bordadoId){ alert("Pedido sem negócio de Bordado associado."); return; }
+        if(!payload.execucoes||!payload.execucoes.length){ alert("Nenhum bordado para enviar."); return; }
+        const nextMap={
+          "Programação":"Amostra Digital",
+          "Amostra Digital":"Aprovação de Amostra Digital",
+          "Amostra Física":"Aprovação de Amostra Física",
+        };
+        const next=nextMap[o.etapa]||o.etapa;
+        const res=await apiFetch(`/programacao-exec/${bordadoId}`,"POST",{
+          execucoes:payload.execucoes,
+          propriedade:ETAPA_PROPRIEDADE[o.etapa],
+          propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
+          novaEtapa:ETAPA_STAGE_ID[next],
+          nota:`${o.etapa} → ${next}`,
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
+        resultMsg=`${o.etapa} registrada e enviada para ${next}.`;
+        if(res.relatorioGravado===false){
+          resultMsg+=` ⚠ Atenção: o relatório de programação não foi gravado (${res.relatorioErro||"verifique a tabela programacao_execucoes no Supabase"}).`;
+        }
+      }
+
+      // ── ALTERAÇÃO DE FORMULÁRIO (pós-venda) ────────────────────────────────────
+      else if(tipo==="alteracao_formulario"){
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        const stageDestino=ETAPA_STAGE_ID[payload.novaEtapa];
+        if(!stageDestino) throw new Error("Etapa de destino inválida.");
+        const res=await apiFetch(`/alteracao-formulario/${bordadoId}`,"PATCH",{
+          novaEtapa:stageDestino,
+          motivo:payload.motivo,
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
+        resultMsg="Alteração de formulário registrada. Pedido retornado para "+payload.novaEtapa+".";
+      }
+
+      // ── APROVAR AMOSTRA (pós-venda) ────────────────────────────────────────────
+      else if(tipo==="aprovar_amostra"){
+        const next=o.etapa==="Aprovação de Amostra Digital"?"Amostra Física":"Liberado para bordar";
+        if(bordadoId&&ETAPA_STAGE_ID[next]){
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`Amostra aprovada → ${next}`,ctx});
+        }
+      }
+
+      // ── REPROVAR AMOSTRA (limpa arquivo + volta etapa) ─────────────────────────
+      else if(tipo==="reprovar_amostra"){
+        const voltaMap={
+          "Aprovação de Amostra Digital":"Amostra Digital",
+          "Aprovação de Amostra Física":"Amostra Física",
+        };
+        const volta=voltaMap[o.etapa]||"Amostra Digital";
+        const propVolta=ETAPA_PROPRIEDADE[volta];
+        const propMotivo=ETAPA_PROP_MOTIVO[volta];
+        if(bordadoId&&ETAPA_STAGE_ID[volta]){
+          await apiFetch(`/reprovar/${bordadoId}`,"PATCH",{
+            propriedade:propVolta,
+            propMotivo:propMotivo,
+            motivo:payload.obs||"",
+            novaEtapa:ETAPA_STAGE_ID[volta],
+            ctx,
+          });
+        }
+      }
+
+      // ── CONCLUSÃO DE BORDADO (interno/externo, aguarda ambos) ──────────────────
+      else if(tipo==="mover"&&(o.etapa==="Bordado Interno"||o.etapa==="Bordado Externo"||o.etapa==="Bordado Interno e Externo")){
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        // O lado depende de qual fila/etapa o operador está
+        const lado=payload.lado||(o.etapa==="Bordado Externo"?"externo":"interno");
+        const res=await apiFetch(`/concluir-bordado/${bordadoId}`,"PATCH",{lado,ctx});
+        if(res.error) throw new Error(res.error);
+        // Monta a mensagem de retorno conforme o resultado
+        if(res.totalmenteConcluido){
+          resultMsg=res.posVendaMovido
+            ? "Bordado finalizado! Ambos os lados concluídos. O pedido foi enviado para Expedição."
+            : "Bordado finalizado! Ambos os lados concluídos.";
+        }else{
+          const falta=lado==="interno"?"externo":"interno";
+          resultMsg=`Lado ${lado} concluído! Aguardando o lado ${falta} para finalizar e enviar à Expedição.`;
+        }
+      }
+
+      // ── MOVIMENTAÇÃO PÓS-VENDA (Expedição → Faturamento → Faturado) ────────────
+      else if(tipo==="mover"&&(o.etapa==="Expedição"||o.etapa==="Faturamento")){
+        if(!o.posvendaId) throw new Error("Pedido sem negócio de Pós-venda.");
+        const stageMap={
+          "Expedição":"1377587761",   // Análise de frete
+          "Faturamento":"1377587762", // Faturado
+        };
+        const novaEtapa=stageMap[o.etapa];
+        await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`,ctx});
+        resultMsg=o.etapa==="Expedição"
+          ?"Pedido enviado para Faturamento."
+          :"Pedido faturado! Processo de pós-venda concluído.";
+      }
+
+      // ── MOVIMENTAÇÃO SIMPLES (fallback) ────────────────────────────────────────
+      else if(tipo==="mover"){
+        const nextMap={};
+        const next=nextMap[o.etapa]||o.etapa;
+        if(bordadoId&&ETAPA_STAGE_ID[next]){
+          await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{novaEtapa:ETAPA_STAGE_ID[next],nota:`${o.etapa} → ${next}`,ctx});
+        }
+      }
+
+    }catch(e){
+      alert("Erro ao processar: "+e.message);
+      console.error("handleAction:",e);
+      throw e; // propaga para o botão não marcar como concluído
+    }
+
+    // Sucesso — recarrega as filas. NÃO fecha o modal aqui:
+    // o botão exibe a tela de pós-execução com a mensagem.
+    setTimeout(()=>triggerRefresh(),900);
+    return resultMsg||"O pedido foi movimentado com sucesso.";
   };
 
   const TITLES={
@@ -1787,42 +3667,57 @@ export default function App(){
     pedidos:"Todos os Pedidos",direcionamento:"Direcionamento",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-    expedicao:"Expedição",faturamento:"Faturamento",sla:"Configurar SLA",usuarios:"Usuários",
+    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",sla:"Configurar SLA",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
-  if(!user)return <Login onLogin={u=>{setUser(u);setPage("demandas");}}/>;
+  if(!user)return <Login onLogin={doLogin}/>;
 
   return(
     <div style={{display:"flex",height:"100dvh",...F.body,background:C.gray100,overflow:"hidden",flexDirection:"column"}}>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
         {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)}/>}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-          <Topbar user={user} title={TITLES[page]||""} notifs={notifs} onBell={()=>setShowN(!showN)} onLogout={()=>setUser(null)} isMobile={isMobile}/>
-          {showN&&<NotifPanel notifs={notifs} user={user} onClose={()=>setShowN(false)}/>}
-          <div style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
-            {page==="demandas"&&<MinhasDemandas user={user} orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
+          <Topbar user={user} title={TITLES[page]||""} naoLidas={naoLidas} onBell={toggleBell} onLogout={doLogout} isMobile={isMobile}/>
+          {showN&&<NotifPanel notifs={notifs} onClose={()=>setShowN(false)} onAbrir={abrirPedidoNotif}/>}
+          <div className="sgp-scroll" style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
+            {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="funil"&&<Funil orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="gerencial"&&<Gerencial isMobile={isMobile}/>}
-            {page==="historico"&&<Historico hist={HIST} onOpen={setSel}/>}
-            {page==="ranking"&&<Ranking hist={HIST}/>}
-            {page==="pedidos"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
-            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
-            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
-            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
-            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
-            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
-            {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
+            {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
+            {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
+            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
+            {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
+            {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
+            {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
+            {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
+            {page==="alteracoes_form"&&<AlteracoesFormList/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
         </div>
       </div>
       {isMobile&&<BottomNav user={user} active={page} onNav={nav}/>}
-      {sel&&<OrderModal order={sel} me={user} onClose={()=>setSel(null)} onSendChat={sendChat} onAction={handleAction} isMobile={isMobile} slaCfg={slaCfg}/>}
+      {sel&&<OrderModal order={sel} me={user} onClose={()=>setSel(null)} usuarios={usuarios} onAction={handleAction} isMobile={isMobile} slaCfg={slaCfg}/>}
     </div>
   );
+}
+
+export default function App(){
+  useEffect(()=>{
+    // Define o favicon (ícone da aba) e o título da página
+    try{
+      let link=document.querySelector("link[rel='icon']");
+      if(!link){link=document.createElement("link");link.rel="icon";document.head.appendChild(link);}
+      link.type="image/png";
+      link.href=FAVICON_SGP;
+      document.title="SGP · Gestão de Personalizados";
+    }catch(e){}
+  },[]);
+  return <ErrorBoundary><AppInner/></ErrorBoundary>;
 }
