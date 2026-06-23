@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.9.4";
+const SGP_VERSION = "v2.9.5";
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
 
@@ -125,6 +125,8 @@ const ICONS = {
   inbox:     "M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4",
   eye:       "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
   eyeOff:    "M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94 M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19 M14.12 14.12a3 3 0 11-4.24-4.24 M1 1l22 22",
+  barcode:   "M3 5v14M6 5v14M8 5v14M11 5v14M13 5v10M16 5v14M18 5v10M21 5v14",
+  lock:      "M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z M8 11V7a4 4 0 118 0v4 M12 15v2",
 };
 
 function Ic({ n, s = 16, c = "currentColor", style = {} }) {
@@ -167,6 +169,8 @@ const NAV_ITEMS = [
   {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
   {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
   {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Operações"},
+  // Cadastros
+  {id:"codigos_barra", label:"Códigos de Barra",   icon:"barcode", grupo:"Cadastros"},
   // Sistema
   {id:"sla",         label:"Configurar SLA",     icon:"gear",    grupo:"Sistema"},
   {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
@@ -1015,10 +1019,176 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
 }
 
 
+// ─── BIPAGEM DA EXPEDIÇÃO ─────────────────────────────────────────────────────
+// Segunda conferência: o expedidor bipa todas as peças; a contagem por
+// produto+grade tem que bater com o pedido. Cadeado (senha) libera conferência
+// manual por produto caso o leitor falhe.
+function BipagemExpedicao({order,onChange,user}){
+  const linhas=[];
+  const idx={};
+  (order.items||[]).forEach(it=>{
+    const produto=String(it.sku||"").trim(), grade=String(it.cor||"").trim();
+    const key=produto+"|"+grade;
+    if(idx[key]==null){ idx[key]=linhas.length; linhas.push({key,produto,grade,desc:it.desc||"",qty:0}); }
+    linhas[idx[key]].qty+=Number(it.qty||0);
+  });
+  const lineKeys=new Set(linhas.map(l=>l.key));
+
+  const [scans,setScans]=useState([]);
+  const [resolvidos,setResolvidos]=useState({});
+  const [desconhecidos,setDesconhecidos]=useState({});
+  const [manual,setManual]=useState({});
+  const [unlocked,setUnlocked]=useState(false);
+  const [input,setInput]=useState("");
+  const [showSenha,setShowSenha]=useState(false);
+  const [senha,setSenha]=useState("");
+  const [senhaErro,setSenhaErro]=useState("");
+  const inputRef=useRef(null);
+  const pendingRef=useRef(new Set());
+  const timerRef=useRef(null);
+
+  useEffect(()=>{ if(inputRef.current) inputRef.current.focus(); },[]);
+
+  const resolverPendentes=async()=>{
+    const lote=Array.from(pendingRef.current); pendingRef.current=new Set();
+    if(!lote.length) return;
+    try{
+      const r=await apiFetch("/codigos/lookup","POST",{codigos:lote});
+      if(r.success){
+        if(r.mapa) setResolvidos(prev=>({...prev,...r.mapa}));
+        if(r.desconhecidos&&r.desconhecidos.length) setDesconhecidos(prev=>{const n={...prev};r.desconhecidos.forEach(c=>n[c]=true);return n;});
+      }
+    }catch(e){/* recomputa quando resolver */}
+  };
+  const onScan=(code)=>{
+    const c=String(code).trim(); if(!c) return;
+    setScans(prev=>[...prev,c]);
+    if(!resolvidos[c]&&!desconhecidos[c]){
+      pendingRef.current.add(c);
+      if(timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current=setTimeout(resolverPendentes,250);
+    }
+    setInput("");
+    if(inputRef.current) inputRef.current.focus();
+  };
+
+  const bipMap={}; let naoPert=0;
+  scans.forEach(c=>{
+    const r=resolvidos[c];
+    if(!r) return;
+    const key=String(r.produto).trim()+"|"+String(r.grade).trim();
+    if(lineKeys.has(key)) bipMap[key]=(bipMap[key]||0)+1; else naoPert++;
+  });
+  const conferido=(l)=>{ const mv=manual[l.key]; if(unlocked&&mv!=null&&mv!=="") return Number(mv)||0; return bipMap[l.key]||0; };
+  const okLinha=(l)=>conferido(l)===l.qty;
+  const totalPedido=linhas.reduce((s,l)=>s+l.qty,0);
+  const totalConferido=linhas.reduce((s,l)=>s+conferido(l),0);
+  const desconhecidosList=Object.keys(desconhecidos);
+  const houveManual=unlocked&&Object.values(manual).some(v=>v!=null&&v!=="");
+  const ready=linhas.length>0&&linhas.every(okLinha);
+
+  useEffect(()=>{
+    if(!onChange) return;
+    onChange(ready,{
+      totalPedido,totalConferido,bateu:ready,desbloqueado:houveManual,
+      detalhes:{linhas:linhas.map(l=>({produto:l.produto,grade:l.grade,esperado:l.qty,bipado:bipMap[l.key]||0,manual:(unlocked&&manual[l.key]!=null&&manual[l.key]!=="")?Number(manual[l.key]):null})),desconhecidos:desconhecidosList,naoPertence:naoPert},
+    });
+  // eslint-disable-next-line
+  },[ready,totalConferido,totalPedido,houveManual,desconhecidosList.length,naoPert]);
+
+  const validarSenha=async()=>{
+    setSenhaErro("");
+    try{
+      const r=await apiFetch("/expedicao/validar-senha","POST",{senha});
+      if(r.naoConfigurada){ setSenhaErro("Nenhuma senha definida. Configure na aba Configurar SLA."); return; }
+      if(r.ok){ setUnlocked(true); setShowSenha(false); setSenha(""); }
+      else setSenhaErro("Senha incorreta.");
+    }catch(e){ setSenhaErro(e.message); }
+  };
+  const limpar=()=>{ setScans([]); setResolvidos({}); setDesconhecidos({}); setManual({}); if(inputRef.current) inputRef.current.focus(); };
+
+  return(
+    <div style={{border:`1.5px solid ${ready?C.green:C.gray200}`,borderRadius:10,padding:16,background:ready?C.green+"08":C.white,position:"relative"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,gap:8}}>
+        <div style={{...F.title,fontSize:12,fontWeight:700,color:C.gray600,letterSpacing:"0.08em",display:"flex",alignItems:"center",gap:7}}>
+          <Ic n="barcode" s={16} c={ready?C.green:C.gray500}/> CONFERÊNCIA POR BIPAGEM
+        </div>
+        <button onClick={()=>{ if(unlocked) return; setShowSenha(s=>!s); setSenhaErro(""); }} title={unlocked?"Conferência manual liberada":"Desbloquear conferência manual"}
+          style={{background:"transparent",border:"none",cursor:unlocked?"default":"pointer",display:"flex",alignItems:"center",gap:4,color:unlocked?C.amber:C.gray300,padding:4}}>
+          <Ic n="lock" s={15} c={unlocked?C.amber:C.gray300}/>
+          {unlocked&&<span style={{...F.body,fontSize:10,fontWeight:700,color:C.amber}}>manual</span>}
+        </button>
+      </div>
+
+      {showSenha&&!unlocked&&(
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"10px 12px",background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:7,flexWrap:"wrap"}}>
+          <input type="password" value={senha} onChange={e=>setSenha(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")validarSenha();}} placeholder="Senha do gestor"
+            style={{border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"7px 10px",...F.body,fontSize:13,outline:"none",width:160}}/>
+          <button onClick={validarSenha} style={{background:C.amber,color:C.white,border:"none",borderRadius:6,padding:"7px 14px",cursor:"pointer",fontWeight:700,fontSize:12,...F.body}}>Liberar</button>
+          {senhaErro&&<span style={{...F.body,fontSize:12,color:C.red}}>{senhaErro}</span>}
+        </div>
+      )}
+
+      <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
+        <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();onScan(input);}}}
+          placeholder="Bipe os códigos aqui (um por peça)…"
+          style={{flex:1,minWidth:220,border:`1.5px solid ${C.gray300}`,borderRadius:7,padding:"11px 13px",...F.body,fontSize:14,outline:"none",fontFamily:"monospace"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:8,...F.body,fontSize:13}}>
+          <span style={{fontWeight:700,color:ready?C.green:(totalConferido>totalPedido?C.red:C.gray700)}}>{totalConferido} / {totalPedido} peças</span>
+          <button onClick={limpar} style={{background:C.white,color:C.gray500,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontSize:12,...F.body}}>Limpar</button>
+        </div>
+      </div>
+
+      <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
+        <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
+          <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
+            {["Produto","Grade","Esperado","Conferido","Status"].map(h=><th key={h} style={{padding:"7px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{linhas.map(l=>{
+            const conf=conferido(l), ok=conf===l.qty;
+            return(
+              <tr key={l.key} style={{borderBottom:`1px solid ${C.gray100}`,background:ok?C.green+"08":(conf>l.qty?C.red+"08":"transparent")}}>
+                <td style={{padding:"7px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{l.produto}</td>
+                <td style={{padding:"7px 10px",...F.body,color:C.gray600}}>{l.grade||"—"}</td>
+                <td style={{padding:"7px 10px",fontWeight:700,...F.body}}>{l.qty}</td>
+                <td style={{padding:"7px 10px",...F.body}}>
+                  {unlocked
+                    ?<input type="number" min="0" value={manual[l.key]!=null?manual[l.key]:(bipMap[l.key]||0)} onChange={e=>setManual(p=>({...p,[l.key]:e.target.value}))}
+                       style={{width:64,border:`1.5px solid ${C.amber}`,borderRadius:5,padding:"4px 7px",...F.body,fontSize:13,fontWeight:700,outline:"none",textAlign:"center"}}/>
+                    :<span style={{fontWeight:700,color:ok?C.green:(conf>l.qty?C.red:C.gray700)}}>{conf}</span>}
+                </td>
+                <td style={{padding:"7px 10px"}}>
+                  {ok?<span style={{...F.body,fontSize:12,fontWeight:700,color:C.green,display:"inline-flex",alignItems:"center",gap:4}}><Ic n="check" s={13} c={C.green}/>OK</span>
+                    :conf>l.qty?<span style={{...F.body,fontSize:12,fontWeight:700,color:C.red}}>Excesso</span>
+                    :<span style={{...F.body,fontSize:12,color:C.gray400}}>Faltam {l.qty-conf}</span>}
+                </td>
+              </tr>
+            );
+          })}</tbody>
+        </table>
+      </div>
+
+      {desconhecidosList.length>0&&(
+        <div style={{marginTop:10,padding:"9px 12px",background:C.red+"0e",border:`1px solid ${C.red}33`,borderRadius:7,...F.body,fontSize:12,color:C.red}}>
+          <strong>Código(s) não cadastrado(s):</strong> {desconhecidosList.join(", ")}. Solicite o cadastro ao gestor (aba Códigos de Barra) ou libere a conferência manual no cadeado.
+        </div>
+      )}
+      {naoPert>0&&(
+        <div style={{marginTop:10,padding:"9px 12px",background:C.amber+"12",border:`1px solid ${C.amber}40`,borderRadius:7,...F.body,fontSize:12,color:"#8a5a00"}}>
+          {naoPert} peça(s) bipada(s) <strong>não pertencem a este pedido</strong> (produto/grade fora da lista).
+        </div>
+      )}
+      {ready&&<div style={{marginTop:10,...F.body,fontSize:13,fontWeight:700,color:C.green,display:"flex",alignItems:"center",gap:6}}><Ic n="check" s={15} c={C.green}/>Conferência completa{houveManual?" (com ajuste manual)":""} — pode avançar.</div>}
+    </div>
+  );
+}
+
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
 function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
+  const[bipReady,setBipReady]=useState(false);
+  const bipInfoRef=useRef({});
 
   // Pedido já concluído — apenas consulta, sem ação
   if(etapa==="Finalizado"){
@@ -1335,6 +1505,10 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
         </div>
       )}
+      {/* Conferência por bipagem (somente Expedição) */}
+      {etapa==="Expedição"&&(
+        <BipagemExpedicao order={order} user={me} onChange={(r,info)=>{ setBipReady(r); bipInfoRef.current=info||{}; }}/>
+      )}
       {/* Observação */}
       <div>
         <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações (opcional)</label>
@@ -1344,11 +1518,24 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       {moveConfig.next&&<div style={{...F.body,fontSize:12,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
         <Ic n="arrow" s={12} c={C.gray300}/> Próxima etapa: <strong style={{color:C.gray600,marginLeft:2}}>{moveConfig.next}</strong>
       </div>}
-      <button onClick={async()=>{
-          try{ const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true); }
+      {etapa==="Expedição"&&!bipReady&&<div style={{...F.body,fontSize:12,color:C.gray400}}>Conclua a conferência por bipagem para liberar o avanço.</div>}
+      <button disabled={etapa==="Expedição"&&!bipReady}
+        onClick={async()=>{
+          try{
+            if(etapa==="Expedição"){
+              const info=bipInfoRef.current||{};
+              apiFetch("/bipagem","POST",{
+                pedidoId:order.id,posvendaId:order.posvendaId||"",bordadoId:order.bordadoId||"",
+                cliente:order.client||"",usuario:me?.email||me?.nome||"",
+                totalPedido:info.totalPedido||0,totalBipado:info.totalConferido||0,
+                bateu:!!info.bateu,desbloqueado:!!info.desbloqueado,detalhes:info.detalhes||{},
+              }).catch(()=>{}); // auditoria não bloqueia o avanço
+            }
+            const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true);
+          }
           catch(e){ alert("Erro ao processar: "+e.message); }
         }}
-        style={{background:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+        style={{background:(etapa==="Expedição"&&!bipReady)?C.gray300:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:(etapa==="Expedição"&&!bipReady)?"not-allowed":"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
         <Ic n={moveConfig.icon} s={16} c={C.white}/> {moveConfig.btn}
       </button>
     </div>
@@ -2907,6 +3094,8 @@ function SLAConfig({slaCfg,onSave}){
   const[prazoCom,setPrazoCom]=useState(15);
   const[prazoSem,setPrazoSem]=useState(7);
   const[cap,setCap]=useState({interno:0,bordadel:0,mg_bordados:0,outros:0});
+  const[senhaExp,setSenhaExp]=useState("");
+  const[temSenhaExp,setTemSenhaExp]=useState(false);
   const[saved,setSaved]=useState(false);
   const[saving,setSaving]=useState(false);
   const[loading,setLoading]=useState(true);
@@ -2919,6 +3108,7 @@ function SLAConfig({slaCfg,onSave}){
         if(r.config.prazoComBordado!=null)setPrazoCom(r.config.prazoComBordado);
         if(r.config.prazoSemBordado!=null)setPrazoSem(r.config.prazoSemBordado);
         if(r.config.capacidade)setCap(prev=>({...prev,...r.config.capacidade}));
+        setTemSenhaExp(!!r.config.temSenhaExpedicao);
       }
     }).catch(()=>{}).finally(()=>setLoading(false));
   },[]);
@@ -2926,7 +3116,10 @@ function SLAConfig({slaCfg,onSave}){
   const save=async()=>{
     setSaving(true);
     try{
-      await apiFetch("/config-sla","PATCH",{etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem),capacidade:{interno:Number(cap.interno||0),bordadel:Number(cap.bordadel||0),mg_bordados:Number(cap.mg_bordados||0),outros:Number(cap.outros||0)}});
+      const payload={etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem),capacidade:{interno:Number(cap.interno||0),bordadel:Number(cap.bordadel||0),mg_bordados:Number(cap.mg_bordados||0),outros:Number(cap.outros||0)}};
+      if(senhaExp.trim()) payload.senhaDesbloqueioExpedicao=senhaExp.trim();
+      await apiFetch("/config-sla","PATCH",payload);
+      if(senhaExp.trim()){setTemSenhaExp(true);setSenhaExp("");}
       onSave(local);
       setSaved(true);setTimeout(()=>setSaved(false),2000);
     }catch(e){alert("Erro ao salvar: "+e.message);}
@@ -2983,6 +3176,21 @@ function SLAConfig({slaCfg,onSave}){
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      {/* Senha do cadeado de desbloqueio manual (Expedição) */}
+      <Card>
+        <SecH>Senha de desbloqueio da bipagem (Expedição)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:14}}>
+          Senha do <strong>cadeado</strong> na conferência da Expedição. Quem tiver a senha consegue informar a quantidade conferida manualmente por produto, caso o leitor falhe. {temSenhaExp
+            ? <span style={{color:C.green,fontWeight:600}}>✓ Senha configurada.</span>
+            : <span style={{color:C.amber,fontWeight:600}}>Nenhuma senha definida ainda — o desbloqueio manual fica indisponível até definir uma.</span>}
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          <input type="password" value={senhaExp} onChange={e=>setSenhaExp(e.target.value)} placeholder={temSenhaExp?"Digite para alterar a senha":"Defina uma senha"}
+            style={{width:260,maxWidth:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none"}}/>
+          <span style={{...F.body,fontSize:11,color:C.gray400}}>Deixe em branco para manter a atual.</span>
         </div>
       </Card>
 
@@ -3601,6 +3809,125 @@ function BordadoExternoPage({orders,onOpen,slaCfg}){
   return <Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={onOpen} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg} filtroBordador={filtro} topoExtra={topoExtra}/>;
 }
 
+// ─── CADASTRO DE CÓDIGOS DE BARRA ─────────────────────────────────────────────
+function CodigosBarra({user}){
+  const [busca,setBusca]=useState("");
+  const [buscaAtiva,setBuscaAtiva]=useState("");
+  const [page,setPage]=useState(0);
+  const [data,setData]=useState([]);
+  const [total,setTotal]=useState(0);
+  const [loading,setLoading]=useState(false);
+  const [erro,setErro]=useState("");
+  const [form,setForm]=useState({codigo_barra:"",produto:"",grade:""});
+  const [saving,setSaving]=useState(false);
+  const [msg,setMsg]=useState(null); // {tipo:"ok"|"err", texto}
+  const LIMIT=50;
+
+  const carregar=()=>{
+    setLoading(true);setErro("");
+    const qs=`?busca=${encodeURIComponent(buscaAtiva)}&page=${page}&limit=${LIMIT}`;
+    apiFetch("/codigos"+qs)
+      .then(r=>{ if(r.success){setData(r.data||[]);setTotal(r.total||0);} else setErro(r.error||"Erro ao carregar."); })
+      .catch(e=>setErro(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[buscaAtiva,page]);
+
+  const fazerBusca=()=>{ setPage(0); setBuscaAtiva(busca.trim()); };
+  const cadastrar=async()=>{
+    const codigo=form.codigo_barra.trim(), produto=form.produto.trim(), grade=form.grade.trim();
+    if(!codigo){setMsg({tipo:"err",texto:"Informe o código de barra."});return;}
+    if(!produto){setMsg({tipo:"err",texto:"Informe o produto."});return;}
+    setSaving(true);setMsg(null);
+    try{
+      const r=await apiFetch("/codigos","POST",{codigo_barra:codigo,produto,grade,criadoPor:user?.email||user?.nome||""});
+      if(r.error) throw new Error(r.error);
+      setMsg({tipo:"ok",texto:`Código ${codigo} cadastrado.`});
+      setForm({codigo_barra:"",produto:"",grade:""});
+      if(page===0&&!buscaAtiva) carregar(); else {setPage(0);setBuscaAtiva("");}
+    }catch(e){ setMsg({tipo:"err",texto:e.message}); }
+    finally{ setSaving(false); }
+  };
+
+  const totalPages=Math.max(1,Math.ceil(total/LIMIT));
+  const inp={width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"};
+
+  return(
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Códigos de Barra" sub={`${total.toLocaleString("pt-BR")} códigos cadastrados`} onRefresh={carregar} refreshing={loading}/>
+
+      {/* Cadastro de novo código */}
+      <Card>
+        <SecH>Cadastrar novo código</SecH>
+        <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr 0.7fr auto",gap:10,alignItems:"end",flexWrap:"wrap"}}>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Código de barra</label>
+            <input value={form.codigo_barra} onChange={e=>setForm(f=>({...f,codigo_barra:e.target.value}))} placeholder="o que o leitor lê" style={inp}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Produto</label>
+            <input value={form.produto} onChange={e=>setForm(f=>({...f,produto:e.target.value}))} placeholder="ex.: 01.02.0051" style={inp}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Grade</label>
+            <input value={form.grade} onChange={e=>setForm(f=>({...f,grade:e.target.value}))} placeholder="ex.: 43" style={inp}/>
+          </div>
+          <button onClick={cadastrar} disabled={saving}
+            style={{background:saving?C.gray300:C.green,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:saving?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
+            <Ic n="check" s={14} c={C.white}/>{saving?"Salvando...":"Cadastrar"}
+          </button>
+        </div>
+        {msg&&<div style={{marginTop:12,...F.body,fontSize:13,fontWeight:600,color:msg.tipo==="ok"?C.green:C.red,display:"flex",alignItems:"center",gap:6}}>
+          <Ic n={msg.tipo==="ok"?"check":"warn"} s={14} c={msg.tipo==="ok"?C.green:C.red}/>{msg.texto}
+        </div>}
+      </Card>
+
+      {/* Lista / busca */}
+      <Card>
+        <div style={{display:"flex",gap:10,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
+          <div style={{position:"relative",flex:1,minWidth:220}}>
+            <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+            <input value={busca} onChange={e=>setBusca(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")fazerBusca();}}
+              placeholder="Buscar por código, produto ou grade..." style={{...inp,paddingLeft:36}}/>
+          </div>
+          <button onClick={fazerBusca} style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 18px",cursor:"pointer",fontWeight:700,fontSize:13,...F.body}}>Buscar</button>
+          {buscaAtiva&&<button onClick={()=>{setBusca("");setBuscaAtiva("");setPage(0);}} style={{background:C.white,color:C.gray600,border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 14px",cursor:"pointer",fontSize:13,...F.body}}>Limpar</button>}
+        </div>
+
+        {erro&&<div style={{...F.body,fontSize:13,color:C.red,marginBottom:10}}><Ic n="warn" s={14} c={C.red}/> {erro}</div>}
+
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+            <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Código de barra","Produto","Grade","Cadastrado"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+            <tbody>
+              {data.length===0&&!loading&&<tr><td colSpan={4} style={{padding:"18px 10px",...F.body,color:C.gray400,fontSize:13}}>{buscaAtiva?"Nenhum código encontrado para a busca.":"Nenhum código cadastrado ainda."}</td></tr>}
+              {data.map((r,i)=>(
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,color:C.gray800}}>{r.codigo_barra}</td>
+                  <td style={{padding:"8px 10px",...F.body,fontWeight:600}}>{r.produto}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray600}}>{r.grade||"—"}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray400,fontSize:11}}>{r.criado_em?new Date(r.criado_em).toLocaleDateString("pt-BR"):"—"}{r.criado_por?` · ${r.criado_por}`:""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Paginação */}
+        {total>LIMIT&&<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:14,...F.body,fontSize:13,color:C.gray600}}>
+          <span>Página {page+1} de {totalPages.toLocaleString("pt-BR")}</span>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={()=>setPage(p=>Math.max(0,p-1))} disabled={page===0}
+              style={{background:C.white,color:page===0?C.gray300:C.gray700,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"6px 14px",cursor:page===0?"not-allowed":"pointer",fontSize:13,...F.body}}>Anterior</button>
+            <button onClick={()=>setPage(p=>(p+1<totalPages?p+1:p))} disabled={page+1>=totalPages}
+              style={{background:C.white,color:page+1>=totalPages?C.gray300:C.gray700,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"6px 14px",cursor:page+1>=totalPages?"not-allowed":"pointer",fontSize:13,...F.body}}>Próxima</button>
+          </div>
+        </div>}
+      </Card>
+    </div>
+  );
+}
+
 function AppInner(){
   const isMobile=useIsMobile();
   const _acoesEmAndamento=useRef(new Set()); // trava antiduplicação por pedido+ação
@@ -3861,7 +4188,7 @@ function AppInner(){
     pedidos:"Todos os Pedidos",direcionamento:"Direcionamento",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",sla:"Configurar SLA",usuarios:"Usuários",
+    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",codigos_barra:"Códigos de Barra",sla:"Configurar SLA",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
@@ -3891,6 +4218,7 @@ function AppInner(){
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
             {page==="alteracoes_form"&&<AlteracoesFormList/>}
+            {page==="codigos_barra"&&<CodigosBarra user={user}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
