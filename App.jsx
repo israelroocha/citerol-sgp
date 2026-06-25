@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, Component } from "react";
+import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.9.1";
+const SGP_VERSION = "v2.9.11";
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
 
@@ -48,13 +48,110 @@ async function apiFetch(path, method = "GET", body = null) {
   throw ultimoErro;
 }
 
-// Mescla os resultados das filas mantendo os itens anteriores do grupo que falhou,
-// evitando que itens "sumam" quando um endpoint falha pontualmente numa atualização.
+// Mescla os resultados das filas de forma estável, evitando que itens "pisquem"
+// entre atualizações por causa de falhas pontuais ou da eventual consistency do
+// HubSpot (uma busca pode retornar 12 ou 14 conforme o índice).
+// Regras:
+//  - endpoint falhou (items=null) → mantém os itens anteriores do grupo;
+//  - item ausente numa resposta nova → só é removido após sumir em 2 atualizações seguidas;
+//  - se o pedido já aparece "fresco" em alguma fila, remove as cópias "presas" das outras.
+// ─── Fonte única da verdade dos pedidos em aberto ────────────────────────────
+// Cache no Worker (20s) garante que todas as telas vejam exatamente os mesmos
+// números. Quando uma ação muda stage, o cache é invalidado automaticamente.
+// Estado global e listeners para sincronizar entre telas:
+const _snapState = { data: null, loading: false, error: null, lastFetch: 0, listeners: new Set() };
+function _emitSnap(){ _snapState.listeners.forEach(fn => { try { fn(); } catch(e){} }); }
+async function _fetchSnap(force){
+  if (_snapState.loading) return; // dedup
+  _snapState.loading = true; _emitSnap();
+  try {
+    const r = await apiFetch("/snapshot-aberto" + (force ? "?force=1" : ""));
+    _snapState.data = r;
+    _snapState.error = null;
+    _snapState.lastFetch = Date.now();
+  } catch (e) {
+    _snapState.error = e.message || "erro ao carregar";
+  } finally {
+    _snapState.loading = false; _emitSnap();
+  }
+}
+function useSnapshotAberto(){
+  const [, force] = useState(0);
+  useEffect(() => {
+    const fn = () => force(n => n + 1);
+    _snapState.listeners.add(fn);
+    // Se nunca carregou ou está velho demais (>30s), busca
+    if (!_snapState.data || (Date.now() - _snapState.lastFetch) > 30000) _fetchSnap(false);
+    return () => _snapState.listeners.delete(fn);
+  }, []);
+  return {
+    data: _snapState.data,
+    loading: _snapState.loading,
+    error: _snapState.error,
+    lastFetch: _snapState.lastFetch,
+    refresh: () => _fetchSnap(true),
+  };
+}
+// Helper: extrai todos os pedidos de um snapshot (achata porEtapa)
+function snapTodosPedidos(snap){
+  if (!snap || !snap.porEtapa) return [];
+  const out = [];
+  for (const nome of Object.keys(snap.porEtapa)) {
+    const g = snap.porEtapa[nome];
+    if (!g || !g.items) continue;
+    for (const it of g.items) out.push({ ...it, etapa: nome, _grupo: nome });
+  }
+  return out;
+}
+// "atualizado há X" formatado
+function _ageStr(ts){
+  if (!ts) return "—";
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 5) return "agora";
+  if (s < 60) return `há ${s}s`;
+  const m = Math.floor(s/60);
+  if (m < 60) return `há ${m} min`;
+  return `há ${Math.floor(m/60)}h`;
+}
+// Componente de status: "atualizado há Xs" + botão Atualizar agora + erro/parcial
+function SnapStatus({snap}){
+  const [, tick] = useState(0);
+  useEffect(() => { const t = setInterval(() => tick(n => n+1), 5000); return () => clearInterval(t); }, []);
+  if (!snap.data && !snap.error) return null;
+  const parcial = snap.data && snap.data.parcial;
+  const cor = snap.error ? C.red : parcial ? C.amber : C.gray500;
+  const txt = snap.error
+    ? "Não foi possível atualizar — última carga " + _ageStr(snap.lastFetch)
+    : parcial
+      ? `Atualizado ${_ageStr(snap.lastFetch)} · algumas etapas falharam (${(snap.data.etapasComErro||[]).join(", ")})`
+      : `Atualizado ${_ageStr(snap.lastFetch)}`;
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:8,fontSize:11.5,color:cor,fontWeight:600,...F.body}}>
+      <span style={{width:7,height:7,borderRadius:"50%",background:snap.loading?C.amber:(snap.error?C.red:C.green),display:"inline-block"}}/>
+      <span>{snap.loading ? "Atualizando..." : txt}</span>
+      <button onClick={snap.refresh} disabled={snap.loading} style={{...F.body,fontSize:11.5,fontWeight:600,background:"transparent",border:"none",color:C.red,cursor:snap.loading?"default":"pointer",padding:0,textDecoration:"underline",opacity:snap.loading?0.5:1}}>Atualizar agora</button>
+    </div>
+  );
+}
+
 function mesclarEmAberto(prev, resultados) {
   const prevArr = prev || [];
-  return resultados.flatMap(res =>
-    res.items !== null ? res.items : prevArr.filter(o => o._grupo === res.nome)
-  );
+  const MAX_MISSES = 2;
+  const out = [];
+  for (const res of resultados) {
+    const prevGrupo = prevArr.filter(o => o._grupo === res.nome);
+    if (res.items === null) { out.push(...prevGrupo); continue; }
+    const novosIds = new Set(res.items.map(o => o.id));
+    out.push(...res.items.map(o => ({ ...o, _misses: 0 })));
+    for (const p of prevGrupo) {
+      if (!novosIds.has(p.id)) {
+        const m = (p._misses || 0) + 1;
+        if (m < MAX_MISSES) out.push({ ...p, _misses: m });
+      }
+    }
+  }
+  const idsFrescos = new Set(out.filter(o => (o._misses || 0) === 0).map(o => o.id));
+  return out.filter(o => (o._misses || 0) === 0 || !idsFrescos.has(o.id));
 }
 
 
@@ -86,6 +183,7 @@ const ICONS = {
   list:      "M4 6h16M4 10h16M4 14h16M4 18h16",
   needle:    "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z",
   monitor:   "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+  activity:  "M22 12h-4l-3 9L9 3l-3 9H2",
   scissors:  "M6 9a3 3 0 100-6 3 3 0 000 6zm12 6a3 3 0 100-6 3 3 0 000 6zM6 9l12-6M6 15l12 6",
   arrow:     "M13 7l5 5m0 0l-5 5m5-5H6",
   box:       "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
@@ -107,6 +205,9 @@ const ICONS = {
   inbox:     "M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4",
   eye:       "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
   eyeOff:    "M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94 M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19 M14.12 14.12a3 3 0 11-4.24-4.24 M1 1l22 22",
+  barcode:   "M3 5v14M6 5v14M8 5v14M11 5v14M13 5v10M16 5v14M18 5v10M21 5v14",
+  print:     "M6 9V3h12v6 M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2 M6 14h12v7H6z",
+  lock:      "M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z M8 11V7a4 4 0 118 0v4 M12 15v2",
 };
 
 function Ic({ n, s = 16, c = "currentColor", style = {} }) {
@@ -135,9 +236,14 @@ const NAV_ITEMS = [
   {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
   {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
   // Análise
+  {id:"painel_fluxo",    label:"Painel de Fluxo",          icon:"activity",grupo:"Análise"},
+  {id:"gestao_vista",    label:"Gestão à Vista",           icon:"monitor", grupo:"Análise"},
+  {id:"pedidos_risco",   label:"Pedidos em Risco",         icon:"warn",    grupo:"Análise"},
   {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
   // Operações
-  {id:"pedidos",                 label:"Todos os Pedidos",         icon:"list",    grupo:"Operações"},
+  {id:"pedidos",                 label:"Pedidos em Aberto",         icon:"list",    grupo:"Operações"},
+  {id:"separacao",               label:"Separação",                icon:"inbox",   grupo:"Operações"},
+  {id:"impressao_pedido",        label:"Impressão de Pedido",      icon:"print",   grupo:"Operações"},
   {id:"direcionamento",          label:"Direcionamento",           icon:"arrow",   grupo:"Operações"},
   {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Operações"},
   {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Operações"},
@@ -149,14 +255,17 @@ const NAV_ITEMS = [
   {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
   {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
   {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Operações"},
+  // Cadastros
+  {id:"codigos_barra", label:"Códigos de Barra",   icon:"barcode", grupo:"Cadastros"},
   // Sistema
-  {id:"sla",         label:"Configurar SLA",     icon:"gear",    grupo:"Sistema"},
+  {id:"sla",         label:"Configurações",     icon:"gear",    grupo:"Sistema"},
   {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
 ];
 
 // Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
 const MODULO_ETAPA = {
   direcionamento:           "Direcionamento",
+  separacao:                "Separação",
   programacao:              "Programação",
   amostra_digital:          "Amostra Digital",
   aprovacao_amostra_digital:"Aprovação de Amostra Digital",
@@ -170,6 +279,7 @@ const MODULO_ETAPA = {
 // Mapa módulo -> endpoint do Worker (para carregar demandas ao vivo)
 const MODULO_ENDPOINT = {
   direcionamento:           "/direcionamento",
+  separacao:                "/separacao",
   programacao:              "/programacao",
   amostra_digital:          "/amostra-digital",
   aprovacao_amostra_digital:"/aprovacao-amostra-digital",
@@ -278,8 +388,16 @@ const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
 });
 
 // Normaliza um card cru do Worker para o formato que o modal/cards esperam
+// Helper de formatação do número do pedido — mostra "PED - <linx> | <vendasId>"
+// quando o pedido tem código no Linx; senão, "PED-<vendasId>" como antes.
+function idPedido(o){
+  if (!o) return "";
+  if (o.pedidoLinx) return "PED - " + o.pedidoLinx + " | " + (o.vendasId || (o.id||"").replace(/^PED-/, ""));
+  return o.id || ("PED-" + (o.vendasId || ""));
+}
 const normalizarCard=(o,etapa)=>({
   id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
+  pedidoLinx:o.pedidoLinx||"",
   client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
   cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
   obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
@@ -342,6 +460,25 @@ function baixarExcelFinalizados(lista,de,ate){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 const hrsIn=(at)=>(Date.now()-new Date(at).getTime())/3600000;
+function baixarExcelProgramacao(lista,de,ate){
+  const esc=(v)=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const cols=["Arquivo","Dificuldade","Data da execução"];
+  const linhas=lista.map(r=>{
+    const d=r.data_execucao?new Date(r.data_execucao).toLocaleString("pt-BR"):"";
+    return [r.nome_arquivo||"",r.dificuldade||"",d];
+  });
+  const thead="<tr>"+cols.map(c=>`<th style="background:#9E0B0F;color:#fff;font-weight:bold;padding:6px;border:1px solid #ccc">${esc(c)}</th>`).join("")+"</tr>";
+  const tbody=linhas.map(r=>"<tr>"+r.map(c=>`<td style="padding:5px;border:1px solid #ccc">${esc(c)}</td>`).join("")+"</tr>").join("");
+  const periodo=`Relatório de Programação — ${de||"início"} a ${ate||"hoje"} (${lista.length} bordados)`;
+  const html=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>`+
+    `<h3>${esc(periodo)}</h3><table border="1" cellspacing="0">${thead}${tbody}</table></body></html>`;
+  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`relatorio-programacao-${de||""}_${ate||""}.xls`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 function getSLA(o,cfg){
   const sla=cfg[o.etapa]||0;
   const hrs=hrsIn(o.etapaAt);
@@ -480,7 +617,7 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
-  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
   // Injeta o CSS da scrollbar sutil uma única vez
   useEffect(()=>{
@@ -551,7 +688,7 @@ function BottomNav({user,active,onNav}){
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:allItems.filter(n=>n.grupo===label)}));
 
   return(
@@ -978,10 +1115,176 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
 }
 
 
+// ─── BIPAGEM DA EXPEDIÇÃO ─────────────────────────────────────────────────────
+// Segunda conferência: o expedidor bipa todas as peças; a contagem por
+// produto+grade tem que bater com o pedido. Cadeado (senha) libera conferência
+// manual por produto caso o leitor falhe.
+function BipagemExpedicao({order,onChange,user}){
+  const linhas=[];
+  const idx={};
+  (order.items||[]).forEach(it=>{
+    const produto=String(it.sku||"").trim(), grade=String(it.cor||"").trim();
+    const key=produto+"|"+grade;
+    if(idx[key]==null){ idx[key]=linhas.length; linhas.push({key,produto,grade,desc:it.desc||"",qty:0}); }
+    linhas[idx[key]].qty+=Number(it.qty||0);
+  });
+  const lineKeys=new Set(linhas.map(l=>l.key));
+
+  const [scans,setScans]=useState([]);
+  const [resolvidos,setResolvidos]=useState({});
+  const [desconhecidos,setDesconhecidos]=useState({});
+  const [manual,setManual]=useState({});
+  const [unlocked,setUnlocked]=useState(false);
+  const [input,setInput]=useState("");
+  const [showSenha,setShowSenha]=useState(false);
+  const [senha,setSenha]=useState("");
+  const [senhaErro,setSenhaErro]=useState("");
+  const inputRef=useRef(null);
+  const pendingRef=useRef(new Set());
+  const timerRef=useRef(null);
+
+  useEffect(()=>{ if(inputRef.current) inputRef.current.focus(); },[]);
+
+  const resolverPendentes=async()=>{
+    const lote=Array.from(pendingRef.current); pendingRef.current=new Set();
+    if(!lote.length) return;
+    try{
+      const r=await apiFetch("/codigos/lookup","POST",{codigos:lote});
+      if(r.success){
+        if(r.mapa) setResolvidos(prev=>({...prev,...r.mapa}));
+        if(r.desconhecidos&&r.desconhecidos.length) setDesconhecidos(prev=>{const n={...prev};r.desconhecidos.forEach(c=>n[c]=true);return n;});
+      }
+    }catch(e){/* recomputa quando resolver */}
+  };
+  const onScan=(code)=>{
+    const c=String(code).trim(); if(!c) return;
+    setScans(prev=>[...prev,c]);
+    if(!resolvidos[c]&&!desconhecidos[c]){
+      pendingRef.current.add(c);
+      if(timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current=setTimeout(resolverPendentes,250);
+    }
+    setInput("");
+    if(inputRef.current) inputRef.current.focus();
+  };
+
+  const bipMap={}; let naoPert=0;
+  scans.forEach(c=>{
+    const r=resolvidos[c];
+    if(!r) return;
+    const key=String(r.produto).trim()+"|"+String(r.grade).trim();
+    if(lineKeys.has(key)) bipMap[key]=(bipMap[key]||0)+1; else naoPert++;
+  });
+  const conferido=(l)=>{ const mv=manual[l.key]; if(unlocked&&mv!=null&&mv!=="") return Number(mv)||0; return bipMap[l.key]||0; };
+  const okLinha=(l)=>conferido(l)===l.qty;
+  const totalPedido=linhas.reduce((s,l)=>s+l.qty,0);
+  const totalConferido=linhas.reduce((s,l)=>s+conferido(l),0);
+  const desconhecidosList=Object.keys(desconhecidos);
+  const houveManual=unlocked&&Object.values(manual).some(v=>v!=null&&v!=="");
+  const ready=linhas.length>0&&linhas.every(okLinha);
+
+  useEffect(()=>{
+    if(!onChange) return;
+    onChange(ready,{
+      totalPedido,totalConferido,bateu:ready,desbloqueado:houveManual,
+      detalhes:{linhas:linhas.map(l=>({produto:l.produto,grade:l.grade,esperado:l.qty,bipado:bipMap[l.key]||0,manual:(unlocked&&manual[l.key]!=null&&manual[l.key]!=="")?Number(manual[l.key]):null})),desconhecidos:desconhecidosList,naoPertence:naoPert},
+    });
+  // eslint-disable-next-line
+  },[ready,totalConferido,totalPedido,houveManual,desconhecidosList.length,naoPert]);
+
+  const validarSenha=async()=>{
+    setSenhaErro("");
+    try{
+      const r=await apiFetch("/expedicao/validar-senha","POST",{senha});
+      if(r.naoConfigurada){ setSenhaErro("Nenhuma senha definida. Configure na aba Configurar SLA."); return; }
+      if(r.ok){ setUnlocked(true); setShowSenha(false); setSenha(""); }
+      else setSenhaErro("Senha incorreta.");
+    }catch(e){ setSenhaErro(e.message); }
+  };
+  const limpar=()=>{ setScans([]); setResolvidos({}); setDesconhecidos({}); setManual({}); if(inputRef.current) inputRef.current.focus(); };
+
+  return(
+    <div style={{border:`1.5px solid ${ready?C.green:C.gray200}`,borderRadius:10,padding:16,background:ready?C.green+"08":C.white,position:"relative"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,gap:8}}>
+        <div style={{...F.title,fontSize:12,fontWeight:700,color:C.gray600,letterSpacing:"0.08em",display:"flex",alignItems:"center",gap:7}}>
+          <Ic n="barcode" s={16} c={ready?C.green:C.gray500}/> CONFERÊNCIA POR BIPAGEM
+        </div>
+        <button onClick={()=>{ if(unlocked) return; setShowSenha(s=>!s); setSenhaErro(""); }} title={unlocked?"Conferência manual liberada":"Desbloquear conferência manual"}
+          style={{background:"transparent",border:"none",cursor:unlocked?"default":"pointer",display:"flex",alignItems:"center",gap:4,color:unlocked?C.amber:C.gray300,padding:4}}>
+          <Ic n="lock" s={15} c={unlocked?C.amber:C.gray300}/>
+          {unlocked&&<span style={{...F.body,fontSize:10,fontWeight:700,color:C.amber}}>manual</span>}
+        </button>
+      </div>
+
+      {showSenha&&!unlocked&&(
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"10px 12px",background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:7,flexWrap:"wrap"}}>
+          <input type="password" value={senha} onChange={e=>setSenha(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")validarSenha();}} placeholder="Senha do gestor"
+            style={{border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"7px 10px",...F.body,fontSize:13,outline:"none",width:160}}/>
+          <button onClick={validarSenha} style={{background:C.amber,color:C.white,border:"none",borderRadius:6,padding:"7px 14px",cursor:"pointer",fontWeight:700,fontSize:12,...F.body}}>Liberar</button>
+          {senhaErro&&<span style={{...F.body,fontSize:12,color:C.red}}>{senhaErro}</span>}
+        </div>
+      )}
+
+      <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
+        <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();onScan(input);}}}
+          placeholder="Bipe os códigos aqui (um por peça)…"
+          style={{flex:1,minWidth:220,border:`1.5px solid ${C.gray300}`,borderRadius:7,padding:"11px 13px",...F.body,fontSize:14,outline:"none",fontFamily:"monospace"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:8,...F.body,fontSize:13}}>
+          <span style={{fontWeight:700,color:ready?C.green:(totalConferido>totalPedido?C.red:C.gray700)}}>{totalConferido} / {totalPedido} peças</span>
+          <button onClick={limpar} style={{background:C.white,color:C.gray500,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontSize:12,...F.body}}>Limpar</button>
+        </div>
+      </div>
+
+      <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
+        <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:420}}>
+          <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
+            {["Produto","Grade","Esperado","Conferido","Status"].map(h=><th key={h} style={{padding:"7px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{linhas.map(l=>{
+            const conf=conferido(l), ok=conf===l.qty;
+            return(
+              <tr key={l.key} style={{borderBottom:`1px solid ${C.gray100}`,background:ok?C.green+"08":(conf>l.qty?C.red+"08":"transparent")}}>
+                <td style={{padding:"7px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{l.produto}</td>
+                <td style={{padding:"7px 10px",...F.body,color:C.gray600}}>{l.grade||"—"}</td>
+                <td style={{padding:"7px 10px",fontWeight:700,...F.body}}>{l.qty}</td>
+                <td style={{padding:"7px 10px",...F.body}}>
+                  {unlocked
+                    ?<input type="number" min="0" value={manual[l.key]!=null?manual[l.key]:(bipMap[l.key]||0)} onChange={e=>setManual(p=>({...p,[l.key]:e.target.value}))}
+                       style={{width:64,border:`1.5px solid ${C.amber}`,borderRadius:5,padding:"4px 7px",...F.body,fontSize:13,fontWeight:700,outline:"none",textAlign:"center"}}/>
+                    :<span style={{fontWeight:700,color:ok?C.green:(conf>l.qty?C.red:C.gray700)}}>{conf}</span>}
+                </td>
+                <td style={{padding:"7px 10px"}}>
+                  {ok?<span style={{...F.body,fontSize:12,fontWeight:700,color:C.green,display:"inline-flex",alignItems:"center",gap:4}}><Ic n="check" s={13} c={C.green}/>OK</span>
+                    :conf>l.qty?<span style={{...F.body,fontSize:12,fontWeight:700,color:C.red}}>Excesso</span>
+                    :<span style={{...F.body,fontSize:12,color:C.gray400}}>Faltam {l.qty-conf}</span>}
+                </td>
+              </tr>
+            );
+          })}</tbody>
+        </table>
+      </div>
+
+      {desconhecidosList.length>0&&(
+        <div style={{marginTop:10,padding:"9px 12px",background:C.red+"0e",border:`1px solid ${C.red}33`,borderRadius:7,...F.body,fontSize:12,color:C.red}}>
+          <strong>Código(s) não cadastrado(s):</strong> {desconhecidosList.join(", ")}. Solicite o cadastro ao gestor (aba Códigos de Barra) ou libere a conferência manual no cadeado.
+        </div>
+      )}
+      {naoPert>0&&(
+        <div style={{marginTop:10,padding:"9px 12px",background:C.amber+"12",border:`1px solid ${C.amber}40`,borderRadius:7,...F.body,fontSize:12,color:"#8a5a00"}}>
+          {naoPert} peça(s) bipada(s) <strong>não pertencem a este pedido</strong> (produto/grade fora da lista).
+        </div>
+      )}
+      {ready&&<div style={{marginTop:10,...F.body,fontSize:13,fontWeight:700,color:C.green,display:"flex",alignItems:"center",gap:6}}><Ic n="check" s={15} c={C.green}/>Conferência completa{houveManual?" (com ajuste manual)":""} — pode avançar.</div>}
+    </div>
+  );
+}
+
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
 function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
+  const[bipReady,setBipReady]=useState(false);
+  const bipInfoRef=useRef({});
 
   // Pedido já concluído — apenas consulta, sem ação
   if(etapa==="Finalizado"){
@@ -1298,6 +1601,10 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
         </div>
       )}
+      {/* Conferência por bipagem (somente Expedição) */}
+      {etapa==="Expedição"&&(
+        <BipagemExpedicao order={order} user={me} onChange={(r,info)=>{ setBipReady(r); bipInfoRef.current=info||{}; }}/>
+      )}
       {/* Observação */}
       <div>
         <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações (opcional)</label>
@@ -1307,11 +1614,24 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       {moveConfig.next&&<div style={{...F.body,fontSize:12,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
         <Ic n="arrow" s={12} c={C.gray300}/> Próxima etapa: <strong style={{color:C.gray600,marginLeft:2}}>{moveConfig.next}</strong>
       </div>}
-      <button onClick={async()=>{
-          try{ const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true); }
+      {etapa==="Expedição"&&!bipReady&&<div style={{...F.body,fontSize:12,color:C.gray400}}>Conclua a conferência por bipagem para liberar o avanço.</div>}
+      <button disabled={etapa==="Expedição"&&!bipReady}
+        onClick={async()=>{
+          try{
+            if(etapa==="Expedição"){
+              const info=bipInfoRef.current||{};
+              apiFetch("/bipagem","POST",{
+                pedidoId:order.id,posvendaId:order.posvendaId||"",bordadoId:order.bordadoId||"",
+                cliente:order.client||"",usuario:me?.email||me?.nome||"",
+                totalPedido:info.totalPedido||0,totalBipado:info.totalConferido||0,
+                bateu:!!info.bateu,desbloqueado:!!info.desbloqueado,detalhes:info.detalhes||{},
+              }).catch(()=>{}); // auditoria não bloqueia o avanço
+            }
+            const msg=await onAction(order.id,"mover",{obs:obsText}); setActionMsg(msg||""); setActionDone(true);
+          }
           catch(e){ alert("Erro ao processar: "+e.message); }
         }}
-        style={{background:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+        style={{background:(etapa==="Expedição"&&!bipReady)?C.gray300:moveConfig.color,color:C.white,border:"none",borderRadius:8,padding:"12px 28px",cursor:(etapa==="Expedição"&&!bipReady)?"not-allowed":"pointer",...F.body,fontWeight:700,fontSize:14,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
         <Ic n={moveConfig.icon} s={16} c={C.white}/> {moveConfig.btn}
       </button>
     </div>
@@ -1364,7 +1684,7 @@ function OrderModal({order,me,onClose,usuarios,onAction,isMobile,slaCfg}){
         <div style={{padding:"14px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8,flexShrink:0}}>
           <div style={{flex:1,minWidth:0}}>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-              <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black}}>{order.id}</span>
+              <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black}}>{idPedido(order)}</span>
               <ETag etapa={order.etapa}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
@@ -1556,7 +1876,7 @@ function OCard({order,onClick,slaCfg}){
       onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,gap:8}}>
         <div style={{minWidth:0}}>
-          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{order.id}</div>
+          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{idPedido(order)}</div>
           <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{order.client}</div>
         </div>
         <ETag etapa={order.etapa}/>
@@ -1591,25 +1911,22 @@ function MinhasDemandas({user,onOpen,slaCfg}){
     ? Object.keys(MODULO_ENDPOINT)
     : (user.modulos||[]).filter(m=>MODULO_ENDPOINT[m]));
 
-  const [dados,setDados]=useState(null);   // { [etapa]: [pedidos] }
-  const [loading,setLoading]=useState(true);
-  const [erro,setErro]=useState("");
   const [filtro,setFiltro]=useState("todos"); // "todos" ou nome da etapa
 
-  const carregar=async()=>{
-    setLoading(true);setErro("");
-    try{
-      const pares=await Promise.all(modulos.map(async m=>{
-        const etapa=MODULO_ETAPA[m];
-        const r=await apiFetch(MODULO_ENDPOINT[m]).catch(()=>({data:[]}));
-        return [etapa,ordenarPorPrioridade((r.data||[]).map(o=>normalizarCard(o,etapa)))];
-      }));
-      const obj={};pares.forEach(([etapa,lista])=>{obj[etapa]=lista;});
-      setDados(obj);
-    }catch(e){setErro(e.message);}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{carregar();},[]);
+  // Fonte única: filtra o snapshot pelas etapas que o usuário tem acesso
+  const snap = useSnapshotAberto();
+  const loading = snap.loading && !snap.data;
+  const erro = snap.error;
+  const carregar = snap.refresh;
+  const dados = useMemo(() => {
+    const obj = {};
+    const todos = snapTodosPedidos(snap.data).map(o => normalizarCard(o, o.etapa));
+    for (const m of modulos) {
+      const etapa = MODULO_ETAPA[m];
+      obj[etapa] = ordenarPorPrioridade(todos.filter(o => o.etapa === etapa));
+    }
+    return obj;
+  }, [snap.data, modulos.join(",")]);
 
   const etapas=modulos.map(m=>MODULO_ETAPA[m]).filter(Boolean);
   const etapasComDados=etapas.filter(e=>dados&&(dados[e]||[]).length>0);
@@ -1621,6 +1938,7 @@ function MinhasDemandas({user,onOpen,slaCfg}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
       <PageH title="Minhas Demandas" sub={`${total} pedido${total!==1?"s":""} sob sua responsabilidade`} onRefresh={carregar} refreshing={loading}/>
+      <SnapStatus snap={snap}/>
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
         <Stat label="Em andamento" value={total} icon="list"/>
@@ -1676,6 +1994,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const [loading,setLoading]=useState(false);
   const [loadError,setLoadError]=useState(null);
   const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
+  const [capLot,setCapLot]=useState({capacidade:{},lotacao:{}}); // capacidade + lotação por destino
 
   const carregarDir=()=>{
     setLoading(true);
@@ -1683,6 +2002,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
     setConfirmed({});
     setDestMap({});
     setSel({});
+    apiFetch("/capacidade-lotacao").then(r=>{ if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}}); }).catch(()=>{});
     apiFetch("/direcionamento")
       .then(res=>{
         if(res.success){
@@ -1728,6 +2048,20 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   // Estado local de seleção por pedido: {orderId: {sku: true/false}}
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
+  const[bordadorMap,setBordadorMap]=useState({});// {orderId: {sku: "bordadel"|"mg_bordados"|"outros"}}
+
+  // ── Sugestão de direcionamento por capacidade ──────────────────────────────
+  const cap=capLot.capacidade||{}, lot=capLot.lotacao||{};
+  const cheio=(d)=>{const c=Number(cap[d]||0);return c>0&&Number(lot[d]||0)>=c;};
+  const bordadorSugerido=()=> !cheio("bordadel")?"bordadel": !cheio("mg_bordados")?"mg_bordados":"outros";
+  const ehJaleco=(it)=>/jaleco/i.test((it&&(it.desc||it.nome||it.sku))||"");
+  const sugerir=(it)=>{
+    if(ehJaleco(it)) return {dir:"externo",bordador:bordadorSugerido()};
+    if(!cheio("interno")) return {dir:"interno"};
+    return {dir:"externo",bordador:bordadorSugerido()};
+  };
+  const LABEL_BORDADOR={bordadel:"Bordadel",mg_bordados:"MG Bordados",outros:"Outros"};
+  const setBordador=(oid,sku,b)=>setBordadorMap(prev=>({...prev,[oid]:{...(prev[oid]||{}),[sku]:b}}));
   const[confirmed,setConfirmed]=useState({});// orderId: bool
   const[pendentesAberto,setPendentesAberto]=useState(false);// caixa recolhível
   const[itensAbertos,setItensAbertos]=useState({});// {orderId: bool} — itens recolhidos por padrão
@@ -1743,6 +2077,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   };
   const setDest=(oid,sku,dest)=>{
     setDestMap(prev=>({...prev,[oid]:{...(prev[oid]||{}),[sku]:dest}}));
+    if(dest==="externo") setBordadorMap(prev=>{const cur=(prev[oid]||{})[sku];return cur?prev:{...prev,[oid]:{...(prev[oid]||{}),[sku]:bordadorSugerido()}};});
   };
   const setDestSelected=(oid,dest,itemSkus)=>{
     const selSkus=itemSkus.filter(s=>(sel[oid]||{})[s]);
@@ -1750,10 +2085,12 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
     const next={...(destMap[oid]||{})};
     selSkus.forEach(s=>next[s]=dest);
     setDestMap(prev=>({...prev,[oid]:next}));
+    if(dest==="externo") setBordadorMap(prev=>{const nb={...(prev[oid]||{})};selSkus.forEach(s=>{if(!nb[s])nb[s]=bordadorSugerido();});return {...prev,[oid]:nb};});
   };
   const setDestAll=(oid,dest,itemSkus)=>{
     const next={};itemSkus.forEach(s=>next[s]=dest);
     setDestMap(prev=>({...prev,[oid]:next}));
+    if(dest==="externo") setBordadorMap(prev=>{const nb={...(prev[oid]||{})};itemSkus.forEach(s=>{if(!nb[s])nb[s]=bordadorSugerido();});return {...prev,[oid]:nb};});
   };
   const confirm=async(oid,items)=>{
     const dm=destMap[oid]||{};
@@ -1766,12 +2103,15 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
       alert("Pedido sem negócio de Bordado/Pós-venda associado.");return;
     }
 
-    // Monta destinos por ID do objeto: { "<objetoId>": "Interno"|"Externo" }
+    // Monta destinos por ID do objeto: { "<objetoId>": { dir, bordador } }
+    const bm=bordadorMap[oid]||{};
     const destinos={};
     items.forEach(it=>{
       const key=it.id||it.sku;
       const val=dm[key];
-      if(val) destinos[it.id||it.sku]=val==="interno"?"Interno":"Externo";
+      if(!val) return;
+      if(val==="interno") destinos[key]={dir:"Interno"};
+      else destinos[key]={dir:"Externo",bordador:bm[key]||"outros"};
     });
 
     try{
@@ -1800,6 +2140,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
       <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo" onRefresh={carregarDir} refreshing={loading}/>
+      <PainelLotacao capLot={capLot} destinos={["interno","bordadel","mg_bordados","outros"]} titulo="Capacidade x lotação — usada para a sugestão"/>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         Carregando pedidos do HubSpot...
@@ -1827,7 +2168,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
           </div>
           {pendentesAberto&&pendentes.map(o=>(
             <div key={o.id} onClick={()=>onOpen(o)} style={{background:"#fffbeb",border:`1px solid ${C.amber}40`,borderLeft:`3px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",cursor:"pointer",marginBottom:8,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-              <div><span style={{...F.body,fontWeight:700}}>{o.id}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
+              <div><span style={{...F.body,fontWeight:700}}>{idPedido(o)}</span><span style={{...F.body,color:C.gray500,fontSize:12,marginLeft:8}}>{o.client}</span></div>
               <Tag label="Amostra pendente" color={C.amber}/>
             </div>
           ))}
@@ -1854,7 +2195,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:14,flexWrap:"wrap",gap:8,alignItems:"center"}}>
               <div>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{o.id}</span>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
                   <ETag etapa={o.etapa}/>
                   {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
                   {sla.ft==="late"&&<Tag label="Prazo vencido" color={C.red}/>}
@@ -1928,16 +2269,38 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                       <td style={{padding:"8px 10px",...F.body,color:C.gray500,fontSize:12}}>{it.cor}</td>
                       <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                       <td style={{padding:"8px 10px"}}>
-                        <div style={{display:"flex",gap:5}}>
-                          <button onClick={()=>setDest(o.id,k,"interno")}
-                            style={{background:thisDest==="interno"?C.green:C.white,color:thisDest==="interno"?C.white:C.gray700,border:`1.5px solid ${thisDest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
-                            Interno
-                          </button>
-                          <button onClick={()=>setDest(o.id,k,"externo")}
-                            style={{background:thisDest==="externo"?C.purple:C.white,color:thisDest==="externo"?C.white:C.gray700,border:`1.5px solid ${thisDest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body,transition:"all 0.1s"}}>
-                            Externo
-                          </button>
-                        </div>
+                        {(()=>{
+                          const jaleco=ehJaleco(it);
+                          const sug=sugerir(it);
+                          const sugTxt=sug.dir==="interno"?"Interno":`Externo · ${LABEL_BORDADOR[sug.bordador]}`;
+                          const bord=(bordadorMap[o.id]||{})[k]||sug.bordador||"outros";
+                          return(
+                            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                              <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                                <button onClick={()=>{if(!jaleco)setDest(o.id,k,"interno");}} disabled={jaleco} title={jaleco?"Jaleco não pode ir para Interno":""}
+                                  style={{background:thisDest==="interno"?C.green:C.white,color:jaleco?C.gray400:(thisDest==="interno"?C.white:C.gray700),border:`1.5px solid ${thisDest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:jaleco?"not-allowed":"pointer",fontWeight:600,...F.body,opacity:jaleco?0.55:1}}>
+                                  Interno
+                                </button>
+                                <button onClick={()=>setDest(o.id,k,"externo")}
+                                  style={{background:thisDest==="externo"?C.purple:C.white,color:thisDest==="externo"?C.white:C.gray700,border:`1.5px solid ${thisDest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 11px",fontSize:12,cursor:"pointer",fontWeight:600,...F.body}}>
+                                  Externo
+                                </button>
+                                {jaleco
+                                  ?<span style={{...F.body,fontSize:10,fontWeight:700,color:C.purple,background:C.purple+"14",padding:"2px 6px",borderRadius:4}}>JALECO → EXTERNO</span>
+                                  :!thisDest&&<span style={{...F.body,fontSize:11,color:C.gray400}}>Sugestão: <strong style={{color:sug.dir==="interno"?C.green:C.purple}}>{sugTxt}</strong></span>}
+                              </div>
+                              {thisDest==="externo"&&<div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                                <span style={{...F.body,fontSize:10,color:C.gray400,marginRight:2}}>Bordador:</span>
+                                {["bordadel","mg_bordados","outros"].map(b=>(
+                                  <button key={b} onClick={()=>setBordador(o.id,k,b)}
+                                    style={{background:bord===b?C.purple:C.white,color:bord===b?C.white:C.gray600,border:`1px solid ${bord===b?C.purple:C.gray300}`,borderRadius:4,padding:"3px 8px",fontSize:11,cursor:"pointer",fontWeight:600,...F.body}}>
+                                    {LABEL_BORDADOR[b]}{sug.dir==="externo"&&sug.bordador===b?" ★":""}
+                                  </button>
+                                ))}
+                              </div>}
+                            </div>
+                          );
+                        })()}
                       </td>
                     </tr>
                   );
@@ -1972,6 +2335,138 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
 }
 
 // ─── DASHBOARD ───────────────────────────────────────────────────────────────
+// Gráfico de Previsão de Faturamento (linhas acumuladas + hover)
+function GraficoPrevisao({data}){
+  const [hover,setHover]=useState(null); // dia
+  const WD=["D","S","T","Q","Q","S","S"];
+  const W=920,H=380,padL=64,padR=20,padT=20,padB=46;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const dias=data.dias||[];
+  const n=dias.length||1;
+  const media=data.diasUteisDecorridos>0?(data.totalFaturadoMes/data.diasUteisDecorridos):0;
+  let vAcc=0,rAcc=0,bus=0;
+  const pts=dias.map(d=>{
+    const vDia=data.vencimentoDia[d.dia]||0;
+    const rDia=data.realizadoDia[d.dia]||0;
+    vAcc+=vDia;
+    const passou=d.dia<=data.hojeDia;
+    if(passou) rAcc+=rDia;
+    if(d.util) bus+=1;
+    return {dia:d.dia,dow:d.dow,util:d.util,vDia,rDia:passou?rDia:null,vAcc,rAcc:passou?rAcc:null,mediaDia:d.util?media:0,mediaAcc:media*bus};
+  });
+  const maxY=Math.max(1,...pts.map(p=>Math.max(p.vAcc,p.mediaAcc,p.rAcc||0)));
+  const xFor=(dia)=>padL+(n<=1?0:((dia-1)/(n-1))*plotW);
+  const yFor=(v)=>padT+plotH-(v/maxY)*plotH;
+  const line=(key,filtro)=>pts.filter(filtro||(()=>true)).map(p=>`${xFor(p.dia)},${yFor(p[key]||0)}`).join(" ");
+  const realPts=pts.filter(p=>p.rAcc!=null);
+  const realLine=realPts.map(p=>`${xFor(p.dia)},${yFor(p.rAcc)}`).join(" ");
+  const realArea=realPts.length?`${xFor(realPts[0].dia)},${yFor(0)} ${realLine} ${xFor(realPts[realPts.length-1].dia)},${yFor(0)}`:"";
+  const fmtK=(v)=>v>=1000000?`${(v/1000000).toFixed(1)}M`:v>=1000?`${Math.round(v/1000)}k`:String(Math.round(v));
+  const yticks=[0,0.25,0.5,0.75,1].map(f=>f*maxY);
+  const COR={real:C.red,venc:C.black,media:C.gray500};
+
+  const onMove=(e)=>{
+    const rect=e.currentTarget.getBoundingClientRect();
+    const xRel=(e.clientX-rect.left)*(W/rect.width);
+    let dia=Math.round((xRel-padL)/plotW*(n-1))+1;
+    dia=Math.max(1,Math.min(n,dia));
+    setHover(dia);
+  };
+  const hp=hover?pts.find(p=>p.dia===hover):null;
+
+  return(
+    <Card>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10,marginBottom:6}}>
+        <SecH>Previsão de Faturamento — {String(data.mes).padStart(2,"0")}/{data.ano}</SecH>
+        <div style={{display:"flex",gap:16,flexWrap:"wrap",...F.body,fontSize:11,color:C.gray500}}>
+          {[["Previsão Vencimento",COR.venc],["Previsão Média Faturamento",COR.media],["Faturamento Realizado",COR.real]].map(([l,c])=>(
+            <span key={l} style={{display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:14,height:3,borderRadius:2,background:c,display:"inline-block"}}/>{l}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{position:"relative"}} onMouseLeave={()=>setHover(null)}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",display:"block"}} onMouseMove={onMove}>
+          <defs>
+            <linearGradient id="gradReal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={C.red} stopOpacity="0.22"/>
+              <stop offset="100%" stopColor={C.red} stopOpacity="0.02"/>
+            </linearGradient>
+          </defs>
+          {/* grid + y labels */}
+          {yticks.map((v,i)=>(
+            <g key={i}>
+              <line x1={padL} y1={yFor(v)} x2={W-padR} y2={yFor(v)} stroke={C.gray100} strokeWidth="1"/>
+              <text x={padL-8} y={yFor(v)+4} textAnchor="end" fontSize="11" fill={C.gray400} fontFamily="monospace">{fmtK(v)}</text>
+            </g>
+          ))}
+          {/* x labels (dia + inicial) */}
+          {pts.map(p=>(
+            <g key={p.dia}>
+              <text x={xFor(p.dia)} y={H-padB+18} textAnchor="middle" fontSize="9" fill={hover===p.dia?C.black:C.gray500} fontWeight={hover===p.dia?700:400}>{p.dia}</text>
+              <text x={xFor(p.dia)} y={H-padB+30} textAnchor="middle" fontSize="8" fill={p.dow===0||p.dow===6?C.gray300:C.gray400}>{WD[p.dow]}</text>
+            </g>
+          ))}
+          {/* área gradiente do realizado */}
+          {realArea&&<polygon points={realArea} fill="url(#gradReal)"/>}
+          {/* linha previsão média (tracejada) */}
+          <polyline points={line("mediaAcc")} fill="none" stroke={COR.media} strokeWidth="2" strokeDasharray="5 4" strokeLinejoin="round"/>
+          {/* linha previsão vencimento */}
+          <polyline points={line("vAcc")} fill="none" stroke={COR.venc} strokeWidth="2" strokeLinejoin="round"/>
+          {/* linha faturamento realizado (destacada) */}
+          {realLine&&<polyline points={realLine} fill="none" stroke={COR.real} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round"/>}
+          {/* guia + pontos no hover */}
+          {hp&&<>
+            <line x1={xFor(hp.dia)} y1={padT} x2={xFor(hp.dia)} y2={padT+plotH} stroke={C.gray300} strokeWidth="1" strokeDasharray="3 3"/>
+            <circle cx={xFor(hp.dia)} cy={yFor(hp.vAcc)} r="4" fill={COR.venc}/>
+            <circle cx={xFor(hp.dia)} cy={yFor(hp.mediaAcc)} r="4" fill={COR.media}/>
+            {hp.rAcc!=null&&<circle cx={xFor(hp.dia)} cy={yFor(hp.rAcc)} r="5" fill={COR.real} stroke={C.white} strokeWidth="1.5"/>}
+          </>}
+        </svg>
+        {/* tooltip */}
+        {hp&&(
+          <div style={{position:"absolute",top:8,left:`${(xFor(hp.dia)/W)*100}%`,transform:`translateX(${xFor(hp.dia)>W*0.6?"-105%":"12px"})`,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",padding:"10px 12px",pointerEvents:"none",minWidth:210,zIndex:5}}>
+            <div style={{...F.title,fontSize:12,fontWeight:700,color:C.gray700,marginBottom:8}}>Dia {hp.dia} ({WD[hp.dow]})</div>
+            {[["Previsão venc. (dia)",hp.vDia,COR.venc],["Previsão venc. (acum.)",hp.vAcc,COR.venc],["Média fat. (dia)",hp.mediaDia,COR.media],["Média fat. (acum.)",hp.mediaAcc,COR.media],["Faturado no dia",hp.rDia,COR.real],["Faturado acum.",hp.rAcc,COR.real]].map(([l,v,c])=>(
+              <div key={l} style={{display:"flex",justifyContent:"space-between",gap:14,...F.body,fontSize:12,marginBottom:3}}>
+                <span style={{color:C.gray500,display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:8,height:8,borderRadius:2,background:c}}/>{l}</span>
+                <span style={{fontWeight:700,color:v==null?C.gray300:C.black}}>{v==null?"—":fmtR(v)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:10}}>
+        Média por dia útil: <strong style={{color:C.gray600}}>{fmtR(media)}</strong> ({data.diasUteisDecorridos} de {data.diasUteisMes} dias úteis) · passe o mouse no gráfico para ver os valores do dia.
+      </div>
+    </Card>
+  );
+}
+
+// Gráfico de barras horizontais (sem dependência externa)
+function GraficoBarrasH({itens,cor=C.red,corAtraso}){
+  const max=Math.max(1,...itens.map(i=>i.valor||0));
+  return(
+    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+      {itens.map((it,i)=>{
+        const pct=Math.max(2,((it.valor||0)/max)*100);
+        const pctAtr=it.atraso!=null&&it.valor?Math.min(pct,(it.atraso/max)*100):0;
+        return(
+          <div key={i}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:5,...F.body,fontSize:12,gap:8}}>
+              <span style={{fontWeight:600,color:C.gray700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{it.label}</span>
+              <span style={{fontWeight:700,color:C.black,whiteSpace:"nowrap",flexShrink:0}}>{it.texto}</span>
+            </div>
+            <div style={{height:12,background:C.gray100,borderRadius:7,overflow:"hidden",display:"flex"}}>
+              <div style={{height:"100%",width:`${pct}%`,background:cor,borderRadius:7,position:"relative"}}>
+                {pctAtr>0&&corAtraso&&<div style={{position:"absolute",right:0,top:0,height:"100%",width:`${(pctAtr/pct)*100}%`,background:corAtraso,borderRadius:"0 7px 7px 0"}}/>}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 // Opções de Centro de Custo (da propriedade do HubSpot)
 const CENTRO_OPTIONS=[
   {value:"27",label:"27 - Corporativo"},
@@ -1983,6 +2478,7 @@ const CENTRO_OPTIONS=[
 // Etapas em aberto, na ordem do funil, com endpoint
 const ABERTO_ETAPAS=[
   {nome:"Direcionamento",endpoint:"/direcionamento"},
+  {nome:"Separação",endpoint:"/separacao"},
   {nome:"Programação",endpoint:"/programacao"},
   {nome:"Amostra Digital",endpoint:"/amostra-digital"},
   {nome:"Aprovação de Amostra Digital",endpoint:"/aprovacao-amostra-digital"},
@@ -1994,16 +2490,49 @@ const ABERTO_ETAPAS=[
   {nome:"Faturamento",endpoint:"/faturamento"},
 ];
 
+// Painel de capacidade x lotação (peças com bordado em aberto) por destino
+function PainelLotacao({capLot,destinos,titulo}){
+  const cap=capLot.capacidade||{}, lot=capLot.lotacao||{};
+  const LBL={interno:"Interno",bordadel:"Bordadel",mg_bordados:"MG Bordados",outros:"Outros"};
+  const COR={interno:C.green,bordadel:C.red,mg_bordados:"#7c3aed",outros:C.amber};
+  return(
+    <Card>
+      <SecH>{titulo||"Capacidade x lotação (peças com bordado em aberto)"}</SecH>
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {destinos.map(d=>{
+          const c=Number(cap[d]||0), v=Number(lot[d]||0);
+          const pct=c>0?Math.min(100,(v/c)*100):(v>0?100:0);
+          const over=c>0&&v>c;
+          return(
+            <div key={d}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:5,...F.body,fontSize:12,gap:8}}>
+                <span style={{fontWeight:700,color:C.gray700,display:"inline-flex",alignItems:"center",gap:6}}><span style={{width:10,height:10,borderRadius:3,background:COR[d]}}/>{LBL[d]}</span>
+                <span style={{fontWeight:700,color:over?C.red:C.black,whiteSpace:"nowrap"}}>{v}{c>0?` / ${c} peças · ${Math.round((v/c)*100)}%`:" peças"}{over?" · LOTADO":""}</span>
+              </div>
+              <div style={{height:12,background:C.gray100,borderRadius:7,overflow:"hidden"}}>
+                <div style={{height:"100%",width:`${pct}%`,background:over?C.red:COR[d],borderRadius:7,transition:"width 0.3s"}}/>
+              </div>
+              {c===0&&<div style={{...F.body,fontSize:10,color:C.gray400,marginTop:3}}>Capacidade não definida — configure na aba SLA.</div>}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function Dashboard({onOpen,slaCfg}){
   const [grupo,setGrupo]=useState("aberto");   // aberto | finalizados
   const [centro,setCentro]=useState("");
   const [bordadoF,setBordadoF]=useState("");   // "" | com | sem
   const [statusF,setStatusF]=useState("todos");// todos | prazo | atraso
   const [busca,setBusca]=useState("");
-  const [aberto,setAberto]=useState(null);     // array de pedidos em aberto
   const [rel,setRel]=useState(null);           // relatórios de finalizados
-  const [loading,setLoading]=useState(true);
   const [erro,setErro]=useState("");
+  // Pedidos abertos vêm da fonte única (cache 20s no Worker, consistente entre telas)
+  const snap = useSnapshotAberto();
+  const aberto = useMemo(() => snapTodosPedidos(snap.data).map(o => normalizarCard(o, o.etapa)), [snap.data]);
+  const loading = snap.loading && !snap.data;
   // Intervalo de datas (default: mês atual)
   const hoje=new Date();
   const primeiroDia=new Date(hoje.getFullYear(),hoje.getMonth(),1).toISOString().slice(0,10);
@@ -2016,6 +2545,10 @@ function Dashboard({onOpen,slaCfg}){
   const [relProg,setRelProg]=useState(null);
   const [relProgLoading,setRelProgLoading]=useState(false);
   const [relProgAviso,setRelProgAviso]=useState("");
+  // Previsão de faturamento (mês atual)
+  const [prev,setPrev]=useState(null);
+  const [prevLoading,setPrevLoading]=useState(false);
+  const carregarPrev=()=>{ setPrevLoading(true); apiFetch("/previsao-faturamento").then(r=>{ if(r.success)setPrev(r); }).catch(()=>{}).finally(()=>setPrevLoading(false)); };
   const carregarRelProg=async()=>{
     setRelProgLoading(true);setRelProgAviso("");
     try{
@@ -2036,17 +2569,7 @@ function Dashboard({onOpen,slaCfg}){
     return p.length?"?"+p.join("&"):"";
   };
 
-  const carregar=async()=>{
-    setLoading(true);setErro("");
-    try{
-      const resultados=await Promise.all(
-        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
-      );
-      setAberto(prev=>mesclarEmAberto(prev,resultados));
-    }catch(e){setErro(e.message);}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{carregar();},[]);
+  const carregar = snap.refresh;
 
   // Carrega o relatório de finalizados.
   // Fonte dos FATURADOS: HubSpot (pedidos na etapa Faturado), data = entrada na etapa
@@ -2098,6 +2621,7 @@ function Dashboard({onOpen,slaCfg}){
   };
   useEffect(()=>{ if(grupo==="finalizados"&&!rel){ carregarRel(); } },[grupo]);
   useEffect(()=>{ if(grupo==="programacao"&&!relProg){ carregarRelProg(); } },[grupo]);
+  useEffect(()=>{ if(grupo==="previsao"&&!prev){ carregarPrev(); } },[grupo]);
 
   // Exporta todos os pedidos finalizados do período para Excel
   const exportarExcel=async()=>{
@@ -2151,10 +2675,11 @@ function Dashboard({onOpen,slaCfg}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
       <PageH title="Dashboard" sub="Visão geral de pedidos em aberto e finalizados" onRefresh={carregar} refreshing={loading}/>
+      {grupo==="aberto"&&<SnapStatus snap={snap}/>}
 
       {/* Alternância de grupo */}
       <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        {[["aberto","Pedidos em Aberto"],["finalizados","Pedidos Finalizados"],["programacao","Relatório de Programação"]].map(([id,lbl])=>(
+        {[["aberto","Pedidos em Aberto"],["finalizados","Pedidos Finalizados"],["programacao","Relatório de Programação"],["previsao","Previsão de Faturamento"]].map(([id,lbl])=>(
           <button key={id} onClick={()=>setGrupo(id)}
             style={{padding:"9px 18px",borderRadius:8,border:`1.5px solid ${grupo===id?C.red:C.gray200}`,background:grupo===id?C.red:C.white,color:grupo===id?C.white:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:700}}>
             {lbl}
@@ -2278,34 +2803,17 @@ function Dashboard({onOpen,slaCfg}){
           <Card>
             <SecH>SLA médio por etapa</SecH>
             {(!rel.slaPorEtapa||rel.slaPorEtapa.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Sem dados suficientes ainda. As médias aparecem conforme os pedidos são executados.</div>
-            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
-              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Etapa","Tempo médio","Execuções"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
-              <tbody>{rel.slaPorEtapa.map((s,i)=>(
-                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{s.etapa}</td>
-                  <td style={{padding:"8px 10px",fontWeight:700,color:C.black,...F.body}}>{fmtDur(s.mediaMin)}</td>
-                  <td style={{padding:"8px 10px",color:C.gray500,...F.body}}>{s.qtd}</td>
-                </tr>
-              ))}</tbody>
-            </table>}
+            :<GraficoBarrasH cor={C.amber} itens={rel.slaPorEtapa.map(s=>({label:s.etapa,valor:s.mediaMin,texto:`${fmtDur(s.mediaMin)} · ${s.qtd} exec`}))}/>}
           </Card>
 
           <Card>
             <SecH>Faturados por mês</SecH>
             {(!rel.faturadosPorMes||rel.faturadosPorMes.length===0)?<div style={{...F.body,color:C.gray400,fontSize:13}}>Nenhum pedido faturado registrado ainda.</div>
-            :<table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
-              <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Mês","Faturados","Em atraso","% atraso"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
-              <tbody>{rel.faturadosPorMes.map((m,i)=>{
-                const [y,mo]=m.mes.split("-");
-                const label=mo?`${mo}/${y}`:m.mes;
-                return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                  <td style={{padding:"8px 10px",fontWeight:600,...F.body}}>{label}</td>
-                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{m.total}</td>
-                  <td style={{padding:"8px 10px",color:m.atrasados>0?C.red:C.gray500,fontWeight:m.atrasados>0?700:400,...F.body}}>{m.atrasados}</td>
-                  <td style={{padding:"8px 10px",color:m.pctAtraso>20?C.red:C.gray600,...F.body}}>{m.pctAtraso}%</td>
-                </tr>);
-              })}</tbody>
-            </table>}
+            :<><GraficoBarrasH cor={C.green} corAtraso={C.red} itens={rel.faturadosPorMes.map(m=>{const [y,mo]=m.mes.split("-");return {label:mo?`${mo}/${y}`:m.mes,valor:m.total,atraso:m.atrasados,texto:`${m.total} faturados${m.atrasados>0?` · ${m.atrasados} em atraso`:""}`};})}/>
+              <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:10,display:"flex",alignItems:"center",gap:12}}>
+                <span style={{display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:10,height:10,borderRadius:3,background:C.green,display:"inline-block"}}/>Faturados</span>
+                <span style={{display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:10,height:10,borderRadius:3,background:C.red,display:"inline-block"}}/>Em atraso</span>
+              </div></>}
           </Card>
 
           <Card>
@@ -2322,7 +2830,7 @@ function Dashboard({onOpen,slaCfg}){
                       onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,marginBottom:6}}>
                         <div style={{minWidth:0}}>
-                          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{o.id}</div>
+                          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{idPedido(o)}</div>
                           <div style={{...F.body,fontSize:12,color:C.gray500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{o.client}</div>
                         </div>
                         <span style={{display:"inline-flex",alignItems:"center",background:C.green+"15",color:C.green,borderRadius:4,padding:"3px 9px",fontSize:11,fontWeight:700,...F.body,whiteSpace:"nowrap",flexShrink:0}}>FATURADO</span>
@@ -2357,6 +2865,10 @@ function Dashboard({onOpen,slaCfg}){
           <button onClick={carregarRelProg} disabled={relProgLoading}
             style={{padding:"9px 18px",borderRadius:8,border:"none",background:C.red,color:C.white,cursor:relProgLoading?"wait":"pointer",...F.body,fontSize:13,fontWeight:700}}>
             {relProgLoading?"Carregando...":"Atualizar"}
+          </button>
+          <button onClick={()=>baixarExcelProgramacao(relProg||[],de,ate)} disabled={!relProg||!relProg.length}
+            style={{padding:"9px 18px",borderRadius:8,border:`1.5px solid ${(!relProg||!relProg.length)?C.gray200:C.green}`,background:C.white,color:(!relProg||!relProg.length)?C.gray400:C.green,cursor:(!relProg||!relProg.length)?"not-allowed":"pointer",...F.body,fontSize:13,fontWeight:700,display:"inline-flex",alignItems:"center",gap:6}}>
+            <Ic n="download" s={14} c={(!relProg||!relProg.length)?C.gray400:C.green}/> Exportar
           </button>
         </div>
         {relProgAviso&&<div style={{padding:"10px 14px",background:C.amber+"12",border:`1px solid ${C.amber}40`,borderRadius:8,...F.body,fontSize:12.5,color:"#92400e",display:"flex",alignItems:"flex-start",gap:8}}>
@@ -2394,15 +2906,28 @@ function Dashboard({onOpen,slaCfg}){
               </div>}
         </Card>
       </>}
+
+      {grupo==="previsao"&&<>
+        {prevLoading&&!prev&&<Card><div style={{padding:24,textAlign:"center",...F.body,fontSize:13,color:C.gray500}}>Carregando previsão...</div></Card>}
+        {prev&&<>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:12}}>
+            <Stat label="Faturado no mês" value={fmtR(prev.totalFaturadoMes)} color={C.green} icon="dollar"/>
+            <Stat label="Previsão por vencimento (mês)" value={fmtR(Object.values(prev.vencimentoDia||{}).reduce((s,v)=>s+v,0))} color={C.red} icon="clock"/>
+            <Stat label="Média por dia útil" value={fmtR(prev.diasUteisDecorridos>0?prev.totalFaturadoMes/prev.diasUteisDecorridos:0)} color={C.amber} icon="chart"/>
+            <Stat label="Dias úteis" value={`${prev.diasUteisDecorridos}/${prev.diasUteisMes}`} icon="check"/>
+          </div>
+          <GraficoPrevisao data={prev}/>
+        </>}
+        <div style={{display:"flex",justifyContent:"flex-end"}}>
+          <button onClick={carregarPrev} disabled={prevLoading} style={{padding:"8px 16px",borderRadius:8,border:`1.5px solid ${C.gray200}`,background:C.white,color:C.gray600,cursor:prevLoading?"wait":"pointer",...F.body,fontSize:13,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6}}>
+            <Ic n="refresh" s={14} c={C.gray500}/> {prevLoading?"Atualizando...":"Atualizar"}
+          </button>
+        </div>
+      </>}
     </div>
   );
 }
-
-// ─── TODOS OS PEDIDOS (tela operacional: em aberto por fase) ──────────────────
 function TodosPedidos({onOpen,slaCfg,initialBusca}){
-  const [aberto,setAberto]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [erro,setErro]=useState("");
   const [busca,setBusca]=useState(initialBusca||"");
   // Atualiza a busca quando vier de uma notificação
   useEffect(()=>{ if(initialBusca)setBusca(initialBusca); },[initialBusca]);
@@ -2410,17 +2935,11 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
   const [bordadoF,setBordadoF]=useState("");    // "" | com | sem
   const [statusF,setStatusF]=useState("todos");  // todos | prazo | atraso
 
-  const carregar=async()=>{
-    setLoading(true);setErro("");
-    try{
-      const resultados=await Promise.all(
-        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
-      );
-      setAberto(prev=>mesclarEmAberto(prev,resultados));
-    }catch(e){setErro(e.message);}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{carregar();},[]);
+  const snap = useSnapshotAberto();
+  const aberto = useMemo(() => snapTodosPedidos(snap.data).map(o => normalizarCard(o, o.etapa)), [snap.data]);
+  const loading = snap.loading && !snap.data;
+  const erro = snap.error;
+  const carregar = snap.refresh;
 
   const agora=Date.now();
   const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
@@ -2447,7 +2966,8 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:16}}>
-      <PageH title="Todos os Pedidos" sub="Acompanhe em qual fase cada pedido em aberto está" onRefresh={carregar} refreshing={loading}/>
+      <PageH title="Pedidos em Aberto" sub="Acompanhe em qual fase cada pedido em aberto está" onRefresh={carregar} refreshing={loading}/>
+      <SnapStatus snap={snap}/>
 
       {/* Busca em destaque */}
       <div style={{position:"relative"}}>
@@ -2512,22 +3032,12 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
 
 // ─── FUNIL EM TEMPO REAL ──────────────────────────────────────────────────────
 function Funil({onOpen,slaCfg}){
-  const [aberto,setAberto]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [erro,setErro]=useState("");
   const [sel,setSel]=useState(null);
-
-  const carregar=async()=>{
-    setLoading(true);setErro("");
-    try{
-      const resultados=await Promise.all(
-        ABERTO_ETAPAS.map(e=>apiFetch(e.endpoint).then(r=>({nome:e.nome,items:(r.data||[]).map(o=>({...normalizarCard(o,e.nome),_grupo:e.nome}))})).catch(()=>({nome:e.nome,items:null})))
-      );
-      setAberto(prev=>mesclarEmAberto(prev,resultados));
-    }catch(e){setErro(e.message);}
-    finally{setLoading(false);}
-  };
-  useEffect(()=>{carregar();},[]);
+  const snap = useSnapshotAberto();
+  const aberto = useMemo(() => snapTodosPedidos(snap.data).map(o => normalizarCard(o, o.etapa)), [snap.data]);
+  const loading = snap.loading && !snap.data;
+  const erro = snap.error;
+  const carregar = snap.refresh;
 
   const agora=Date.now();
   const isAtrasado=o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora;
@@ -2548,6 +3058,7 @@ function Funil({onOpen,slaCfg}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
       <PageH title="Funil em Tempo Real" sub="Pedidos em aberto por etapa, com atrasos e valor" onRefresh={carregar} refreshing={loading}/>
+      <SnapStatus snap={snap}/>
 
       {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>Carregando do HubSpot...</div>}
       {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
@@ -2704,7 +3215,7 @@ function Historico({hist,onOpen}){
               <tr key={o.id} onClick={()=>onOpen(o)} style={{borderBottom:`1px solid ${C.gray100}`,cursor:"pointer"}}
                 onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
                 onMouseLeave={e=>e.currentTarget.style.background=C.white}>
-                <td style={{padding:"10px 14px",fontWeight:700,...F.body}}>{o.id}</td>
+                <td style={{padding:"10px 14px",fontWeight:700,...F.body}}>{idPedido(o)}</td>
                 <td style={{padding:"10px 14px",...F.body,color:C.gray700}}>{o.client}</td>
                 <td style={{padding:"10px 14px",...F.body,color:C.gray500}}>{o.vendedor}</td>
                 <td style={{padding:"10px 14px",fontWeight:700,...F.body,color:C.green}}>{fmtR(o.valor)}</td>
@@ -2781,6 +3292,12 @@ function SLAConfig({slaCfg,onSave}){
   const[local,setLocal]=useState({...slaCfg});
   const[prazoCom,setPrazoCom]=useState(15);
   const[prazoSem,setPrazoSem]=useState(7);
+  const[cap,setCap]=useState({interno:0,bordadel:0,mg_bordados:0,outros:0});
+  const[senhaExp,setSenhaExp]=useState("");
+  const[temSenhaExp,setTemSenhaExp]=useState(false);
+  const[feriados,setFeriados]=useState([]);
+  const[novoFeriado,setNovoFeriado]=useState("");
+  const[emit,setEmit]=useState({razaoSocial:"",cnpj:"",endereco:"",logoUrl:""});
   const[saved,setSaved]=useState(false);
   const[saving,setSaving]=useState(false);
   const[loading,setLoading]=useState(true);
@@ -2792,14 +3309,24 @@ function SLAConfig({slaCfg,onSave}){
         if(r.config.etapas)setLocal(prev=>({...prev,...r.config.etapas}));
         if(r.config.prazoComBordado!=null)setPrazoCom(r.config.prazoComBordado);
         if(r.config.prazoSemBordado!=null)setPrazoSem(r.config.prazoSemBordado);
+        if(r.config.capacidade)setCap(prev=>({...prev,...r.config.capacidade}));
+        setTemSenhaExp(!!r.config.temSenhaExpedicao);
+        if(Array.isArray(r.config.feriados))setFeriados(r.config.feriados);
+        if(r.config.emitente)setEmit(prev=>({...prev,...r.config.emitente}));
       }
     }).catch(()=>{}).finally(()=>setLoading(false));
   },[]);
 
+  const addFeriado=()=>{ const d=(novoFeriado||"").slice(0,10); if(!d) return; setFeriados(prev=>prev.includes(d)?prev:[...prev,d].sort()); setNovoFeriado(""); };
+  const removeFeriado=(d)=>setFeriados(prev=>prev.filter(x=>x!==d));
+
   const save=async()=>{
     setSaving(true);
     try{
-      await apiFetch("/config-sla","PATCH",{etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem)});
+      const payload={etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem),capacidade:{interno:Number(cap.interno||0),bordadel:Number(cap.bordadel||0),mg_bordados:Number(cap.mg_bordados||0),outros:Number(cap.outros||0)},feriados,emitente:emit};
+      if(senhaExp.trim()) payload.senhaDesbloqueioExpedicao=senhaExp.trim();
+      await apiFetch("/config-sla","PATCH",payload);
+      if(senhaExp.trim()){setTemSenhaExp(true);setSenhaExp("");}
       onSave(local);
       setSaved(true);setTimeout(()=>setSaved(false),2000);
     }catch(e){alert("Erro ao salvar: "+e.message);}
@@ -2808,7 +3335,7 @@ function SLAConfig({slaCfg,onSave}){
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
-      <PageH title="Configurar SLA" sub="Tempo máximo por etapa e prazos de vencimento dos pedidos"/>
+      <PageH title="Configurações" sub="Tempo máximo por etapa e prazos de vencimento dos pedidos"/>
 
       {/* Prazos de vencimento (data de vencimento do pedido) */}
       <Card>
@@ -2834,6 +3361,87 @@ function SLAConfig({slaCfg,onSave}){
             </div>
           </div>
         </div>
+      </Card>
+
+      {/* Capacidade produtiva por destino de bordado (em peças) */}
+      <Card>
+        <SecH>Capacidade produtiva (peças)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:16}}>
+          Volume máximo de <strong>peças com bordado em aberto</strong> que cada destino comporta. Usado para sugerir o direcionamento (prioridade: Interno → Bordadel → MG Bordados → Outros).
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:16}}>
+          {[["interno","Interno",C.green],["bordadel","Bordadel",C.red],["mg_bordados","MG Bordados","#7c3aed"],["outros","Outros",C.amber]].map(([k,lbl,cor])=>(
+            <div key={k}>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
+                <span style={{width:10,height:10,borderRadius:3,background:cor,display:"inline-block"}}/>
+                <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em"}}>{lbl}</label>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <input type="number" min="0" value={cap[k]} onChange={e=>setCap(prev=>({...prev,[k]:e.target.value}))}
+                  style={{width:90,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+                <span style={{...F.body,fontSize:12,color:C.gray400}}>peças</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Senha do cadeado de desbloqueio manual (Expedição) */}
+      <Card>
+        <SecH>Senha de desbloqueio da bipagem (Expedição)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:14}}>
+          Senha do <strong>cadeado</strong> na conferência da Expedição. Quem tiver a senha consegue informar a quantidade conferida manualmente por produto, caso o leitor falhe. {temSenhaExp
+            ? <span style={{color:C.green,fontWeight:600}}>✓ Senha configurada.</span>
+            : <span style={{color:C.amber,fontWeight:600}}>Nenhuma senha definida ainda — o desbloqueio manual fica indisponível até definir uma.</span>}
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          <input type="password" value={senhaExp} onChange={e=>setSenhaExp(e.target.value)} placeholder={temSenhaExp?"Digite para alterar a senha":"Defina uma senha"}
+            style={{width:260,maxWidth:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none"}}/>
+          <span style={{...F.body,fontSize:11,color:C.gray400}}>Deixe em branco para manter a atual.</span>
+        </div>
+      </Card>
+
+      {/* Feriados (para dias úteis na Previsão de Faturamento) */}
+      <Card>
+        <SecH>Feriados</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:14}}>
+          Datas consideradas <strong>não úteis</strong> no cálculo da Previsão de Faturamento (média por dia útil). Fins de semana já são excluídos automaticamente.
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+          <input type="date" value={novoFeriado} onChange={e=>setNovoFeriado(e.target.value)}
+            style={{border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"8px 12px",...F.body,fontSize:13,outline:"none"}}/>
+          <button onClick={addFeriado} style={{background:C.green,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",cursor:"pointer",fontWeight:700,fontSize:13,...F.body,display:"flex",alignItems:"center",gap:6}}>
+            <Ic n="check" s={14} c={C.white}/> Adicionar
+          </button>
+        </div>
+        {feriados.length===0
+          ?<div style={{...F.body,fontSize:13,color:C.gray400}}>Nenhum feriado cadastrado.</div>
+          :<div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {feriados.map(d=>(
+              <span key={d} style={{display:"inline-flex",alignItems:"center",gap:8,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:20,padding:"6px 8px 6px 14px",...F.body,fontSize:13,fontWeight:600,color:C.gray700}}>
+                {d.split("-").reverse().join("/")}
+                <button onClick={()=>removeFeriado(d)} title="Remover" style={{background:C.red+"14",color:C.red,border:"none",borderRadius:"50%",width:20,height:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,lineHeight:1}}>×</button>
+              </span>
+            ))}
+          </div>}
+      </Card>
+
+      {/* Dados da Citerol (emitente) para a Impressão de Pedido */}
+      <Card>
+        <SecH>Dados da Citerol (cabeçalho da impressão)</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:16}}>
+          Aparecem no topo de cada folha de separação. Os dados do cliente saem automaticamente do próprio pedido.
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
+          {[["razaoSocial","Razão social"],["cnpj","CNPJ"],["endereco","Endereço"],["logoUrl","URL do logo (opcional)"]].map(([k,l])=>(
+            <div key={k} style={k==="endereco"||k==="logoUrl"?{gridColumn:"1 / -1"}:{}}>
+              <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:6}}>{l}</label>
+              <input value={emit[k]||""} onChange={e=>setEmit(prev=>({...prev,[k]:e.target.value}))} placeholder={k==="logoUrl"?"https://...":""}
+                style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+            </div>
+          ))}
+        </div>
+        {emit.logoUrl&&<div style={{marginTop:12}}><img src={emit.logoUrl} alt="logo" style={{height:44,objectFit:"contain"}}/></div>}
       </Card>
 
       {/* Tempo por etapa */}
@@ -2867,7 +3475,7 @@ function SLAConfig({slaCfg,onSave}){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado}){
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra}){
   const [loading,setLoading]=useState(false);
   const [hsData,setHsData]=useState(null);
   const [loadError,setLoadError]=useState(null);
@@ -2901,6 +3509,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             items:(o.items||[]).map(it=>({
               id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
               qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
+              bordador:(it.bordadorExterno||"").toLowerCase(),
               status:"separado",
             })),
             timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
@@ -2939,6 +3548,11 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     });
   }
 
+  // Filtro por bordador externo (só usado na aba Externo)
+  if(filtroBordador&&filtroBordador!=="todos"){
+    mine=mine.filter(o=>(o.items||[]).some(it=>(it.bordador||"")===filtroBordador));
+  }
+
   // Ordena por PRIORIDADE (data de vencimento mais próxima primeiro)
   mine=ordenarPorPrioridade(mine);
 
@@ -2957,6 +3571,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
   return(
     <div style={{padding:24}}>
       <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}`} onRefresh={carregar} refreshing={loading}/>
+
+      {topoExtra}
 
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
@@ -2997,7 +3613,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}}>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
-                    <span style={{...F.body,fontWeight:700,fontSize:14}}>{o.id}</span>
+                    <span style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</span>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
                     {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
@@ -3137,7 +3753,7 @@ function Usuarios(){
   };
   useEffect(carregar,[]);
 
-  const GRUPOS=["Principal","Análise","Operações","Sistema"];
+  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
 
   const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
   const toggleGrupo=(grupo)=>{
@@ -3415,8 +4031,686 @@ class ErrorBoundary extends Component {
 let _refreshListeners=[];
 function triggerRefresh(){ _refreshListeners.forEach(fn=>fn()); }
 
+// Página de Bordado Externo: gráfico de lotação por bordador + filtro + fila
+function BordadoExternoPage({orders,onOpen,slaCfg}){
+  const [capLot,setCapLot]=useState({capacidade:{},lotacao:{}});
+  const [filtro,setFiltro]=useState("todos");
+  useEffect(()=>{
+    const load=()=>apiFetch("/capacidade-lotacao").then(r=>{if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}});}).catch(()=>{});
+    load();
+    _refreshListeners.push(load);
+    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==load);};
+  },[]);
+  const FILT=[["todos","Todos",C.gray600],["bordadel","Bordadel",C.red],["mg_bordados","MG Bordados","#7c3aed"],["outros","Outros",C.amber]];
+  const topoExtra=(
+    <div style={{marginBottom:16,display:"flex",flexDirection:"column",gap:12}}>
+      <PainelLotacao capLot={capLot} destinos={["bordadel","mg_bordados","outros"]} titulo="Lotação dos bordadores externos (peças em aberto)"/>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+        <span style={{...F.body,fontSize:12,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.05em",marginRight:2}}>Bordador:</span>
+        {FILT.map(([id,lbl,cor])=>(
+          <button key={id} onClick={()=>setFiltro(id)}
+            style={{padding:"7px 13px",borderRadius:7,border:`1.5px solid ${filtro===id?cor:C.gray200}`,background:filtro===id?cor+"12":C.white,cursor:"pointer",...F.body,fontSize:12,fontWeight:filtro===id?700:500,color:filtro===id?cor:C.gray600}}>
+            {lbl}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+  return <Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={onOpen} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg} filtroBordador={filtro} topoExtra={topoExtra}/>;
+}
+
+// ─── CADASTRO DE CÓDIGOS DE BARRA ─────────────────────────────────────────────
+function CodigosBarra({user}){
+  const [busca,setBusca]=useState("");
+  const [buscaAtiva,setBuscaAtiva]=useState("");
+  const [page,setPage]=useState(0);
+  const [data,setData]=useState([]);
+  const [total,setTotal]=useState(0);
+  const [loading,setLoading]=useState(false);
+  const [erro,setErro]=useState("");
+  const [form,setForm]=useState({codigo_barra:"",produto:"",grade:""});
+  const [saving,setSaving]=useState(false);
+  const [msg,setMsg]=useState(null); // {tipo:"ok"|"err", texto}
+  const LIMIT=50;
+
+  const carregar=()=>{
+    setLoading(true);setErro("");
+    const qs=`?busca=${encodeURIComponent(buscaAtiva)}&page=${page}&limit=${LIMIT}`;
+    apiFetch("/codigos"+qs)
+      .then(r=>{ if(r.success){setData(r.data||[]);setTotal(r.total||0);} else setErro(r.error||"Erro ao carregar."); })
+      .catch(e=>setErro(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[buscaAtiva,page]);
+
+  const fazerBusca=()=>{ setPage(0); setBuscaAtiva(busca.trim()); };
+  const cadastrar=async()=>{
+    const codigo=form.codigo_barra.trim(), produto=form.produto.trim(), grade=form.grade.trim();
+    if(!codigo){setMsg({tipo:"err",texto:"Informe o código de barra."});return;}
+    if(!produto){setMsg({tipo:"err",texto:"Informe o produto."});return;}
+    setSaving(true);setMsg(null);
+    try{
+      const r=await apiFetch("/codigos","POST",{codigo_barra:codigo,produto,grade,criadoPor:user?.email||user?.nome||""});
+      if(r.error) throw new Error(r.error);
+      setMsg({tipo:"ok",texto:`Código ${codigo} cadastrado.`});
+      setForm({codigo_barra:"",produto:"",grade:""});
+      if(page===0&&!buscaAtiva) carregar(); else {setPage(0);setBuscaAtiva("");}
+    }catch(e){ setMsg({tipo:"err",texto:e.message}); }
+    finally{ setSaving(false); }
+  };
+
+  const totalPages=Math.max(1,Math.ceil(total/LIMIT));
+  const inp={width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"};
+
+  return(
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <PageH title="Códigos de Barra" sub={`${total.toLocaleString("pt-BR")} códigos cadastrados`} onRefresh={carregar} refreshing={loading}/>
+
+      {/* Cadastro de novo código */}
+      <Card>
+        <SecH>Cadastrar novo código</SecH>
+        <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr 0.7fr auto",gap:10,alignItems:"end",flexWrap:"wrap"}}>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Código de barra</label>
+            <input value={form.codigo_barra} onChange={e=>setForm(f=>({...f,codigo_barra:e.target.value}))} placeholder="o que o leitor lê" style={inp}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Produto</label>
+            <input value={form.produto} onChange={e=>setForm(f=>({...f,produto:e.target.value}))} placeholder="ex.: 01.02.0051" style={inp}/>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",display:"block",marginBottom:5}}>Grade</label>
+            <input value={form.grade} onChange={e=>setForm(f=>({...f,grade:e.target.value}))} placeholder="ex.: 43" style={inp}/>
+          </div>
+          <button onClick={cadastrar} disabled={saving}
+            style={{background:saving?C.gray300:C.green,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:saving?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
+            <Ic n="check" s={14} c={C.white}/>{saving?"Salvando...":"Cadastrar"}
+          </button>
+        </div>
+        {msg&&<div style={{marginTop:12,...F.body,fontSize:13,fontWeight:600,color:msg.tipo==="ok"?C.green:C.red,display:"flex",alignItems:"center",gap:6}}>
+          <Ic n={msg.tipo==="ok"?"check":"warn"} s={14} c={msg.tipo==="ok"?C.green:C.red}/>{msg.texto}
+        </div>}
+      </Card>
+
+      {/* Lista / busca */}
+      <Card>
+        <div style={{display:"flex",gap:10,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
+          <div style={{position:"relative",flex:1,minWidth:220}}>
+            <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+            <input value={busca} onChange={e=>setBusca(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")fazerBusca();}}
+              placeholder="Buscar por código, produto ou grade..." style={{...inp,paddingLeft:36}}/>
+          </div>
+          <button onClick={fazerBusca} style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 18px",cursor:"pointer",fontWeight:700,fontSize:13,...F.body}}>Buscar</button>
+          {buscaAtiva&&<button onClick={()=>{setBusca("");setBuscaAtiva("");setPage(0);}} style={{background:C.white,color:C.gray600,border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 14px",cursor:"pointer",fontSize:13,...F.body}}>Limpar</button>}
+        </div>
+
+        {erro&&<div style={{...F.body,fontSize:13,color:C.red,marginBottom:10}}><Ic n="warn" s={14} c={C.red}/> {erro}</div>}
+
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",fontSize:13,borderCollapse:"collapse"}}>
+            <thead><tr style={{borderBottom:`1px solid ${C.gray200}`}}>{["Código de barra","Produto","Grade","Cadastrado"].map(h=><th key={h} style={{padding:"8px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body}}>{h}</th>)}</tr></thead>
+            <tbody>
+              {data.length===0&&!loading&&<tr><td colSpan={4} style={{padding:"18px 10px",...F.body,color:C.gray400,fontSize:13}}>{buscaAtiva?"Nenhum código encontrado para a busca.":"Nenhum código cadastrado ainda."}</td></tr>}
+              {data.map((r,i)=>(
+                <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                  <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,color:C.gray800}}>{r.codigo_barra}</td>
+                  <td style={{padding:"8px 10px",...F.body,fontWeight:600}}>{r.produto}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray600}}>{r.grade||"—"}</td>
+                  <td style={{padding:"8px 10px",...F.body,color:C.gray400,fontSize:11}}>{r.criado_em?new Date(r.criado_em).toLocaleDateString("pt-BR"):"—"}{r.criado_por?` · ${r.criado_por}`:""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Paginação */}
+        {total>LIMIT&&<div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:14,...F.body,fontSize:13,color:C.gray600}}>
+          <span>Página {page+1} de {totalPages.toLocaleString("pt-BR")}</span>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={()=>setPage(p=>Math.max(0,p-1))} disabled={page===0}
+              style={{background:C.white,color:page===0?C.gray300:C.gray700,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"6px 14px",cursor:page===0?"not-allowed":"pointer",fontSize:13,...F.body}}>Anterior</button>
+            <button onClick={()=>setPage(p=>(p+1<totalPages?p+1:p))} disabled={page+1>=totalPages}
+              style={{background:C.white,color:page+1>=totalPages?C.gray300:C.gray700,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"6px 14px",cursor:page+1>=totalPages?"not-allowed":"pointer",fontSize:13,...F.body}}>Próxima</button>
+          </div>
+        </div>}
+      </Card>
+    </div>
+  );
+}
+
+// ─── IMPRESSÃO DE PEDIDO (folha de separação) ────────────────────────────────
+function Folha({emit,o,fmtDt}){
+  const totalPecas=(o.produtos||[]).reduce((s,p)=>s+p.total,0);
+  return(
+    <div className="folha-print" style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 2px 12px rgba(0,0,0,0.08)",width:"100%",maxWidth:820,padding:32,boxSizing:"border-box"}}>
+      <div style={{display:"flex",alignItems:"center",gap:16,borderBottom:`2px solid ${C.gray300}`,paddingBottom:14,marginBottom:14}}>
+        {emit.logoUrl
+          ?<img src={emit.logoUrl} alt="" style={{height:48,objectFit:"contain"}}/>
+          :<div style={{...F.title,fontSize:20,fontWeight:800,color:C.red,whiteSpace:"nowrap"}}>{emit.razaoSocial||"CITEROL"}</div>}
+        <div style={{flex:1,minWidth:0}}>
+          {emit.logoUrl&&<div style={{...F.title,fontSize:15,fontWeight:800,color:C.black}}>{emit.razaoSocial}</div>}
+          {emit.cnpj&&<div style={{...F.body,fontSize:11,color:C.gray600}}>CNPJ: {emit.cnpj}</div>}
+          {emit.endereco&&<div style={{...F.body,fontSize:11,color:C.gray600}}>{emit.endereco}</div>}
+        </div>
+        <div style={{textAlign:"right",flexShrink:0}}>
+          <div style={{...F.title,fontSize:10,fontWeight:700,color:C.gray500,letterSpacing:"0.1em"}}>FOLHA DE SEPARAÇÃO</div>
+          <div style={{...F.title,fontSize:18,fontWeight:800,color:C.black}}>
+            {o.pedidoLinx ? <>Pedido {o.pedidoLinx} <span style={{fontSize:12,color:C.gray500,fontWeight:600}}>| {o.pedido}</span></> : <>Pedido {o.pedido}</>}
+          </div>
+          {o.data&&<div style={{...F.body,fontSize:11,color:C.gray500}}>{fmtDt(o.data)}</div>}
+        </div>
+      </div>
+      <div style={{background:C.gray50,borderRadius:8,padding:"10px 14px",marginBottom:16}}>
+        <span style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Cliente: </span>
+        <span style={{...F.body,fontSize:14,fontWeight:700,color:C.black}}>{o.cliente||"—"}</span>
+        {(o.cnpj||o.endereco)&&<div style={{...F.body,fontSize:11,color:C.gray600,marginTop:2}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.endereco?(o.cnpj?" · ":"")+o.endereco:""}</div>}
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {(o.produtos||[]).map((p,i)=>(
+          <div key={i} className="produto-row" style={{display:"flex",gap:14,alignItems:"center",border:`1px solid ${C.gray200}`,borderRadius:8,padding:10}}>
+            <div style={{width:84,height:84,border:`1px solid ${C.gray200}`,borderRadius:6,background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",flexShrink:0}}>
+              {p.foto?<img src={p.foto} alt="" style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<span style={{...F.body,fontSize:9,color:C.gray400}}>sem foto</span>}
+            </div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,fontFamily:"monospace"}}>{p.sku}</div>
+              <div style={{...F.title,fontSize:15,fontWeight:800,color:C.black,marginBottom:5,lineHeight:1.15}}>{p.nome}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {p.grades.map((g,j)=>(
+                  <span key={j} style={{...F.body,fontSize:12,fontWeight:600,background:C.gray100,borderRadius:5,padding:"2px 9px"}}>{g.tamanho||"—"}: <strong>{g.qtd}</strong></span>
+                ))}
+              </div>
+            </div>
+            <div style={{textAlign:"center",flexShrink:0,paddingLeft:10,borderLeft:`1px solid ${C.gray200}`}}>
+              <div style={{...F.body,fontSize:9,color:C.gray400,fontWeight:700}}>TOTAL</div>
+              <div style={{...F.title,fontSize:22,fontWeight:800,color:C.red}}>{p.total}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{marginTop:14,paddingTop:10,borderTop:`2px solid ${C.gray300}`,display:"flex",justifyContent:"space-between",...F.body,fontSize:13,fontWeight:700}}>
+        <span>{(o.produtos||[]).length} produto(s)</span>
+        <span style={{color:C.red}}>Total de peças: {totalPecas}</span>
+      </div>
+    </div>
+  );
+}
+
+function ImpressaoPedido({user}){
+  const [modo,setModo]=useState("data");
+  const hoje=new Date().toISOString().slice(0,10);
+  const [de,setDe]=useState(hoje),[ate,setAte]=useState(hoje);
+  const [pedido,setPedido]=useState("");
+  const [resp,setResp]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [erro,setErro]=useState("");
+
+  const buscar=()=>{
+    setLoading(true);setErro("");setResp(null);
+    const qs=modo==="pedido"?`?pedido=${encodeURIComponent(pedido.trim())}`:`?de=${de}&ate=${ate}`;
+    apiFetch("/impressao"+qs).then(r=>{ if(r.success)setResp(r); else setErro(r.error||"Erro ao buscar."); }).catch(e=>setErro(e.message)).finally(()=>setLoading(false));
+  };
+
+  const emit=resp?.emitente||{};
+  const orders=resp?.data||[];
+  const fmtDt=(d)=>d?new Date(d).toLocaleDateString("pt-BR"):"";
+  const inp={border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"9px 12px",...F.body,fontSize:13,outline:"none"};
+  const lbl={...F.body,fontSize:11,fontWeight:700,color:C.gray500,display:"block",marginBottom:4};
+
+  return(
+    <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
+      <div className="no-print"><PageH title="Impressão de Pedido" sub="Folha de separação — uma página por pedido, com foto dos produtos"/></div>
+
+      <div className="no-print"><Card>
+        <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+          {[["data","Por intervalo de datas"],["pedido","Por nº do pedido"]].map(([id,l])=>(
+            <button key={id} onClick={()=>setModo(id)} style={{padding:"7px 14px",borderRadius:7,border:`1.5px solid ${modo===id?C.red:C.gray200}`,background:modo===id?C.red+"10":C.white,color:modo===id?C.red:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:modo===id?700:500}}>{l}</button>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:10,alignItems:"flex-end",flexWrap:"wrap"}}>
+          {modo==="data"?<>
+            <div><label style={lbl}>De</label><input type="date" value={de} onChange={e=>setDe(e.target.value)} style={inp}/></div>
+            <div><label style={lbl}>Até</label><input type="date" value={ate} onChange={e=>setAte(e.target.value)} style={inp}/></div>
+          </>:(
+            <div style={{flex:1,minWidth:220}}><label style={lbl}>Número do pedido</label>
+              <input value={pedido} onChange={e=>setPedido(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")buscar();}} placeholder="ex.: 61293153208" style={{...inp,width:"100%",boxSizing:"border-box"}}/>
+            </div>
+          )}
+          <button onClick={buscar} disabled={loading} style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:loading?"wait":"pointer",fontWeight:700,fontSize:13,...F.body}}>{loading?"Buscando...":"Buscar"}</button>
+          {orders.length>0&&<button onClick={()=>window.print()} style={{background:C.green,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:"pointer",fontWeight:700,fontSize:13,...F.body,display:"inline-flex",alignItems:"center",gap:7}}>
+            <Ic n="print" s={15} c={C.white}/> Imprimir / PDF ({orders.length} pedido{orders.length!==1?"s":""})
+          </button>}
+        </div>
+        {erro&&<div style={{marginTop:12,...F.body,fontSize:13,color:C.red,display:"flex",alignItems:"center",gap:6}}><Ic n="warn" s={14} c={C.red}/>{erro}</div>}
+        {resp&&orders.length===0&&<div style={{marginTop:12,...F.body,fontSize:13,color:C.gray500}}>Nenhum pedido encontrado para o filtro.</div>}
+        {resp&&orders.length>0&&!emit.razaoSocial&&<div style={{marginTop:12,padding:"9px 12px",background:C.amber+"12",border:`1px solid ${C.amber}40`,borderRadius:7,...F.body,fontSize:12,color:"#8a5a00"}}>Dica: configure os dados da Citerol (emitente) em <strong>Configurações</strong> para aparecerem no cabeçalho.</div>}
+        {resp&&orders.length>0&&<div style={{marginTop:12,...F.body,fontSize:12,color:C.gray500}}>{orders.length} pedido(s) — uma folha cada (quebra pra 2ª folha só se não couber). Confira a pré-visualização e clique em Imprimir.</div>}
+      </Card></div>
+
+      {orders.length>0&&<div className="print-area" style={{display:"flex",flexDirection:"column",gap:18,alignItems:"center"}}>
+        {orders.map((o,i)=><Folha key={i} emit={emit} o={o} fmtDt={fmtDt}/>)}
+      </div>}
+
+      <style>{`@media print {
+        body * { visibility: hidden !important; }
+        .print-area, .print-area * { visibility: visible !important; }
+        .print-area { position: absolute; left: 0; top: 0; width: 100%; gap: 0 !important; }
+        .no-print { display: none !important; }
+        .folha-print { box-shadow: none !important; border: none !important; border-radius: 0 !important; max-width: 100% !important; page-break-after: always; }
+        .produto-row { page-break-inside: avoid; }
+      }`}</style>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MÓDULOS DE ANÁLISE (Painel de Fluxo · Gestão à Vista · Pedidos em Risco)
+// Aditivos. Consomem os endpoints /painel-fluxo, /gestao-vista, /pedidos-risco.
+// ═══════════════════════════════════════════════════════════════════════════
+const _f1 = n => (n==null||isNaN(n)) ? "—" : (Math.round(n*10)/10).toString().replace(".",",");
+const _iso = d => d.toISOString().slice(0,10);
+
+// "?" com explicação (O que é / Como se calcula)
+function Ajuda({oq,como}){
+  const [open,setOpen]=useState(false);
+  return (
+    <span style={{position:"relative",display:"inline-flex",verticalAlign:"middle"}}>
+      <button onClick={e=>{e.stopPropagation();setOpen(o=>!o);}}
+        onMouseEnter={()=>setOpen(true)} onMouseLeave={()=>setOpen(false)}
+        style={{width:16,height:16,borderRadius:"50%",border:`1.4px solid ${C.gray400}`,background:"transparent",
+          color:C.gray500,fontSize:10,fontWeight:700,lineHeight:1,cursor:"pointer",display:"inline-flex",
+          alignItems:"center",justifyContent:"center",padding:0,flex:"0 0 auto"}}>?</button>
+      {open&&<span style={{position:"absolute",top:22,left:"50%",transform:"translateX(-50%)",width:230,
+        background:C.white,border:`1px solid ${C.gray200}`,borderRadius:10,boxShadow:"0 10px 30px rgba(0,0,0,.16)",
+        padding:"10px 11px",zIndex:50,fontSize:12,lineHeight:1.5,color:C.gray700,textAlign:"left",fontWeight:400,
+        textTransform:"none",letterSpacing:0,...F.body}}>
+        <div style={{marginBottom:5}}><b style={{color:C.black}}>O que é:</b> {oq}</div>
+        <div><b style={{color:C.black}}>Como se calcula:</b> {como}</div>
+      </span>}
+    </span>
+  );
+}
+function CabecalhoAnalise({titulo,sub,corBarra}){
+  return (
+    <div style={{padding:"4px 2px 14px"}}>
+      <div style={{...F.title,fontSize:11,letterSpacing:"0.14em",color:C.gray500,fontWeight:600}}>SGP · CITEROL</div>
+      <h1 style={{...F.title,fontSize:25,fontWeight:700,margin:"3px 0 0"}}>{titulo}</h1>
+      <div style={{width:42,height:4,background:corBarra||C.red,borderRadius:3,marginTop:8}}/>
+      {sub&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:8,maxWidth:640}}>{sub}</div>}
+    </div>
+  );
+}
+function EstadoCarga({loading,erro,onRetry,vazio,vazioTxt}){
+  if(loading) return <div style={{...F.body,textAlign:"center",color:C.gray500,padding:"60px 0"}}>Carregando…</div>;
+  if(erro) return <div style={{...F.body,textAlign:"center",color:C.red,padding:"50px 0"}}>
+    Não foi possível carregar. <button onClick={onRetry} style={{marginLeft:8,...F.body,color:C.red,textDecoration:"underline",background:"none",border:"none",cursor:"pointer"}}>tentar de novo</button></div>;
+  if(vazio) return <div style={{...F.body,textAlign:"center",color:C.gray500,padding:"50px 0"}}>{vazioTxt||"Nada por aqui."}</div>;
+  return null;
+}
+const cardBox = {background:C.white,border:`1px solid ${C.gray200}`,borderRadius:15,padding:16,boxShadow:"0 1px 3px rgba(0,0,0,.04)"};
+
+// ─── PAINEL DE FLUXO ─────────────────────────────────────────────────────────
+function PainelFluxo(){
+  const isMobile=useIsMobile();
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const [de,setDe]=useState(_iso(new Date(hoje.getFullYear(),hoje.getMonth(),1)));
+  const [ate,setAte]=useState(_iso(hoje));
+  const [d,setD]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState(false);
+  const [relSel,setRelSel]=useState("");
+  const [cfdHover,setCfdHover]=useState(null);
+  const carregar=()=>{setLoading(true);setErro(false);
+    apiFetch(`/painel-fluxo?de=${de}&ate=${ate}`).then(r=>{setD(r);setLoading(false);
+      if(r.pedidos&&r.pedidos.length&&!relSel)setRelSel(String(r.pedidos[0].id));
+    }).catch(()=>{setErro(true);setLoading(false);});};
+  useEffect(carregar,[de,ate]);
+
+  return (
+    <div style={{padding:isMobile?14:"18px 22px",maxWidth:1180,margin:"0 auto"}}>
+      <CabecalhoAnalise titulo="Painel de Fluxo" sub="Indicadores do fluxo de produção. Toque no ? em cada medida pra ver o que é e como é calculada."/>
+      {/* filtro */}
+      <div style={{...cardBox,display:"flex",alignItems:"flex-end",gap:10,flexWrap:"wrap",marginBottom:14}}>
+        <div><label style={lblFiltro}>De</label><input type="date" value={de} onChange={e=>setDe(e.target.value)} style={inpFiltro}/></div>
+        <div><label style={lblFiltro}>Até</label><input type="date" value={ate} onChange={e=>setAte(e.target.value)} style={inpFiltro}/></div>
+        {d&&<div style={{marginLeft:"auto",...F.body,fontSize:11.5,color:C.gray600,fontWeight:600,textAlign:"right"}}>
+          Período analisado:<br/><b style={{color:C.black}}>{brData(d.periodo.de)}</b> a <b style={{color:C.black}}>{brData(d.periodo.ate)}</b> · <b style={{color:C.black}}>{d.periodo.n}</b> faturados</div>}
+      </div>
+      <EstadoCarga loading={loading} erro={erro} onRetry={carregar}/>
+      {d&&!loading&&!erro&&<>
+        {/* KPIs */}
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
+          <Kpi lab="Lead Time" val={_f1(d.leadMedio)} un=" dias" sub="tempo de atravessamento médio" subCor={C.green}
+            oq="Tempo total do pedido, do início (orçamento aprovado) ao faturamento." como="Média, no período, de (faturamento − criação) dos pedidos faturados."/>
+          <Kpi lab="OTIF" val={d.otif} un="%" sub="no prazo e completo · meta 90%"
+            oq="Percentual de pedidos entregues no prazo E completos." como="(faturados até o vencimento E completos) ÷ total faturado no período."/>
+          <Kpi lab="Vazão" val={d.vazao} un=" ped." sub="faturados nos últimos 7 dias"
+            oq="Quantos pedidos ficam prontos por período." como="Contagem de pedidos faturados nos últimos 7 dias."/>
+          <Kpi lab="WIP" val={d.wipTotal} un=" ped." sub="em aberto agora"
+            oq="Trabalho em progresso: pedidos em andamento." como="Pedidos em qualquer etapa, exceto Faturado."/>
+        </div>
+        {/* gargalo */}
+        <div style={{...cardBox,background:"linear-gradient(180deg,#fff,#fdf4f4)",borderColor:"#9E0B0F33",marginBottom:14}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+            <span style={{...F.title,display:"inline-flex",alignItems:"center",gap:6,background:C.red,color:"#fff",
+              fontSize:11,fontWeight:600,padding:"5px 11px",borderRadius:20,letterSpacing:"0.07em"}}>● GARGALO</span>
+            <Ajuda oq="A etapa que mais represa o fluxo." como="Etapa com maior combinação de WIP e envelhecimento da fila."/>
+          </div>
+          <div style={{...F.title,fontSize:23,fontWeight:700,marginTop:10}}>{d.gargalo.nm}</div>
+          <div style={{display:"flex",gap:20,marginTop:6}}>
+            <div><b style={{...F.title,fontSize:19,color:C.red}}>{d.gargalo.n}</b><span style={{display:"block",...F.body,fontSize:11,color:C.gray600}}>na fila</span></div>
+            <div><b style={{...F.title,fontSize:19,color:C.red}}>{d.gargalo.age} d</b><span style={{display:"block",...F.body,fontSize:11,color:C.gray600}}>mais antigo</span></div>
+          </div>
+        </div>
+        {/* cycle + wip */}
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:14,marginBottom:14}}>
+          <div style={cardBox}>
+            <TituloCard texto="Tempo por etapa (Cycle Time)" oq="Quanto tempo o pedido fica em média em cada etapa." como="Média de (saída − entrada) por etapa, pelos marcos de cada estágio."/>
+            <div style={{...F.body,fontSize:11.5,color:C.gray500,margin:"2px 0 12px"}}>Dias médios em cada etapa.</div>
+            {(d.cycleTime||[]).length? d.cycleTime.map((c,i)=>{
+              const mx=Math.max(...d.cycleTime.map(x=>x.dias),0.1);const peak=c.dias===mx;
+              return <BarLinha key={i} nm={c.nm} pct={c.dias/mx*100} txt={_f1(c.dias)+"d"} cor={peak?C.red:C.gray400}/>;
+            }):<Vazio/>}
+          </div>
+          <div style={cardBox}>
+            <TituloCard texto="WIP por etapa" oq="O WIP separado por etapa, com o envelhecimento do mais antigo." como="Conta os pedidos em cada etapa; envelhecimento = dias desde a entrada do mais antigo." extra={d.wipTotal+" em aberto"}/>
+            {(d.wipPorEtapa||[]).length? d.wipPorEtapa.map((w,i)=>{
+              const st=w.age>=5?"bad":w.age>=3?"warn":"ok";
+              const cor=st==="bad"?C.red:st==="warn"?C.amber:C.green;
+              const bg=st==="bad"?"#9E0B0F14":st==="warn"?"#b4530914":"#4B552814";
+              return <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"8px 0",borderBottom:`1px solid ${C.gray100}`}}>
+                <span style={{...F.body,fontSize:12.5,fontWeight:600,color:C.gray700}}>{w.nm}</span>
+                <span style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{...F.body,fontSize:10.5,fontWeight:700,padding:"3px 8px",borderRadius:20,background:bg,color:cor}}>{w.age} d</span>
+                  <span style={{...F.title,fontSize:18,fontWeight:700,minWidth:26,textAlign:"right"}}>{w.n}</span>
+                </span></div>;
+            }):<Vazio/>}
+          </div>
+        </div>
+        {/* otif + relatório */}
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:14,marginBottom:14}}>
+          <div style={cardBox}>
+            <TituloCard texto="No prazo e completo (OTIF)" oq="Percentual de pedidos no prazo E completos." como="No prazo+completo vs atrasado vs incompleto, sobre os faturados do período." extra={d.periodo.n+" faturados"}/>
+            <div style={{display:"flex",alignItems:"center",gap:18,marginTop:6}}>
+              <DonutOTIF prazo={d.otifBreak.prazo} atraso={d.otifBreak.atraso} incompleto={d.otifBreak.incompleto}/>
+              <div style={{flex:1}}>
+                <LegOtif cor={C.green} txt="No prazo e completo" val={d.otifBreak.prazo}/>
+                <LegOtif cor={C.red} txt="Atrasado" val={d.otifBreak.atraso}/>
+                <LegOtif cor={C.amber} txt="Incompleto" val={d.otifBreak.incompleto}/>
+              </div>
+            </div>
+          </div>
+          <div style={cardBox}>
+            <TituloCard texto="Relatório por etapa" oq="Tempo que um pedido passou em cada etapa." como="Diferença entre os marcos de entrada de cada estágio registrados no HubSpot."/>
+            <div style={{...F.body,fontSize:11.5,color:C.gray500,margin:"2px 0 8px"}}>Escolha um pedido e veja o tempo em cada etapa.</div>
+            <select value={relSel} onChange={e=>setRelSel(e.target.value)} style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 10px",...F.body,fontSize:13,marginBottom:8}}>
+              {(d.pedidos||[]).map(p=><option key={p.id} value={String(p.id)}>Pedido {p.id} · {p.cli}{p.finalizado?" (faturado)":""}</option>)}
+            </select>
+            <RelatorioEtapa pedido={(d.pedidos||[]).find(p=>String(p.id)===String(relSel))}/>
+          </div>
+        </div>
+        {/* CFD */}
+        <div style={cardBox}>
+          <TituloCard texto="Fluxo acumulado (CFD)" oq="Acúmulo de pedidos por etapa ao longo do tempo. Faixa que engorda = gargalo." como="A cada dia conta quantos passaram por cada marco; a área entre marcos é a fila da etapa." extra="últimos 14 dias"/>
+          <div style={{...F.body,fontSize:11.5,color:C.gray500,margin:"2px 0 12px"}}>Cada faixa é uma fase; faixa engrossando = gargalo.</div>
+          <GraficoCFD cfd={d.cfd} hover={cfdHover} setHover={setCfdHover}/>
+        </div>
+      </>}
+    </div>
+  );
+}
+function Kpi({lab,val,un,sub,subCor,oq,como}){
+  return <div style={cardBox}>
+    <div style={{...F.body,fontSize:10.5,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em",color:C.gray500,display:"flex",alignItems:"center",gap:6,minHeight:18}}>
+      <span style={{flex:1}}>{lab}</span><Ajuda oq={oq} como={como}/></div>
+    <div style={{...F.title,fontSize:30,fontWeight:700,lineHeight:1.05,marginTop:5}}>{val}<span style={{fontSize:14,fontWeight:500,color:C.gray500}}>{un}</span></div>
+    <div style={{...F.body,fontSize:11,fontWeight:600,marginTop:3,color:subCor||C.gray500}}>{sub}</div>
+  </div>;
+}
+function TituloCard({texto,oq,como,extra}){
+  return <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:5}}>
+    <span style={{...F.title,fontSize:14,fontWeight:600}}>{texto}</span>
+    {oq&&<Ajuda oq={oq} como={como}/>}
+    {extra&&<span style={{marginLeft:"auto",...F.body,fontSize:11,color:C.gray500,fontWeight:600}}>{extra}</span>}
+  </div>;
+}
+function BarLinha({nm,pct,txt,cor}){
+  return <div style={{display:"flex",alignItems:"center",gap:9,margin:"8px 0"}}>
+    <span style={{flex:"0 0 100px",...F.body,fontSize:12,fontWeight:600,color:C.gray700}}>{nm}</span>
+    <span style={{flex:1,height:18,background:C.gray100,borderRadius:5,overflow:"hidden"}}>
+      <span style={{display:"block",height:"100%",width:Math.max(2,pct)+"%",background:cor}}/></span>
+    <span style={{flex:"0 0 56px",textAlign:"right",...F.title,fontWeight:600,fontSize:12.5,color:cor===C.red?C.red:C.gray700}}>{txt}</span>
+  </div>;
+}
+function Vazio(){return <div style={{...F.body,fontSize:12,color:C.gray400,padding:"14px 0"}}>Ainda sem dados suficientes neste período.</div>;}
+function LegOtif({cor,txt,val}){
+  return <div style={{display:"flex",alignItems:"center",gap:8,margin:"7px 0",...F.body,fontSize:12,color:C.gray700}}>
+    <span style={{width:10,height:10,borderRadius:3,background:cor,flex:"0 0 auto"}}/>{txt}
+    <b style={{...F.title,marginLeft:"auto",fontSize:15}}>{val}%</b></div>;
+}
+function DonutOTIF({prazo,atraso,incompleto}){
+  const cx=60,cy=60,r=46,circ=2*Math.PI*r;let off=0;
+  const segs=[[prazo,C.green],[atraso,C.red],[incompleto,C.amber]];
+  return <svg width="120" height="120" viewBox="0 0 120 120" style={{flex:"0 0 120px"}}>
+    <circle cx={cx} cy={cy} r={r} fill="none" stroke={C.gray100} strokeWidth="15"/>
+    {segs.map(([p,col],i)=>{const len=p/100*circ;const el=<circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={col} strokeWidth="15" strokeDasharray={`${len} ${circ-len}`} strokeDashoffset={-off} transform={`rotate(-90 ${cx} ${cy})`}/>;off+=len;return el;})}
+    <text x={cx} y={cy-1} textAnchor="middle" fontFamily="Oswald" fontWeight="700" fontSize="26" fill={C.green}>{prazo}%</text>
+    <text x={cx} y={cy+15} textAnchor="middle" fontSize="9" fill={C.gray500}>no prazo</text>
+  </svg>;
+}
+function RelatorioEtapa({pedido}){
+  if(!pedido) return <Vazio/>;
+  const PAL=[C.gray400,"#6b7280",C.amber,"#8a6d3b","#b8651a",C.red,C.green,"#0e7490"];
+  const ets=pedido.etapas||[];
+  const lt=ets.reduce((s,e)=>s+(e.dias||0),0);
+  const maxd=Math.max(...ets.filter(e=>e.dias!=null).map(e=>e.dias),0);
+  return <div>
+    <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:8,flexWrap:"wrap",margin:"6px 0 4px"}}>
+      <div><div style={{...F.title,fontSize:18,fontWeight:700}}>Pedido {pedido.id}</div>
+        <div style={{...F.body,fontSize:12,color:C.gray600}}>{pedido.cli} · {pedido.comBordado?"com bordado":"sem bordado"} · {pedido.finalizado?"faturado":"em "+(pedido.etapa||"andamento")}</div></div>
+      <div style={{textAlign:"right"}}><div style={{...F.body,fontSize:12,color:C.gray600}}>{pedido.finalizado?"lead time":"em aberto há"}</div>
+        <div style={{...F.title,fontSize:14,fontWeight:700,color:C.red}}>{_f1(lt)} dias</div></div>
+    </div>
+    {ets.length?<>
+      <div style={{display:"flex",height:14,borderRadius:5,overflow:"hidden",margin:"10px 0 12px",border:`1px solid ${C.gray100}`}}>
+        {ets.map((e,i)=><span key={i} title={e.nm} style={{height:"100%",width:Math.max(2,((e.dias||0.3)/(lt||1))*100)+"%",background:e.done?PAL[i%PAL.length]:C.gray200}}/>)}
+      </div>
+      {ets.map((e,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:9,margin:"7px 0"}}>
+        <span style={{width:11,height:11,borderRadius:3,background:e.done?PAL[i%PAL.length]:C.gray200,flex:"0 0 auto"}}/>
+        <span style={{flex:1,...F.body,fontSize:12.5,fontWeight:600,color:e.dias===maxd&&e.done?C.red:C.gray700}}>{e.nm}</span>
+        <span style={{...F.body,fontSize:10,color:C.gray400,fontWeight:600}}>{e.done?"":"em curso"}</span>
+        <span style={{...F.title,fontSize:13,fontWeight:600,color:e.dias===maxd&&e.done?C.red:C.gray700}}>{e.dias!=null?_f1(e.dias)+" d":"—"}</span>
+      </div>)}
+    </>:<Vazio/>}
+  </div>;
+}
+function GraficoCFD({cfd,hover,setHover}){
+  if(!cfd||!cfd.bands||!cfd.dias||!cfd.dias.length) return <Vazio/>;
+  const dias=cfd.dias,N=dias.length;
+  const W=340,H=210,padL=28,padR=8,padT=10,padB=22,plotW=W-padL-padR,plotH=H-padT-padB;
+  const topo=cfd.criado||(cfd.bands[cfd.bands.length-1]?cfd.bands[cfd.bands.length-1].topo:[]);
+  const maxY=Math.max(1,...(topo||[1]))*1.05;
+  const x=i=>padL+i/Math.max(1,N-1)*plotW, y=v=>padT+plotH-v/maxY*plotH;
+  const COR={"Expedição":C.teal,"Bordado":C.red,"Direcionamento":C.blue,"Separação":C.amber,"Início":C.gray400};
+  const polys=[];
+  // faixa de faturado (0..fat) no fundo
+  const fat=cfd.fat||[];
+  if(fat.length){let t="",b="";for(let i=0;i<N;i++)t+=`${x(i)},${y(fat[i])} `;for(let i=N-1;i>=0;i--)b+=`${x(i)},${y(0)} `;polys.push(<polygon key="fat" points={t+b} fill={C.gray200} opacity="0.7"/>);}
+  cfd.bands.forEach((bd,k)=>{let t="",b="";for(let i=0;i<N;i++)t+=`${x(i)},${y(bd.topo[i])} `;for(let i=N-1;i>=0;i--)b+=`${x(i)},${y(bd.base[i])} `;polys.push(<polygon key={k} points={t+b} fill={COR[bd.nm]||C.gray400} opacity="0.9"/>);});
+  const onMove=ev=>{const svg=ev.currentTarget;const rc=svg.getBoundingClientRect();const px=((ev.touches?ev.touches[0].clientX:ev.clientX)-rc.left)*(W/rc.width);let i=Math.round((px-padL)/plotW*(N-1));i=Math.max(0,Math.min(N-1,i));setHover(i);};
+  return <div style={{position:"relative"}}>
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",display:"block",touchAction:"none"}} onMouseMove={onMove} onMouseLeave={()=>setHover(null)} onTouchStart={onMove} onTouchMove={onMove}>
+      {[0,.25,.5,.75,1].map((fr,i)=>{const v=maxY*fr;return <g key={i}><line x1={padL} y1={y(v)} x2={W-padR} y2={y(v)} stroke={C.gray100}/><text x={padL-4} y={y(v)+3} textAnchor="end" fontSize="8" fill={C.gray400} fontFamily="monospace">{Math.round(v)}</text></g>;})}
+      {polys}
+      {dias.map((dn,i)=>(i%2===0||i===N-1)?<text key={i} x={x(i)} y={H-padB+13} textAnchor="middle" fontSize="8" fill={C.gray500}>{dn}</text>:null)}
+      {hover!=null&&<line x1={x(hover)} y1={padT} x2={x(hover)} y2={padT+plotH} stroke={C.gray600} strokeDasharray="3 3"/>}
+    </svg>
+    <div style={{display:"flex",flexWrap:"wrap",gap:"8px 12px",marginTop:10}}>
+      {cfd.bands.slice().reverse().map((b,i)=><span key={i} style={{display:"flex",alignItems:"center",gap:6,...F.body,fontSize:11,color:C.gray600,fontWeight:600}}><span style={{width:10,height:10,borderRadius:3,background:COR[b.nm]||C.gray400}}/>{b.nm}</span>)}
+      <span style={{display:"flex",alignItems:"center",gap:6,...F.body,fontSize:11,color:C.gray600,fontWeight:600}}><span style={{width:10,height:10,borderRadius:3,background:C.gray200}}/>Faturado</span>
+    </div>
+    {hover!=null&&<div style={{...F.body,fontSize:11.5,marginTop:8,padding:"8px 10px",background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8}}>
+      <b style={{...F.title}}>Dia {dias[hover]}</b> — {cfd.bands.slice().reverse().map((b,i)=>`${b.nm}: ${(b.topo[hover]-b.base[hover])}`).join(" · ")}</div>}
+  </div>;
+}
+
+// ─── GESTÃO À VISTA ──────────────────────────────────────────────────────────
+function GestaoVista(){
+  const isMobile=useIsMobile();
+  const [d,setD]=useState(null);const [loading,setLoading]=useState(true);const [erro,setErro]=useState(false);
+  const [hora,setHora]=useState("--:--");
+  const carregar=()=>{setLoading(true);setErro(false);apiFetch("/gestao-vista").then(r=>{setD(r);setLoading(false);}).catch(()=>{setErro(true);setLoading(false);});};
+  useEffect(()=>{carregar();const t=setInterval(carregar,120000);return ()=>clearInterval(t);},[]);
+  useEffect(()=>{const tk=()=>{const n=new Date();setHora(String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0"));};tk();const t=setInterval(tk,20000);return ()=>clearInterval(t);},[]);
+  const DIAS=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+  const MES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  const ag=new Date();
+  const tot=d?d.total:0, pAtr=tot?Math.round(d.atrasados/tot*100):0, pPz=100-pAtr;
+  const maxTot=d&&d.porEtapa.length?Math.max(...d.porEtapa.map(s=>s.tot),1):1;
+  return (
+    <div style={{padding:isMobile?14:"18px 22px",maxWidth:1180,margin:"0 auto"}}>
+      <div style={{background:C.black,color:"#fff",borderRadius:16,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
+        <div><div style={{...F.title,fontSize:11,letterSpacing:"0.15em",color:"#c9a36b",fontWeight:600}}>SGP · CITEROL</div>
+          <h2 style={{...F.title,fontSize:"clamp(22px,2.4vw,32px)",margin:"4px 0 0"}}>GESTÃO À VISTA</h2>
+          <div style={{...F.body,fontSize:12,color:"#b9b6b0",marginTop:4}}>Pedidos em aberto · atualiza sozinho</div></div>
+        <div style={{textAlign:"right"}}><div style={{...F.title,fontSize:"clamp(24px,3vw,40px)",lineHeight:1}}>{hora}</div>
+          <div style={{...F.body,fontSize:12,color:"#b9b6b0",marginTop:4}}>{DIAS[ag.getDay()]}, {ag.getDate()} {MES[ag.getMonth()]}</div></div>
+      </div>
+      <EstadoCarga loading={loading&&!d} erro={erro&&!d} onRetry={carregar}/>
+      {d&&<>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+          <TileGV cor={C.red} sombra="0 8px 24px #9E0B0F40" lab="Em atraso" num={d.atrasados} sub={`${pAtr}% dos pedidos em aberto`}
+            oq="Pedidos em aberto cujo vencimento já passou." como="Não finalizados com vencimento anterior a hoje."/>
+          <TileGV cor={C.green} lab="No prazo" num={d.noPrazo} sub={`${pPz}% dos pedidos em aberto`}
+            oq="Pedidos em aberto dentro do prazo." como="Não finalizados com vencimento ≥ hoje."/>
+        </div>
+        <div style={{...cardBox,marginBottom:14}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:9,...F.title,fontSize:12.5,fontWeight:600,color:C.gray600}}>
+            <span>SAÚDE DO PRAZO</span><span style={{color:C.gray500}}>meta: 90% no prazo</span></div>
+          <div style={{display:"flex",height:28,borderRadius:8,overflow:"hidden",...F.title,fontWeight:600,fontSize:13,color:"#fff"}}>
+            <div style={{background:C.green,width:pPz+"%",display:"flex",alignItems:"center",paddingLeft:12,minWidth:0}}>{pPz}% no prazo</div>
+            <div style={{background:C.red,width:pAtr+"%",display:"flex",alignItems:"center",justifyContent:"flex-end",paddingRight:12,minWidth:0}}>{pAtr}%</div>
+          </div>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
+          <MiniGV lab="Em aberto" num={d.total} sub="em andamento" oq="Todos os pedidos em andamento." como="Em qualquer etapa, exceto Faturado. Aberto = no prazo + vencidos."/>
+          <MiniGV lab="Já vencidos" num={d.atrasados} sub="venceram e abertos" cor={C.red} oq="Pedidos vencidos e ainda abertos." como="Não finalizados com vencimento < hoje."/>
+          <MiniGV lab="Vencem hoje" num={d.vencemHoje} sub="prioridade" cor={C.amber} oq="Pedidos em aberto que vencem hoje." como="Não finalizados com vencimento = hoje."/>
+          <MiniGV lab="Vencem amanhã" num={d.vencemAmanha} sub="se preparar" oq="Pedidos em aberto que vencem amanhã." como="Não finalizados com vencimento = amanhã."/>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:14}}>
+          <div style={cardBox}>
+            <TituloCard texto="Onde estão os atrasados" extra={d.atrasados+" atrasados"}/>
+            {d.porEtapa.length? d.porEtapa.map((s,i)=>{const lw=s.tot?s.late/s.tot*100:0;return (
+              <div key={i} style={{display:"flex",alignItems:"center",gap:9,margin:"8px 0"}}>
+                <span style={{flex:"0 0 110px",...F.body,fontSize:12,fontWeight:600,color:C.gray700}}>{s.nm}</span>
+                <span style={{flex:1,height:18,background:C.gray100,borderRadius:5,overflow:"hidden",display:"flex",width:(s.tot/maxTot*100)+"%"}}>
+                  <span style={{height:"100%",width:(100-lw)+"%",background:"#c3c8bb"}}/><span style={{height:"100%",width:lw+"%",background:C.red}}/></span>
+                <span style={{flex:"0 0 64px",textAlign:"right",...F.title,fontWeight:600,fontSize:12.5}}>{s.tot}{s.late?<b style={{color:C.red}}> · {s.late}</b>:null}</span>
+              </div>);}):<Vazio/>}
+          </div>
+          <div style={cardBox}>
+            <TituloCard texto="Mais atrasados" extra="resolver primeiro"/>
+            {d.maisAtrasados.length? d.maisAtrasados.map((o,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:11,padding:"9px 0",borderBottom:`1px solid ${C.gray100}`}}>
+                <span style={{...F.title,fontWeight:600,fontSize:13.5}}>{idPedido(o)}</span>
+                <span style={{flex:1,minWidth:0}}><span style={{display:"block",...F.body,fontSize:13,fontWeight:600,color:C.gray700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{o.cli}</span>
+                  <span style={{...F.body,fontSize:11,color:C.gray500}}>{o.et}</span></span>
+                <span style={{...F.title,fontWeight:600,fontSize:12,padding:"4px 10px",borderRadius:20,background:"#9E0B0F14",color:C.red,whiteSpace:"nowrap"}}>{o.dias} {o.dias===1?"dia":"dias"}</span>
+              </div>)):<div style={{...F.body,fontSize:12,color:C.gray500,padding:"12px 0"}}>Nenhum pedido atrasado. 🎉</div>}
+          </div>
+        </div>
+      </>}
+    </div>
+  );
+}
+function TileGV({cor,sombra,lab,num,sub,oq,como}){
+  return <div style={{borderRadius:18,padding:"20px 22px",background:cor,color:"#fff",boxShadow:sombra||"none"}}>
+    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.06em",fontSize:"clamp(14px,1.4vw,18px)",fontWeight:600,display:"flex",alignItems:"center",gap:8}}>{lab}
+      <span style={{filter:"invert(1)"}}><Ajuda oq={oq} como={como}/></span></div>
+    <div style={{...F.title,fontWeight:700,lineHeight:.92,marginTop:6,fontSize:"clamp(54px,6.5vw,96px)"}}>{num}</div>
+    <div style={{...F.body,fontSize:"clamp(12px,1vw,15px)",marginTop:7,fontWeight:600,opacity:.93}}>{sub}</div>
+  </div>;
+}
+function MiniGV({lab,num,sub,cor,oq,como}){
+  return <div style={{...cardBox,...(cor===C.red?{borderColor:"#9E0B0F33",background:"linear-gradient(180deg,#fff,#fdf4f4)"}:{})}}>
+    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.05em",fontSize:11,fontWeight:600,color:C.gray500,display:"flex",gap:5,alignItems:"center"}}>{lab}{oq&&<Ajuda oq={oq} como={como}/>}</div>
+    <div style={{...F.title,fontSize:"clamp(28px,3.2vw,44px)",fontWeight:700,lineHeight:1,marginTop:5,color:cor||C.black}}>{num}</div>
+    <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:3,fontWeight:600}}>{sub}</div>
+  </div>;
+}
+
+// ─── PEDIDOS EM RISCO ────────────────────────────────────────────────────────
+function PedidosRisco(){
+  const isMobile=useIsMobile();
+  const [d,setD]=useState(null);const [loading,setLoading]=useState(true);const [erro,setErro]=useState(false);
+  const [filtro,setFiltro]=useState("todos");
+  const carregar=()=>{setLoading(true);setErro(false);apiFetch("/pedidos-risco").then(r=>{setD(r);setLoading(false);}).catch(()=>{setErro(true);setLoading(false);});};
+  useEffect(carregar,[]);
+  const RB={alto:"Alto",medio:"Médio",baixo:"Baixo"};
+  const corNivel={alto:C.red,medio:C.amber,baixo:C.green};
+  const bgNivel={alto:"#9E0B0F14",medio:"#b4530914",baixo:"#4B552814"};
+  const lista=d?(filtro==="todos"?d.data:d.data.filter(o=>o.nivel===filtro)):[];
+  return (
+    <div style={{padding:isMobile?14:"18px 22px",maxWidth:980,margin:"0 auto"}}>
+      <CabecalhoAnalise titulo="Pedidos em Risco" corBarra={C.amber}
+        sub="Pedidos ainda no prazo, mas com etapas que já passaram do tempo previsto — aja antes de virar atraso."/>
+      <EstadoCarga loading={loading} erro={erro} onRetry={carregar}/>
+      {d&&!loading&&!erro&&<>
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
+          <KpiR lab="Em risco" val={d.total} oq="Pedidos no prazo, mas ameaçados por etapas atrasadas." como="Folga = dias até o vencimento − tempo previsto do que falta. Folga baixa entra na lista."/>
+          <KpiR lab="Risco alto" val={d.alto} cor={C.red}/>
+          <KpiR lab="Risco médio" val={d.medio} cor={C.amber}/>
+          <KpiR lab="Risco baixo" val={d.baixo} cor={C.gray600}/>
+        </div>
+        <div style={{...cardBox,padding:"10px 12px",display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
+          {[["todos","Todos ("+d.total+")"],["alto","Alto ("+d.alto+")"],["medio","Médio ("+d.medio+")"],["baixo","Baixo ("+d.baixo+")"]].map(([k,l])=>(
+            <button key={k} onClick={()=>setFiltro(k)} style={{...F.title,fontSize:12.5,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.04em",
+              border:`1px solid ${C.gray200}`,borderRadius:9,padding:"7px 12px",cursor:"pointer",
+              background:filtro===k?C.black:C.white,color:filtro===k?"#fff":C.gray600}}>{l}</button>))}
+        </div>
+        {lista.length? lista.map((o,idx)=>(
+          <div key={idx} style={{...cardBox,marginBottom:12,borderLeft:`5px solid ${corNivel[o.nivel]}`}}>
+            <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{...F.title,fontWeight:700,fontSize:16}}>Pedido {o.id}</div>
+                <div style={{...F.body,fontSize:13,fontWeight:600,color:C.gray700}}>{o.cli}</div>
+                <div style={{...F.body,fontSize:11.5,color:C.gray500,marginTop:1}}>Está em: {o.etapa} · {o.comBordado?"com bordado":"sem bordado"}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <span style={{...F.title,fontWeight:600,fontSize:11.5,textTransform:"uppercase",letterSpacing:"0.05em",padding:"4px 11px",borderRadius:20,background:bgNivel[o.nivel],color:corNivel[o.nivel]}}>{RB[o.nivel]}</span>
+                <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:4,fontWeight:600}}>vence em {o.buffer} {o.buffer===1?"dia":"dias"}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6,margin:"11px 0 9px"}}>
+              {o.slips.length? o.slips.map((s,i)=><span key={i} style={{...F.body,fontSize:11.5,fontWeight:600,background:"#9E0B0F14",color:C.red,borderRadius:6,padding:"3px 8px"}}>{s.nm} +{_f1(s.d)}d</span>)
+                : <span style={{...F.body,fontSize:11.5,fontWeight:600,background:C.gray100,color:C.gray500,borderRadius:6,padding:"3px 8px"}}>buffer apertado</span>}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8,paddingTop:10,borderTop:`1px solid ${C.gray100}`,...F.body,fontSize:12.5,color:C.gray700}}>
+              <span style={{width:18,height:18,borderRadius:"50%",background:o.atrasoAcum>=o.buffer?C.red:C.amber,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",...F.title,fontSize:12,fontWeight:700,flex:"0 0 auto"}}>{o.atrasoAcum>=o.buffer?"!":"~"}</span>
+              <span>{o.atrasoAcum>0?<>Já acumulou <b>{_f1(o.atrasoAcum)}d</b> de atraso nas etapas, com <b>{o.buffer}d</b> de prazo.</>:<>Folga apertada: vence em <b>{o.buffer}d</b>.</>}</span>
+              <span style={{marginLeft:"auto",...F.body,fontSize:11,color:C.gray500,fontWeight:600,whiteSpace:"nowrap"}}>↳ {(o.etapa||"").indexOf("Bordado")>=0?"priorizar no bordado":"acompanhar"}</span>
+            </div>
+          </div>)):<EstadoCarga vazio vazioTxt="Nenhum pedido em risco agora. Tudo sob controle. 🎉"/>}
+      </>}
+    </div>
+  );
+}
+function KpiR({lab,val,cor,oq,como}){
+  return <div style={cardBox}>
+    <div style={{...F.body,fontSize:10.5,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em",color:C.gray500,display:"flex",alignItems:"center",gap:6}}>
+      <span style={{flex:1}}>{lab}</span>{oq&&<Ajuda oq={oq} como={como}/>}</div>
+    <div style={{...F.title,fontSize:30,fontWeight:700,lineHeight:1.05,marginTop:5,color:cor||C.black}}>{val}</div>
+  </div>;
+}
+
+// estilos de filtro reaproveitados
+const lblFiltro={display:"block",...F.body,fontSize:10.5,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.05em",color:C.gray500,marginBottom:4};
+const inpFiltro={border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"8px 10px",...F.body,fontSize:13,outline:"none"};
+function brData(iso){if(!iso)return"";const[y,m,dd]=iso.split("-");return `${dd}/${m}`;}
+
 function AppInner(){
   const isMobile=useIsMobile();
+  const _acoesEmAndamento=useRef(new Set()); // trava antiduplicação por pedido+ação
   const[user,setUser]=useState(()=>{
     try{
       const s=sessionStorage.getItem("sgp_user");
@@ -3429,13 +4723,37 @@ function AppInner(){
   });
   const doLogin=(u)=>{
     try{sessionStorage.setItem("sgp_user",JSON.stringify(u));}catch{}
-    setUser(u);setPage("demandas");
+    setUser(u);
+    // Se o usuário entrou direto numa URL com hash (#funil, etc), respeita
+    if (!(typeof window !== "undefined" && window.location.hash && window.location.hash.length > 1)) {
+      setPage("demandas");
+    }
   };
   const doLogout=()=>{
     try{sessionStorage.removeItem("sgp_user");}catch{}
     setUser(null);
   };
-  const[page,setPage]=useState("demandas");
+  // Página persistida no hash da URL: F5 mantém o módulo atual, e dá pra
+  // compartilhar link direto pra uma tela (ex: claude.ai#funil).
+  const _pageFromHash = () => {
+    if (typeof window === "undefined") return "demandas";
+    const h = (window.location.hash || "").replace(/^#/, "").trim();
+    return h || "demandas";
+  };
+  const[page,_setPageRaw]=useState(_pageFromHash);
+  const setPage = (p) => {
+    _setPageRaw(p);
+    if (typeof window !== "undefined" && p && typeof p === "string") {
+      try { window.history.replaceState(null, "", "#" + p); } catch(e){}
+    }
+  };
+  // Se o usuário usar voltar/avançar do navegador, sincroniza
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const fn = () => _setPageRaw(_pageFromHash());
+    window.addEventListener("hashchange", fn);
+    return () => window.removeEventListener("hashchange", fn);
+  }, []);
   const[orders,setOrders]=useState(ORDERS_INIT);
   const[sel,setSel]=useState(null);
   const[collapsed,setCollapsed]=useState(false);
@@ -3490,6 +4808,11 @@ function AppInner(){
     // O pedido aberto no modal (vem do HubSpot via Fila/Direcionamento)
     const o = sel && sel.id===orderId ? sel : null;
     if(!o){ setSel(null); return; }
+    // Trava antiduplicação: ignora reenvio da MESMA ação no mesmo pedido (clique/efeito duplo)
+    const _acaoKey=`${orderId}:${tipo}`;
+    if(_acoesEmAndamento.current.has(_acaoKey)) return;
+    _acoesEmAndamento.current.add(_acaoKey);
+    const _liberar=()=>setTimeout(()=>_acoesEmAndamento.current.delete(_acaoKey),2000);
     let resultMsg="";
     // Contexto enviado em toda ação (executor + IDs) para nota e Supabase
     const ctx={
@@ -3653,6 +4976,8 @@ function AppInner(){
       alert("Erro ao processar: "+e.message);
       console.error("handleAction:",e);
       throw e; // propaga para o botão não marcar como concluído
+    }finally{
+      _liberar();
     }
 
     // Sucesso — recarrega as filas. NÃO fecha o modal aqui:
@@ -3663,11 +4988,12 @@ function AppInner(){
 
   const TITLES={
     demandas:"Minhas Demandas",dashboard:"Dashboard",funil:"Funil em Tempo Real",
+    painel_fluxo:"Painel de Fluxo",gestao_vista:"Gestão à Vista",pedidos_risco:"Pedidos em Risco",
     gerencial:"Gerencial",historico:"Histórico",ranking:"Ranking / Premiação",
-    pedidos:"Todos os Pedidos",direcionamento:"Direcionamento",
+    pedidos:"Pedidos em Aberto",direcionamento:"Direcionamento",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
-    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",sla:"Configurar SLA",usuarios:"Usuários",
+    expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",codigos_barra:"Códigos de Barra",impressao_pedido:"Impressão de Pedido",sla:"Configurações",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
 
@@ -3684,7 +5010,11 @@ function AppInner(){
             {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
+            {page==="painel_fluxo"&&<PainelFluxo/>}
+            {page==="gestao_vista"&&<GestaoVista/>}
+            {page==="pedidos_risco"&&<PedidosRisco/>}
             {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
+            {page==="separacao"&&<Fila title="Separação" etapa="Separação" endpoint="/separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
             {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
@@ -3692,11 +5022,13 @@ function AppInner(){
             {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
-            {page==="bordado_externo"&&<Fila title="Bordado Externo" etapa="Bordado Externo" endpoint="/bordado-externo" orders={orders} onOpen={setSel} actionLabel="Registrar retorno" actionColor={C.purple} slaCfg={slaCfg}/>}
+            {page==="bordado_externo"&&<BordadoExternoPage orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
             {page==="alteracoes_form"&&<AlteracoesFormList/>}
+            {page==="codigos_barra"&&<CodigosBarra user={user}/>}
+            {page==="impressao_pedido"&&<ImpressaoPedido user={user}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
