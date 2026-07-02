@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.9.12";
+const SGP_VERSION = "v2.9.33";
+if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
 
@@ -95,11 +96,20 @@ function useSnapshotAberto(){
 // Helper: extrai todos os pedidos de um snapshot (achata porEtapa)
 function snapTodosPedidos(snap){
   if (!snap || !snap.porEtapa) return [];
+  // O snapshot pode conter o MESMO card em várias etapas (via etapasAtivas do Worker).
+  // Aqui deduplicamos por vendasId pra contagem/lista sem repetição. Usamos a etapa
+  // do card (a "principal") como sua etapa canônica na lista.
+  const vistos = new Set();
   const out = [];
   for (const nome of Object.keys(snap.porEtapa)) {
     const g = snap.porEtapa[nome];
     if (!g || !g.items) continue;
-    for (const it of g.items) out.push({ ...it, etapa: nome, _grupo: nome });
+    for (const it of g.items) {
+      const key = it.vendasId || it.id;
+      if (vistos.has(key)) continue;
+      vistos.add(key);
+      out.push({ ...it, _grupo: nome });
+    }
   }
   return out;
 }
@@ -362,6 +372,19 @@ function useIsMobile(){
 const fmtD=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
 const fmtDS=(iso)=>!iso?"—":new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
 const fmtR=(v)=>"R$ "+Number(v).toLocaleString("pt-BR",{minimumFractionDigits:2});
+// Formata horas como "6d 23h" quando >24h, "23h" quando ≥1h, "45min" quando <1h.
+// Aceita valor absoluto. Sufixo "atraso" / "restantes" é do chamador.
+const fmtHoras=(horas)=>{
+  if(horas==null)return "—";
+  const abs=Math.abs(horas);
+  if(abs<1)return `${Math.round(abs*60)}min`;
+  const d=Math.floor(abs/24), h=Math.round(abs%24);
+  if(d>0){
+    if(h===0)return `${d}d`;
+    return `${d}d ${h}h`;
+  }
+  return `${Math.round(abs)}h`;
+};
 // Formata duração em minutos -> "2h 15min" / "45min" / "3d 4h"
 const fmtDur=(min)=>{
   if(min==null)return null;
@@ -395,6 +418,60 @@ function idPedido(o){
   if (o.pedidoLinx) return "PED - " + o.pedidoLinx + " | " + (o.vendasId || (o.id||"").replace(/^PED-/, ""));
   return o.id || ("PED-" + (o.vendasId || ""));
 }
+// Quantidade de peças do pedido: usa items quando enriched, senão cai pro qtdTotal do snapshot
+function pecasDoCard(o){
+  if (!o) return 0;
+  const somaItems = (o.items||[]).reduce((s,i)=>s+Number(i.qty||0),0);
+  if (somaItems > 0) return somaItems;
+  return Number(o.qtdTotal||0);
+}
+// Recalcula statusSeparacao a partir dos items enriched (fonte mais confiável que snapshot).
+// Retorna: "completa" | "parcial" | "pendente" | "sem_pedidos" | "carregando"
+function statusSepDoOrder(o){
+  if (!o) return "carregando";
+  const its = o.items || [];
+  if (its.length === 0) {
+    // Sem items enriched ainda: usa o do snapshot, mas se for "sem_pedidos", trata como carregando
+    // (snapshot pode estar desatualizado — só confirmamos "sem pedidos" depois do enriched chegar)
+    const snap = o.statusSeparacao || "pendente";
+    if (snap === "sem_pedidos") return "carregando";
+    return snap;
+  }
+  // Enriched carregado: recalcula localmente
+  const total = its.length;
+  const sep = its.filter(i => i.status === "separado").length;
+  if (sep === 0) return "pendente";
+  if (sep < total) return "parcial";
+  return "completa";
+}
+// Cores e labels do status de separação
+const SEPARACAO_INFO = {
+  completa:     {label:"PEDIDO COMPLETO",      cor:"#15803d", bg:"#dcfce7", borda:"#86efac"},
+  parcial:      {label:"SEPARADO PARCIAL",     cor:"#c2410c", bg:"#ffedd5", borda:"#fdba74"},
+  pendente:     {label:"SEPARAÇÃO PENDENTE",   cor:"#991b1b", bg:"#fee2e2", borda:"#fca5a5"},
+  sem_pedidos:  {label:"SEM PEDIDOS APROVADOS",cor:"#525252", bg:"#f5f5f5", borda:"#d4d4d4"},
+  carregando:   {label:"VERIFICANDO SEPARAÇÃO...", cor:"#525252", bg:"#f5f5f5", borda:"#d4d4d4"},
+  indisponivel: {label:"STATUS INDISPONÍVEL",  cor:"#525252", bg:"#f5f5f5", borda:"#d4d4d4"},
+};
+function BadgeSeparacao({status, qtdSep, qtdTot, qtdItensSep, totalItens, size="md"}){
+  const info = SEPARACAO_INFO[status] || SEPARACAO_INFO.indisponivel;
+  const fontSize = size==="lg" ? 13 : size==="sm" ? 9.5 : 11;
+  const padding = size==="lg" ? "6px 12px" : size==="sm" ? "2px 6px" : "4px 9px";
+  const detalhe = (status==="parcial" && totalItens>0)
+    ? ` (${qtdItensSep||0}/${totalItens})`
+    : "";
+  return (
+    <span style={{
+      display:"inline-flex",alignItems:"center",gap:5,
+      padding,borderRadius:6,background:info.bg,color:info.cor,
+      border:`1px solid ${info.borda}`,
+      ...F.title,fontSize,fontWeight:700,letterSpacing:"0.04em",
+      whiteSpace:"nowrap",
+    }}>
+      {info.label}{detalhe}
+    </span>
+  );
+}
 const normalizarCard=(o,etapa)=>({
   id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
   pedidoLinx:o.pedidoLinx||"",
@@ -409,6 +486,14 @@ const normalizarCard=(o,etapa)=>({
   houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
   temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
   prazoFinal:o.prazoFinal||null,
+  qtdTotal:Number(o.qtdTotal||0),qtdSeparada:Number(o.qtdSeparada||0),
+  totalItensSeparacao:Number(o.totalItensSeparacao||0),qtdItensSeparados:Number(o.qtdItensSeparados||0),
+  statusSeparacao:o.statusSeparacao||"pendente",
+  subEtapa: o.subEtapa || "",
+  stageIdAtual: o.stageIdAtual || o.stageId || null,
+  stageIdPV: o.stageIdPV || null,
+  stageIdBordado: o.stageIdBordado || null,
+  etapasAtivas: Array.isArray(o.etapasAtivas) ? o.etapasAtivas : [(o.etapa || etapa)],
   etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
   entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
   alertas:o.alertas||[],concluido:false,
@@ -416,7 +501,8 @@ const normalizarCard=(o,etapa)=>({
   items:(o.items||[]).map(it=>({
     id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
     qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
-    status:"separado",
+    status: it.separado===true ? "separado" : "pendente",
+    descricao: it.descricao || "",
   })),
   timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
   chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
@@ -479,8 +565,13 @@ function baixarExcelProgramacao(lista,de,ate){
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
-function getSLA(o,cfg){
-  const sla=cfg[o.etapa]||0;
+function getSLA(o,cfg,etapaOverride){
+  // Se a etapa vista NÃO é a etapa real do card (ex.: card aparece na Fila
+  // "Separação" mas seu order.etapa é "Aprovação de Amostra Física" por causa
+  // do bordado), o SLA da tela deve refletir a etapa vista pela fila. Assim
+  // o SLA da Separação é o de Separação, não o do bordado.
+  const etapa = etapaOverride || o.etapa;
+  const sla=cfg[etapa]||0;
   const hrs=hrsIn(o.etapaAt);
   const pct=sla?hrs/sla:0;
   const venc=dataVencimento(o);
@@ -1003,31 +1094,84 @@ function Timeline({order}){
 
 
 // ─── EXECUÇÃO POR BORDADO (Programação: c/ dificuldade · Amostra: s/ dificuldade) ─
-function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setActionDone}){
+function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setActionDone,loadingDet}){
   const ehAmostra=etapa!=="Programação";
   const todos=(order.bordadosJson||[]).filter(b=>b&&(b.fileName||b.fileId));
   const filtro=ehAmostra?/~(prog|amostra)/i:/~prog/i;
   let bordados=todos.filter(b=>filtro.test(b.fileName||""));
   if(!bordados.length) bordados=todos;                                   // legado: sem termo → todos
-  if(!bordados.length) bordados=[{fileName:(comDificuldade?"Programação":"Amostra")+" geral",fileId:"",fileUrl:""}]; // sem json
+  // REGRA CRÍTICA: se não temos bordado real pra programar/amostrar, NUNCA
+  // criamos item fictício ("Programação geral"). Pra a Programação isso é
+  // sensível — programadora é terceirizada e o que ela anexar vira cobrança.
+  // Estados possíveis:
+  //  - loadingDet && bordados vazio → mostra "Carregando bordados..."
+  //  - !loadingDet && bordados vazio → mostra alerta "Nenhum bordado pra ..."
+  //  - bordados existem → renderiza normal
+  if(!bordados.length){
+    const carregando = loadingDet===true;
+    return (
+      <div style={{padding:"32px 24px",background:carregando?C.gray50:"#fff8f1",border:`1.5px solid ${carregando?C.gray200:C.amber+"55"}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:12,textAlign:"center"}}>
+        {carregando ? (
+          <>
+            <Ic n="spin" s={22} c={C.gray500}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.gray600}}>Carregando bordados...</div>
+            <div style={{...F.body,fontSize:12,color:C.gray500,maxWidth:420}}>
+              Aguarde enquanto buscamos os arquivos anexados ao pedido.
+            </div>
+          </>
+        ) : (
+          <>
+            <Ic n="warn" s={22} c={C.amber}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:"#92400e"}}>
+              {comDificuldade ? "Nenhum bordado pra programar" : "Nenhum bordado pra amostrar"}
+            </div>
+            <div style={{...F.body,fontSize:12,color:"#92400e",maxWidth:460,lineHeight:1.55}}>
+              Este pedido está na etapa <strong>{etapa}</strong>, mas não tem nenhum arquivo/bordado anexado que precise dessa ação.
+              <br/><br/>
+              Verifique com o <strong>vendedor</strong> se o pedido está no fluxo correto. Nenhuma execução pode ser feita sem arquivo referência.
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
   const TITULOS={"Programação":"PROGRAMAÇÃO DE BORDADO","Amostra Digital":"ENVIAR AMOSTRA DIGITAL","Amostra Física":"CONFIRMAR AMOSTRA FÍSICA"};
   const HINTS={"Programação":"Para cada bordado: baixe a referência, informe a dificuldade e anexe o(s) arquivo(s) programado(s).","Amostra Digital":"Para cada bordado: baixe a referência e anexe a(s) imagem(ns) da amostra digital.","Amostra Física":"Para cada bordado: baixe a referência e anexe a(s) foto(s) da amostra física."};
-  const ACCEPT=comDificuldade?".emb,.dst,.pes,.jef,image/*":"image/*";
+  // Programação: aceita QUALQUER formato (a programadora pode anexar .emb, .dst,
+  // .pes, .jef, imagens etc). Se restringir por accept, o dialog do navegador
+  // trata como "arquivos personalizados" e esconde os outros — a operadora pode
+  // não achar o arquivo que quer. Amostras: só imagens (é o que a operação
+  // sempre anexa nessa etapa).
+  const ACCEPT=comDificuldade?"":"image/*";
   const BTN=comDificuldade?"Confirmar programação":etapa==="Amostra Digital"?"Enviar amostra digital":"Confirmar amostra";
   const motivoRej=etapa==="Amostra Digital"?order.motivoRejAmDigital:etapa==="Amostra Física"?order.motivoRejAmFisica:"";
   const keyOf=(b,i)=>b.fileId||("idx"+i);
   const [data,setData]=useState(()=>{const m={};bordados.forEach((b,i)=>{m[keyOf(b,i)]={dificuldade:"",files:[]};});return m;});
+  // Quando os bordados mudam (enriquecimento sob demanda chega ~1s depois), garante
+  // que data tem uma entrada pra cada bordado — senão st = data[k] vira undefined
+  // e quebra ao acessar .dificuldade
+  useEffect(()=>{
+    setData(prev=>{
+      const novo={...prev};
+      let mudou=false;
+      bordados.forEach((b,i)=>{
+        const k=keyOf(b,i);
+        if(!novo[k]){novo[k]={dificuldade:"",files:[]};mudou=true;}
+      });
+      return mudou?novo:prev;
+    });
+  },[bordados.length]);
   const [enviando,setEnviando]=useState(false);
   const ehImagem=(n="")=>/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(n);
   const nomeLimpo=(n="")=>n.replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
-  const setDif=(k,d)=>setData(p=>({...p,[k]:{...p[k],dificuldade:d}}));
-  const addFiles=(k,fl)=>setData(p=>({...p,[k]:{...p[k],files:[...p[k].files,...Array.from(fl)]}}));
-  const rmFile=(k,idx)=>setData(p=>({...p,[k]:{...p[k],files:p[k].files.filter((_,i)=>i!==idx)}}));
+  const setDif=(k,d)=>setData(p=>({...p,[k]:{dificuldade:d,files:p[k]?.files||[]}}));
+  const addFiles=(k,fl)=>setData(p=>({...p,[k]:{dificuldade:p[k]?.dificuldade||"",files:[...(p[k]?.files||[]),...Array.from(fl)]}}));
+  const rmFile=(k,idx)=>setData(p=>({...p,[k]:{dificuldade:p[k]?.dificuldade||"",files:(p[k]?.files||[]).filter((_,i)=>i!==idx)}}));
   const DIFS=[["Fácil",C.green],["Médio",C.amber],["Difícil",C.red]];
 
   const confirmar=async()=>{
     for(const [i,b] of bordados.entries()){
-      const st=data[keyOf(b,i)];
+      const st=data[keyOf(b,i)]||{dificuldade:"",files:[]};
       if(comDificuldade&&!st.dificuldade){alert(`Defina a dificuldade do bordado: ${nomeLimpo(b.fileName)}`);return;}
       if(!st.files.length){alert(`Anexe ao menos um arquivo para: ${nomeLimpo(b.fileName)}`);return;}
     }
@@ -1036,7 +1180,7 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
       const toB64=(f)=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
       const execucoes=[];
       for(const [i,b] of bordados.entries()){
-        const st=data[keyOf(b,i)];
+        const st=data[keyOf(b,i)]||{dificuldade:"",files:[]};
         const arquivos=[];
         for(const f of st.files) arquivos.push({fileBase64:await toB64(f),fileName:f.name});
         execucoes.push({nomeArquivo:nomeLimpo(b.fileName),dificuldade:comDificuldade?st.dificuldade:"",arquivos});
@@ -1065,7 +1209,14 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
         </div>
       </div>}
       {bordados.map((b,i)=>{
-        const k=keyOf(b,i);const st=data[k];const img=ehImagem(b.fileName||"");
+        const k=keyOf(b,i);const st=data[k]||{dificuldade:"",files:[]};const img=ehImagem(b.fileName||"");
+        // Nas amostras, o executor precisa ver TUDO que o vendedor e a
+        // programadora escreveram (obs_programacao + obs_bordado). Na
+        // Programação, só vale a obs do vendedor pra programação.
+        const obsProgr = b.obs_programacao || "";
+        const obsBord  = b.obs_bordado || "";
+        const mostrarObsProgr = !!obsProgr;
+        const mostrarObsBord  = etapa!=="Programação" && !!obsBord;
         return(
           <div key={k} style={{border:`1px solid ${C.gray200}`,borderRadius:10,padding:14,display:"flex",flexDirection:"column",gap:12}}>
             <div style={{display:"flex",gap:12,alignItems:"center"}}>
@@ -1074,9 +1225,32 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
                 :<div style={{width:64,height:64,borderRadius:8,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="box" s={24} c={C.gray400}/></div>}
               <div style={{flex:1,minWidth:0}}>
                 <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,wordBreak:"break-word"}}>{nomeLimpo(b.fileName)}</div>
+                {(b.productName||b.positionLabel)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:3,fontWeight:600}}>
+                  {b.productName && <span>👕 <strong>{b.productName}</strong></span>}
+                  {b.productName && b.positionLabel && <span style={{color:C.gray400,margin:"0 5px"}}>·</span>}
+                  {b.positionLabel && <span style={{color:C.gray500}}>📍 {b.positionLabel}</span>}
+                </div>}
                 {b.fileUrl&&<a href={b.fileUrl} target="_blank" rel="noreferrer" download style={{...F.body,fontSize:12,color:C.blue,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4,marginTop:4,textDecoration:"none"}}><Ic n="download" s={13} c={C.blue}/> Baixar referência</a>}
               </div>
             </div>
+            {mostrarObsProgr && (
+              <div style={{background:"#fef3c7",border:`2px solid ${C.amber}`,borderLeft:`6px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",display:"flex",gap:10,alignItems:"flex-start"}}>
+                <div style={{fontSize:22,lineHeight:1,flexShrink:0}}>📋</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{...F.title,fontSize:11,fontWeight:700,color:"#92400e",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4}}>Observação para a Programação</div>
+                  <div style={{...F.body,fontSize:14,color:"#78350f",fontWeight:600,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>{obsProgr}</div>
+                </div>
+              </div>
+            )}
+            {mostrarObsBord && (
+              <div style={{background:"#ede9fe",border:`2px solid ${C.purple}`,borderLeft:`6px solid ${C.purple}`,borderRadius:8,padding:"12px 14px",display:"flex",gap:10,alignItems:"flex-start"}}>
+                <div style={{fontSize:22,lineHeight:1,flexShrink:0}}>🧵</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{...F.title,fontSize:11,fontWeight:700,color:"#5b21b6",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4}}>Observação para o Bordado</div>
+                  <div style={{...F.body,fontSize:14,color:"#4c1d95",fontWeight:600,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>{obsBord}</div>
+                </div>
+              </div>
+            )}
             {comDificuldade&&<div>
               <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Dificuldade</label>
               <div style={{display:"flex",gap:8}}>
@@ -1280,7 +1454,7 @@ function BipagemExpedicao({order,onChange,user}){
 }
 
 // ─── ABA DE EXECUÇÃO POR PERFIL ──────────────────────────────────────────────
-function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile}){
+function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile,loadingDet}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
   const[bipReady,setBipReady]=useState(false);
@@ -1315,7 +1489,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 
   // ── EXECUÇÃO POR BORDADO: Programação (c/ dificuldade) e Amostras (s/ dificuldade) ─
   if(etapa==="Programação"||etapa==="Amostra Digital"||etapa==="Amostra Física"){
-    return <ExecPorBordado order={order} etapa={etapa} comDificuldade={etapa==="Programação"} onAction={onAction} setActionMsg={setActionMsg} setActionDone={setActionDone}/>;
+    return <ExecPorBordado order={order} etapa={etapa} comDificuldade={etapa==="Programação"} onAction={onAction} setActionMsg={setActionMsg} setActionDone={setActionDone} loadingDet={loadingDet}/>;
   }
 
   // ── DIRECIONADOR ────────────────────────────────────────────────────────────
@@ -1532,10 +1706,15 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{ehDigital?"Amostra digital anexada":"Amostra física anexada"}</label>
           <ArquivosBox fileIds={fileIds} emptyText="Nenhum arquivo de amostra anexado ainda."/>
         </div>
-        {/* Observação */}
+        {/* Motivo da reprovação — só usado se Reprovar */}
         <div>
-          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Observações do cliente (opcional)</label>
-          <textarea value={obsText} onChange={e=>setObsText(e.target.value)} rows={3} placeholder="Ex: cliente aprovou com ajuste no tamanho da fonte..."
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>
+            Motivo da reprovação <span style={{color:C.gray400,fontWeight:500}}>(obrigatório apenas se REPROVAR)</span>
+          </label>
+          <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:8,lineHeight:1.4}}>
+            Preencha somente se o cliente rejeitou a amostra. Descreva o que precisa ser ajustado — a programadora usará essa informação para refazer.
+          </div>
+          <textarea value={obsText} onChange={e=>setObsText(e.target.value)} rows={3} placeholder="Ex: cliente pediu para trocar a cor da linha para verde escuro; ajustar o tamanho da fonte..."
             style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
         </div>
         {/* Botões de decisão */}
@@ -1544,7 +1723,13 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             style={{flex:1,minWidth:140,background:C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="check" s={16} c={C.white}/> Amostra Aprovada
           </button>
-          <button onClick={async()=>{try{const m=await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
+          <button onClick={async()=>{
+              if(!obsText.trim()){
+                alert("Pra reprovar, preencha o motivo. A programadora vai usar essa informação para refazer.");
+                return;
+              }
+              try{const m=await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}
+            }}
             style={{flex:1,minWidth:140,background:C.white,color:C.red,border:`2px solid ${C.red}`,borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
             <Ic n="close" s={16} c={C.red}/> Reprovar — Refazer
           </button>
@@ -1573,7 +1758,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       </div>
       {/* Info do pedido */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
-        {[["Pedido",order.id],["Cliente",order.client],["Total de peças",String(order.items.reduce((s,i)=>s+i.qty,0))],["Valor",fmtR(order.valor)]].map(([k,v])=>(
+        {[["Pedido",order.id],["Cliente",order.client],["Total de peças",String(pecasDoCard(order))],["Valor",fmtR(order.valor)]].map(([k,v])=>(
           <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
             <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
             <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{v}</div>
@@ -1583,24 +1768,120 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
       {/* Itens a executar nesta etapa */}
       {order.items&&order.items.length>0&&(
         <div>
-          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{etapa==="Expedição"||etapa==="Faturamento"?"Todos os itens do pedido":`Itens para ${etapa==="Bordado Externo"?"bordado externo":"bordado"}`} ({order.items.length})</label>
-          <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
-            <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:380}}>
-              <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
-                {["SKU","Descrição","TAM","Qtd",etapa.includes("e Externo")||etapa==="Bordado Interno e Externo"?"Destino":null].filter(Boolean).map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
-              </tr></thead>
-              <tbody>{order.items.map((it,i)=>(
-                <tr key={it.id||i} style={{borderBottom:`1px solid ${C.gray100}`}}>
-                  <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700}}>{it.sku}</td>
-                  <td style={{padding:"8px 10px",...F.body,color:C.gray700}}>{it.desc}</td>
-                  <td style={{padding:"8px 10px",...F.body,color:C.gray500,fontSize:12}}>{it.cor}</td>
-                  <td style={{padding:"8px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
-                </tr>
-              ))}</tbody>
-            </table>
-          </div>
+          {/* Bordado Interno/Externo: mostra SÓ itens que têm bordado (com bordado===true).
+              Outros pedidos (Expedição/Faturamento): mostra tudo. Ordenação por SKU
+              agrupa mesmo produto de grades diferentes. */}
+          {(() => {
+            const isExpFat = etapa==="Expedição"||etapa==="Faturamento";
+            const itensBase = isExpFat ? order.items : order.items.filter(it=>it.bordado);
+            const itensOrdenados = itensBase.slice().sort((a,b)=>{
+              const sa=String(a.sku||""), sb=String(b.sku||"");
+              if(sa!==sb) return sa.localeCompare(sb);
+              return String(a.cor||"").localeCompare(String(b.cor||""));
+            });
+            return (
+              <>
+                <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>{isExpFat?"Todos os itens do pedido":`Itens para ${etapa==="Bordado Externo"?"bordado externo":"bordado"}`} ({itensOrdenados.length})</label>
+                <div style={{overflowX:"auto",border:`1px solid ${C.gray200}`,borderRadius:8}}>
+                  <table style={{width:"100%",fontSize:13,borderCollapse:"collapse",minWidth:380}}>
+                    <thead><tr style={{borderBottom:`2px solid ${C.gray200}`,background:C.gray50}}>
+                      {["SKU","Descrição","TAM","Qtd",etapa.includes("e Externo")||etapa==="Bordado Interno e Externo"?"Destino":null].filter(Boolean).map(hd=><th key={hd} style={{padding:"8px 10px",textAlign:"left",fontSize:11,color:C.gray500,fontWeight:700,...F.body,textTransform:"uppercase"}}>{hd}</th>)}
+                    </tr></thead>
+                    <tbody>{itensOrdenados.map((it,i)=>(
+                      <tr key={it.id||i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+                        <td style={{padding:"8px 10px",fontFamily:"monospace",fontWeight:700,fontSize:12,color:C.gray700,verticalAlign:"top"}}>{it.sku}</td>
+                        <td style={{padding:"8px 10px",...F.body,color:C.gray700,verticalAlign:"top"}}>
+                          <div>{it.desc}</div>
+                          {it.descricao&&<div style={{
+                            marginTop:4,fontSize:11,fontWeight:600,color:"#92400e",
+                            background:"#fef3c7",borderLeft:`3px solid #fcd34d`,
+                            borderRadius:3,padding:"4px 7px",lineHeight:1.4,
+                            whiteSpace:"pre-wrap",wordBreak:"break-word"
+                          }}>
+                            <strong>📝 Obs vendedor:</strong> {it.descricao}
+                          </div>}
+                        </td>
+                        <td style={{padding:"8px 10px",...F.body,color:C.gray500,fontSize:12,verticalAlign:"top"}}>{it.cor}</td>
+                        <td style={{padding:"8px 10px",fontWeight:700,...F.body,verticalAlign:"top"}}>{it.qty}</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
+      {/* Bordados aprovados + arquivos da programação — usados no Bordado Interno/Externo */}
+      {/* Bordados desta etapa — com observações do vendedor em destaque */}
+      {(etapa==="Bordado Interno"||etapa==="Bordado Externo"||etapa==="Bordado Interno e Externo") && (() => {
+        const bordadosLista = (order.bordadosJson||[]).filter(b => b && (b.fileName||b.fileId));
+        if (!bordadosLista.length) return null;
+        const ehImg = (n="") => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(n);
+        const limpaNome = (n="") => n.replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
+        return (
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Bordados ({bordadosLista.length})</label>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {bordadosLista.map((b,i) => {
+                const img = ehImg(b.fileName||"");
+                return (
+                  <div key={b.fileId||("bk"+i)} style={{border:`1px solid ${C.gray200}`,borderRadius:10,padding:12,display:"flex",flexDirection:"column",gap:10}}>
+                    <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                      {img&&b.fileUrl
+                        ?<img src={b.fileUrl} alt="" style={{width:64,height:64,objectFit:"cover",borderRadius:8,border:`1px solid ${C.gray200}`,flexShrink:0}}/>
+                        :<div style={{width:64,height:64,borderRadius:8,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="box" s={24} c={C.gray400}/></div>}
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,wordBreak:"break-word"}}>{limpaNome(b.fileName)}</div>
+                        {b.fileUrl&&<a href={b.fileUrl} target="_blank" rel="noreferrer" download style={{...F.body,fontSize:12,color:C.blue,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4,marginTop:4,textDecoration:"none"}}><Ic n="download" s={13} c={C.blue}/> Baixar arquivo</a>}
+                      </div>
+                    </div>
+                    {b.obs_bordado && (
+                      <div style={{background:"#fef3c7",border:`2px solid ${C.amber}`,borderLeft:`6px solid ${C.amber}`,borderRadius:8,padding:"12px 14px",display:"flex",gap:10,alignItems:"flex-start"}}>
+                        <div style={{fontSize:22,lineHeight:1,flexShrink:0}}>🧵</div>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{...F.title,fontSize:11,fontWeight:700,color:"#92400e",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:4}}>Observação do vendedor para o Bordado</div>
+                          <div style={{...F.body,fontSize:14,color:"#78350f",fontWeight:600,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>{b.obs_bordado}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {/* Arquivos da programação e amostras aprovadas — todos os anexos
+                que a bordadeira precisa pra bordar corretamente. */}
+            {(() => {
+              const progIds = String(order.arqProgramacao||"").split(";").filter(Boolean);
+              const digIds = String(order.arqAmostraDigital||"").split(";").filter(Boolean);
+              const fisIds = String(order.arqAmostraFisica||"").split(";").filter(Boolean);
+              if (!progIds.length && !digIds.length && !fisIds.length) return null;
+              return (
+                <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:14}}>
+                  {progIds.length>0&&<div>
+                    <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>
+                      Arquivos da programação ({progIds.length}) — anexados pela programadora
+                    </label>
+                    <ArquivosBox fileIds={progIds} emptyText="Nenhum arquivo de programação anexado."/>
+                  </div>}
+                  {digIds.length>0&&<div>
+                    <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>
+                      Amostra digital aprovada ({digIds.length})
+                    </label>
+                    <ArquivosBox fileIds={digIds} emptyText=""/>
+                  </div>}
+                  {fisIds.length>0&&<div>
+                    <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>
+                      Amostra física aprovada ({fisIds.length})
+                    </label>
+                    <ArquivosBox fileIds={fisIds} emptyText=""/>
+                  </div>}
+                </div>
+              );
+            })()}
+          </div>
+        );
+      })()}
       {/* Conferência por bipagem (somente Expedição) */}
       {etapa==="Expedição"&&(
         <BipagemExpedicao order={order} user={me} onChange={(r,info)=>{ setBipReady(r); bipInfoRef.current=info||{}; }}/>
@@ -1657,9 +1938,35 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   },[_orderLeve?.posvendaId,_orderLeve?.bordadoId]);
   // Mescla: dados leves sempre existem (vindo do snapshot); enriched preenche
   // items, historico, timeline, contato, etc, quando termina de carregar.
-  const order=_enriched?{..._orderLeve,..._enriched}:_orderLeve;
+  // IMPORTANTE: preservamos os campos que o snapshot calculou (etapa, stageId,
+  // pedidoLinx) sobre os do enriched — porque o snapshot já junta pós-venda +
+  // bordado e sabe a etapa granular ("Programação", não "Em Processo de Bordado").
+  const order=_enriched?{
+    ..._enriched,
+    etapa: _orderLeve.etapa,
+    stageId: _orderLeve.stageId,
+    stageIdAtual: _orderLeve.stageIdAtual,
+    pedidoLinx: _orderLeve.pedidoLinx,
+    bordadoId: _orderLeve.bordadoId||_enriched.bordadoId,
+    posvendaId: _orderLeve.posvendaId||_enriched.posvendaId,
+    vendasId: _orderLeve.vendasId||_enriched.vendasId,
+    id: _orderLeve.id||_enriched.id,
+    // Se snapshot leve sabe que tem bordado (bordadoId existe), respeita.
+    // O enriched às vezes lê pedido_com_bordado do deal e vem false por dado
+    // desatualizado — o bordadoId é a verdade.
+    temBordado: !!(_orderLeve.bordadoId) || _enriched.temBordado || _orderLeve.temBordado,
+    // Preserva etapasAtivas do snapshot (não vem no enriched)
+    etapasAtivas: _orderLeve.etapasAtivas || _enriched.etapasAtivas || [_orderLeve.etapa],
+  }:_orderLeve;
   const ETAPAS_COM_ACAO=["Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Faturamento"];
-  const defaultTab=ETAPAS_COM_ACAO.includes(order.etapa)?"acao":"info";
+  // A "etapa efetiva" é a que o USUÁRIO abriu (vinda da tela — ex.: "Separação"
+  // via aba Separação). Se abriu de uma tela sem etapa específica, cai na
+  // etapa real do card. Isso deixa a mesma order abrir sem ações quando vista
+  // pela Separação e com ações quando vista pela Programação.
+  const etapaEfetiva = _orderLeve?._etapaOrigem || order.etapa;
+  // Só mostra ações se a etapa efetiva REALMENTE tem ação nessa etapa E é
+  // igual à etapa real do card (senão veio de outra tela só pra ver).
+  const defaultTab = (ETAPAS_COM_ACAO.includes(etapaEfetiva) && etapaEfetiva===order.etapa) ? "acao" : "info";
   const[tab,setTab]=useState(defaultTab);
   const[uploadFile,setUploadFile]=useState(null);
   const[uploadName,setUploadName]=useState("");
@@ -1674,6 +1981,20 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const itemKeys=itensDirecionaveis.map((it,i)=>it.id||i);
   const[itemSel,setItemSel]=useState({});
   const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach((it,i)=>{if(it.dest)m[it.id||i]=it.dest;});return m;});
+  // Quando items chegam pelo enriquecimento sob demanda (eram [] no card leve),
+  // refaz o itemDest pra incorporar os dest pré-existentes que vieram do HubSpot.
+  useEffect(()=>{
+    if(!order.items||!order.items.length)return;
+    setItemDest(prev=>{
+      let mudou=false;
+      const novo={...prev};
+      order.items.forEach((it,i)=>{
+        const key=it.id||i;
+        if(it.dest&&!novo[key]){novo[key]=it.dest;mudou=true;}
+      });
+      return mudou?novo:prev;
+    });
+  },[order.items.length]);
   const nSel=skus.filter(s=>itemSel[s]).length;
   const allDestDefined=itensDirecionaveis.every((it,i)=>itemDest[it.id||i]);
   const toggleItemSel=(key)=>setItemSel(p=>({...p,[key]:!p[key]}));
@@ -1681,10 +2002,13 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const setDestSel=(dest)=>{const selKeys=itemKeys.filter(k=>itemSel[k]);if(!selKeys.length){alert("Selecione ao menos um item.");return;}setItemDest(p=>{const n={...p};selKeys.forEach(k=>n[k]=dest);return n;});};
   const setDestAll=(dest)=>{const n={};itemKeys.forEach(k=>n[k]=dest);setItemDest(n);};
   const setDestOne=(key,dest)=>setItemDest(p=>({...p,[key]:dest}));
-  const total=order.items.reduce((s,i)=>s+i.qty,0);
+  const total=pecasDoCard(order);
   const sla=getSLA(order,slaCfg);
   // A aba Executar aparece quando a etapa atual do pedido tem uma ação possível
-  const hasAction=ETAPAS_COM_ACAO.includes(order.etapa);
+  // E o usuário veio de uma tela que corresponde a essa etapa (ex.: Programação).
+  // Quem abre da Separação vê o card sem ações — mesmo pedido, mas essa aba
+  // não tem execução.
+  const hasAction=ETAPAS_COM_ACAO.includes(order.etapa) && etapaEfetiva===order.etapa;
   const TABS=[
     ...(order.etapa==="Programação"?[]:[{id:"info",l:"Negócio"}]),
     {id:"sla",l:"SLA / Prazo"},
@@ -1708,8 +2032,11 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
               {(sla.st==="late"||sla.st==="risk"||sla.ft==="late"||sla.ft==="risk")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
             </div>
-            <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:3,fontWeight:600}}>{order.client}</div>
-            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor}{order.etapa!=="Programação"?` · ${total} peças · ${fmtR(order.valor)}`:""}</div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,flexWrap:"wrap"}}>
+              <BadgeSeparacao status={statusSepDoOrder(order)} qtdSep={order.qtdSeparada} qtdTot={order.qtdTotal} qtdItensSep={order.qtdItensSeparados} totalItens={order.totalItensSeparacao} size="lg"/>
+            </div>
+            <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:6,fontWeight:600}}>{order.client}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor}{order.etapa!=="Programação"?` · ${pecasDoCard(order)} peças · ${fmtR(order.valor)}`:""}</div>
           </div>
           <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",padding:4}}><Ic n="close" s={18} c={C.gray400}/></button>
         </div>
@@ -1729,7 +2056,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Data limite",dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)"],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Prazo Faturamento do Pedido",dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)"],["Entrada",fmtD(order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black,wordBreak:"break-word"}}>{v}</div>
@@ -1755,9 +2082,9 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {/* SLA */}
           {tab==="sla"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
-              {[["SLA desta Etapa",sla.st,[`${sla.hrs.toFixed(0)}h`,`/ ${sla.sla}h`],sla.st==="late"?"Etapa ultrapassou o SLA":sla.st==="risk"?"Próximo do limite":"Dentro do SLA"],
-                ["Data limite",sla.ft==="none"?"none":sla.ft,
-                  sla.htd==null?["A definir",""]:[sla.ft==="late"?`${Math.abs(sla.htd).toFixed(0)}h atraso`:`${sla.htd.toFixed(0)}h restantes`,""],
+              {[["SLA desta Etapa",sla.st,[fmtHoras(sla.hrs),`/ ${fmtHoras(sla.sla)}`],sla.st==="late"?"Etapa ultrapassou o SLA":sla.st==="risk"?"Próximo do limite":"Dentro do SLA"],
+                ["Prazo Faturamento do Pedido",sla.ft==="none"?"none":sla.ft,
+                  sla.htd==null?["A definir",""]:[sla.ft==="late"?`${fmtHoras(Math.abs(sla.htd))} de atraso`:`${fmtHoras(sla.htd)} restantes`,""],
                   sla.htd==null?"Sem amostra aprovada — prazo ainda não inicia":sla.ft==="late"?"Pedido fora do prazo":sla.ft==="risk"?"Prazo muito próximo":"Dentro do prazo"]
               ].map(([title,st,vals,msg])=>{
                 const c=st==="late"?C.red:st==="risk"?C.amber:st==="none"?C.gray400:C.green;
@@ -1766,7 +2093,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                     <SecH>{title}</SecH>
                     <div style={{...F.title,fontSize:26,fontWeight:700,color:c,lineHeight:1}}>{vals[0]} <span style={{fontSize:14,fontWeight:400,color:C.gray400}}>{vals[1]}</span></div>
                     {title==="SLA desta Etapa"&&<div style={{marginTop:8}}><SLABar pct={sla.pct} st={sla.st}/></div>}
-                    {title==="Data limite"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtD(dataVencimento(order))}</div>}
+                    {title==="Prazo Faturamento do Pedido"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtD(dataVencimento(order))}</div>}
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:6}}>{msg}</div>
                   </Card>
                 );
@@ -1840,12 +2167,34 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               <tbody>{order.items.map((it,i)=>(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
                   <td style={{padding:"9px 10px",fontWeight:700,fontFamily:"monospace",fontSize:12,color:C.gray700}}>{it.sku}</td>
-                  <td style={{padding:"9px 10px",...F.body,color:C.gray700}}>{it.desc}</td>
+                  <td style={{padding:"9px 10px",...F.body,color:C.gray700}}>
+                    <div>{it.desc}</div>
+                    {it.descricao&&<div style={{
+                      marginTop:4,fontSize:11,fontWeight:600,color:"#92400e",
+                      background:"#fef3c7",borderLeft:`3px solid #fcd34d`,
+                      borderRadius:3,padding:"4px 7px",lineHeight:1.4,
+                      whiteSpace:"pre-wrap",wordBreak:"break-word"
+                    }}>
+                      <strong>📝 Obs vendedor:</strong> {it.descricao}
+                    </div>}
+                  </td>
                   <td style={{padding:"9px 10px",...F.body,color:C.gray500}}>{it.cor}</td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                   <td style={{padding:"9px 10px"}}>{it.bordado?<Tag label="Bordado" color={C.red}/>:<span style={{color:C.gray400}}>—</span>}</td>
                   <td style={{padding:"9px 10px"}}>{it.dest?<Tag label={it.dest==="interno"?"Interno":"Externo"} color={it.dest==="interno"?C.green:C.purple}/>:<span style={{color:C.gray400}}>—</span>}</td>
-                  <td style={{padding:"9px 10px"}}><Tag label={it.status==="faltante"?"Faltante":it.status==="bordando"?"Bordando":it.status==="pronto"?"Pronto":"Separado"} color={it.status==="faltante"?C.red:it.status==="pronto"?C.green:C.gray500}/></td>
+                  <td style={{padding:"9px 10px"}}><Tag label={
+                    it.status==="faltante" ? "Faltante"
+                    : it.status==="bordando" ? "Bordando"
+                    : it.status==="pronto" ? "Pronto"
+                    : it.status==="separado" ? "Separado"
+                    : "Pendente"
+                  } color={
+                    it.status==="faltante" ? C.red
+                    : it.status==="pronto" ? C.green
+                    : it.status==="separado" ? C.green
+                    : it.status==="bordando" ? C.gray500
+                    : C.red
+                  }/></td>
                 </tr>
               ))}</tbody>
               <tfoot><tr style={{borderTop:`2px solid ${C.gray200}`,background:C.gray50}}>
@@ -1870,6 +2219,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
             toggleItemSel={toggleItemSel} selAllItems={selAllItems}
             setDestSel={setDestSel} setDestAll={setDestAll} setDestOne={setDestOne}
             onAction={onAction} isMobile={isMobile}
+            loadingDet={_loadingDet}
           />}
         </div>
       </div>
@@ -1879,7 +2229,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
 
 // ─── ORDER CARD ───────────────────────────────────────────────────────────────
 function OCard({order,onClick,slaCfg}){
-  const total=order.items.reduce((s,i)=>s+i.qty,0);
+  const total=pecasDoCard(order);
   const falt=order.items.filter(i=>i.status==="faltante").reduce((s,i)=>s+i.qty,0);
   const sla=getSLA(order,slaCfg);
   const venc=sla.venc;
@@ -1888,6 +2238,9 @@ function OCard({order,onClick,slaCfg}){
   // Cor da data limite: vermelho vencido, âmbar <24h, cinza ok, cinza claro indefinido
   const corLimite=!venc?C.gray400:vencido?C.red:risco?C.amber:C.gray600;
   const accent=vencido?C.red:risco?C.amber:STAGE_COLOR[order.etapa]||C.gray300;
+  // Cards de Programação são feitos por programadora externa — ocultar dados
+  // comerciais (valor, quantidade de peças, data limite). Só mostra ID, cliente e SLA.
+  const ehProg = order.etapa === "Programação";
   return(
     <div onClick={onClick} style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,padding:14,cursor:"pointer",borderLeft:`3px solid ${accent}`}}
       onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.07)";}}
@@ -1897,26 +2250,29 @@ function OCard({order,onClick,slaCfg}){
           <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{idPedido(order)}</div>
           <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{order.client}</div>
         </div>
-        <ETag etapa={order.etapa}/>
+        <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
+          <ETag etapa={order.etapa}/>
+          {order.subEtapa&&<span style={{...F.title,fontSize:9,fontWeight:700,letterSpacing:"0.04em",padding:"2px 6px",borderRadius:4,background:order.subEtapa==="Aguardando peça"?C.amber+"18":C.gray100,color:order.subEtapa==="Aguardando peça"?"#92400e":C.gray600,border:`1px solid ${order.subEtapa==="Aguardando peça"?C.amber+"55":C.gray200}`,whiteSpace:"nowrap"}}>{order.subEtapa==="Aguardando peça"?"⏳ ":""}{order.subEtapa}</span>}
+        </div>
       </div>
-      <div style={{display:"flex",gap:12,...F.body,fontSize:12,color:C.gray500,flexWrap:"wrap",marginBottom:8}}>
+      {!ehProg&&<div style={{display:"flex",gap:12,...F.body,fontSize:12,color:C.gray500,flexWrap:"wrap",marginBottom:8}}>
         <span style={{fontWeight:700,color:C.green}}>{fmtR(order.valor)}</span>
         <span>{total} peças</span>
         {falt>0&&<span style={{color:C.red,fontWeight:600}}>{falt} faltantes</span>}
         {order.temBordado===false&&<span style={{color:C.gray500,fontWeight:600}}>Sem bordado</span>}
-      </div>
-      {/* DATA LIMITE em destaque */}
-      <div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 9px",borderRadius:6,marginBottom:8,
+      </div>}
+      {/* DATA LIMITE em destaque (não mostrada em Programação) */}
+      {!ehProg&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"6px 9px",borderRadius:6,marginBottom:8,
         background:!venc?C.gray100:vencido?C.red+"12":risco?C.amber+"14":C.gray100,
         border:`1px solid ${!venc?C.gray200:vencido?C.red+"35":risco?C.amber+"40":C.gray200}`}}>
         <Ic n="clock" s={13} c={corLimite}/>
         <span style={{...F.body,fontSize:11.5,fontWeight:700,color:corLimite}}>
-          {!venc?"Data limite a definir":vencido?`Vencido em ${fmtDS(venc)}`:`Vence em ${fmtDS(venc)}`}
+          {!venc?"Prazo Faturamento a definir":vencido?`Vencido em ${fmtDS(venc)}`:`Vence em ${fmtDS(venc)}`}
         </span>
-      </div>
+      </div>}
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <SLABar pct={sla.pct} st={sla.st}/>
-        <span style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>
+        {!ehProg&&<span style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>}
       </div>
     </div>
   );
@@ -1941,7 +2297,11 @@ function MinhasDemandas({user,onOpen,slaCfg}){
     const todos = snapTodosPedidos(snap.data).map(o => normalizarCard(o, o.etapa));
     for (const m of modulos) {
       const etapa = MODULO_ETAPA[m];
-      obj[etapa] = ordenarPorPrioridade(todos.filter(o => o.etapa === etapa));
+      // Card entra na etapa se ela está em suas etapasAtivas (múltiplas etapas
+      // possíveis por card — ex.: separação + programação simultaneamente).
+      obj[etapa] = ordenarPorPrioridade(
+        todos.filter(o => (o.etapasAtivas || [o.etapa]).includes(etapa))
+      );
     }
     return obj;
   }, [snap.data, modulos.join(",")]);
@@ -1949,9 +2309,16 @@ function MinhasDemandas({user,onOpen,slaCfg}){
   const etapas=modulos.map(m=>MODULO_ETAPA[m]).filter(Boolean);
   const etapasComDados=etapas.filter(e=>dados&&(dados[e]||[]).length>0);
   const etapasMostrar=filtro==="todos"?etapasComDados:etapasComDados.filter(e=>e===filtro);
-  const total=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).length,0);
+  // Contagem única por vendasId (card pode estar em várias etapas)
+  const idsUnicos=new Set();
+  etapas.forEach(e=>((dados&&dados[e])||[]).forEach(o=>idsUnicos.add(o.vendasId||o.id)));
+  const total=idsUnicos.size;
   const agora=Date.now();
-  const atrasados=etapas.reduce((s,e)=>s+((dados&&dados[e])||[]).filter(o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora).length,0);
+  const idsAtrasados=new Set();
+  etapas.forEach(e=>((dados&&dados[e])||[]).forEach(o=>{
+    if(o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora) idsAtrasados.add(o.vendasId||o.id);
+  }));
+  const atrasados=idsAtrasados.size;
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:18}}>
@@ -1999,7 +2366,7 @@ function MinhasDemandas({user,onOpen,slaCfg}){
             <span style={{...F.body,fontSize:12,color:C.gray400}}>({dados[etapa].length})</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-            {dados[etapa].map(o=><OCard key={(o.id||"")+etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+            {dados[etapa].map(o=><OCard key={(o.id||"")+etapa} order={o} onClick={()=>onOpen({...o,_etapaOrigem:etapa})} slaCfg={slaCfg}/>)}
           </div>
         </div>
       ))}
@@ -2197,8 +2564,14 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
       {prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando direcionamento.</div>}
       {prontos.map(o=>{
         // Só itens COM bordado precisam de direcionamento. Fallback legado: sem flag em nenhum → todos.
+        // Ordena por SKU (agrupa mesmo produto de grades diferentes) e depois por tamanho.
         const itensComBordado=o.items.filter(it=>it.bordado);
-        const itensCard=itensComBordado.length?itensComBordado:o.items;
+        const itensCard=(itensComBordado.length?itensComBordado:o.items).slice().sort((a,b)=>{
+          const sa=String(a.sku||"");
+          const sb=String(b.sku||"");
+          if(sa!==sb) return sa.localeCompare(sb);
+          return String(a.cor||"").localeCompare(String(b.cor||""));
+        });
         const skus=itensCard.map(it=>it.id||it.sku);
         const dm=destMap[o.id]||{};
         const sm=sel[o.id]||{};
@@ -2215,10 +2588,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                   <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
                   <ETag etapa={o.etapa}/>
+                  <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                   {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
                   {sla.ft==="late"&&<Tag label="Prazo vencido" color={C.red}/>}
                 </div>
-                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {o.items.reduce((s,i)=>s+i.qty,0)} peças</div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
               </div>
               <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
             </div>
@@ -2670,7 +3044,7 @@ function Dashboard({onOpen,slaCfg}){
     if(centro&&o.centroCusto!==centro)return false;
     if(bordadoF==="com"&&o.temBordado===false)return false;
     if(bordadoF==="sem"&&o.temBordado!==false)return false;
-    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)))return false;
+    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)||String(o.pedidoLinx||"").toLowerCase().includes(q)||String(o.vendasId||"").includes(q)))return false;
     return true;
   });
   const agora=Date.now();
@@ -2720,7 +3094,7 @@ function Dashboard({onOpen,slaCfg}){
         </select>
         {grupo==="aberto"&&<div style={{position:"relative",flex:1,minWidth:200,maxWidth:340}}>
           <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
-          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente ou código..."
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido Linx ou ID..."
             style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px 9px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
         </div>}
       </div>
@@ -2969,17 +3343,22 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
     if(statusF==="atraso"&&!isAtrasado(o))return false;
     if(statusF==="prazo"&&isAtrasado(o))return false;
     if(q){
-      const alvo=((o.client||"")+" "+(o.id||"")+" "+(o.razaoSocial||"")).toLowerCase();
+      const alvo=((o.client||"")+" "+(o.id||"")+" "+(o.razaoSocial||"")+" "+(o.pedidoLinx||"")+" "+(o.vendasId||"")).toLowerCase();
       if(!alvo.includes(q))return false;
     }
     return true;
   });
   const total=filtrados.length;
   const atrasados=filtrados.filter(isAtrasado).length;
-  // Agrupado por fase (etapa), na ordem do fluxo
+  // Agrupado por fase (etapa), na ordem do fluxo. Como um mesmo pedido pode
+  // aparecer em VÁRIAS etapas (via etapasAtivas do worker), a contagem geral
+  // acima (total) é única por vendasId. Cada agrupamento por etapa usa
+  // etapasAtivas.includes(nome) — assim um card em separação + programação
+  // aparece nas duas seções.
+  const perteceEtapa = (o, nome) => (o.etapasAtivas||[o.etapa]).includes(nome);
   const porEtapa=ABERTO_ETAPAS.map(e=>({
     etapa:e.nome,
-    ords:ordenarPorPrioridade(filtrados.filter(o=>o.etapa===e.nome)),
+    ords:ordenarPorPrioridade(filtrados.filter(o=>perteceEtapa(o,e.nome))),
   })).filter(s=>s.ords.length>0);
 
   return(
@@ -2990,7 +3369,7 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
       {/* Busca em destaque */}
       <div style={{position:"relative"}}>
         <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={17} c={C.gray400}/></div>
-        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por nome do cliente ou número do pedido..."
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido Linx ou ID HubSpot..."
           style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:10,padding:"12px 14px 12px 42px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
       </div>
 
@@ -3040,7 +3419,7 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
             <span style={{...F.body,fontSize:12,color:C.gray400}}>({s.ords.length})</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:10}}>
-            {s.ords.map(o=><OCard key={(o.id||"")+s.etapa} order={o} onClick={()=>onOpen(o)} slaCfg={slaCfg}/>)}
+            {s.ords.map(o=><OCard key={(o.id||"")+s.etapa} order={o} onClick={()=>onOpen({...o,_etapaOrigem:s.etapa})} slaCfg={slaCfg}/>)}
           </div>
         </div>
       ))}
@@ -3483,6 +3862,13 @@ function SLAConfig({slaCfg,onSave}){
         </div>
       </Card>
 
+      {/* Manutenção — ações administrativas */}
+      <Card>
+        <SecH>Manutenção</SecH>
+        <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:16}}>Ações administrativas para corrigir problemas de dados no HubSpot.</div>
+        <BackfillLinxBtn/>
+      </Card>
+
       <div style={{display:"flex",gap:10,alignItems:"center"}}>
         <Btn label={saving?"Salvando...":"Salvar configurações"} icon="check" onClick={save}/>
         {saved&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
@@ -3492,61 +3878,80 @@ function SLAConfig({slaCfg,onSave}){
   );
 }
 
+// Botão que roda o backfill de id_negocio_vendas nos deals de bordado órfãos.
+// Resolve o caso de cards de Programação/Amostra/Bordado que não mostram o
+// número do Linx porque foram criados manualmente (sem passar pela automação).
+function BackfillLinxBtn(){
+  const [rodando,setRodando]=useState(false);
+  const [resultado,setResultado]=useState(null);
+  const [erro,setErro]=useState("");
+  const rodar=async()=>{
+    if(!confirm("Rodar backfill agora? Vai preencher a propriedade id_negocio_vendas nos deals de bordado que estão sem ela. Costuma levar alguns segundos e é seguro rodar quantas vezes precisar."))return;
+    setRodando(true);setResultado(null);setErro("");
+    try{
+      const r=await apiFetch("/backfill-id-negocio-vendas","POST",{});
+      if(r.success){
+        setResultado(r);
+      } else {
+        setErro(r.error||"Erro desconhecido");
+      }
+    }catch(e){setErro(e.message||"Falha na requisição");}
+    finally{setRodando(false);}
+  };
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      <div>
+        <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,marginBottom:4}}>
+          Preencher LINX em cards de Programação/Bordado
+        </div>
+        <div style={{...F.body,fontSize:12,color:C.gray500,lineHeight:1.45}}>
+          Alguns cards do pipeline de bordado ficam sem o número do Linx porque foram criados manualmente.
+          Este botão descobre o negócio de Vendas de cada um e preenche a propriedade <code>id_negocio_vendas</code>.
+          Pode rodar sempre que quiser — é idempotente.
+        </div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={rodar} disabled={rodando} style={{
+          background:rodando?C.gray400:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,
+          display:"inline-flex",alignItems:"center",gap:7
+        }}>
+          {rodando?"Rodando...":"Rodar backfill agora"}
+        </button>
+        {resultado&&<span style={{...F.body,fontSize:12,color:C.green,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>
+          <Ic n="check" s={13} c={C.green}/>
+          {resultado.atualizados!=null
+            ? `Concluído: ${resultado.atualizados} atualizados${resultado.encontrados!=null?" de "+resultado.encontrados+" órfãos":""}`
+            : "Concluído com sucesso"}
+        </span>}
+        {erro&&<span style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>Erro: {erro}</span>}
+      </div>
+    </div>
+  );
+}
+
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
 function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra}){
-  const [loading,setLoading]=useState(false);
-  const [hsData,setHsData]=useState(null);
-  const [loadError,setLoadError]=useState(null);
   const [busca,setBusca]=useState("");
   const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
 
-  const carregar=()=>{
-    if(!endpoint){setHsData(null);return;}
-    setLoading(true);setLoadError(null);
-    apiFetch(endpoint)
-      .then(res=>{
-        if(res.success){
-          const conv=res.data.map(o=>({
-            id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
-            client:o.client||"",vendedor:o.vendedor,valor:o.valor||0,
-            cnpj:o.cnpj||"",razaoSocial:o.razaoSocial||"",tel:o.telefone||"",email:o.email||"",
-            obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
-            condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
-            arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
-            motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
-            reprogramacao:o.reprogramacao||false,
-            historico:o.historico||[],
-            arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
-            houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
-            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
-            prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
-            etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
-            entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
-            alertas:o.alertas||[],concluido:false,
-            bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
-            items:(o.items||[]).map(it=>({
-              id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,
-              qty:it.quantidade,dest:it.direcionamento?it.direcionamento.toLowerCase():null,
-              bordador:(it.bordadorExterno||"").toLowerCase(),
-              status:"separado",
-            })),
-            timeline:[{stage:o.etapa||etapa,user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
-            chat:[],bordadosJson:o.bordadosJson||[],arquivoBordado:o.arquivoBordado||[],
-          }));
-          setHsData(conv);
-        }
-      })
-      .catch(e=>setLoadError(e.message))
-      .finally(()=>setLoading(false));
-  };
-  useEffect(carregar,[endpoint]);
-  useEffect(()=>{
-    _refreshListeners.push(carregar);
-    return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==carregar);};
-  },[endpoint]);
+  // Consome o snapshot único (1 chamada compartilhada com todas as outras telas).
+  // Filtra apenas a etapa que essa tela é responsável. Não chama endpoint específico.
+  const snap=useSnapshotAberto();
+  const loading=snap.loading&&!snap.data;
+  const loadError=snap.error;
+  const carregar=snap.refresh;
+  const hsData=useMemo(()=>{
+    if(!snap.data)return null;
+    const grupo=snap.data.porEtapa?.[etapa];
+    if(!grupo)return [];
+    return grupo.items.map(o=>normalizarCard(o,etapa));
+  },[snap.data,etapa]);
 
   const source=hsData!==null?hsData:orders;
-  let mine=source.filter(o=>o.etapa===etapa&&!o.concluido);
+  // Um card pode ter várias etapas ativas (ex.: card em Programação + Separação).
+  // Filtra por etapasAtivas — inclui o card se ele pertence a essa etapa.
+  let mine=source.filter(o=>((o.etapasAtivas||[o.etapa]).includes(etapa))&&!o.concluido);
 
   // Filtro de busca (código do produto/SKU ou nome do cliente)
   const q=busca.trim().toLowerCase();
@@ -3554,6 +3959,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     mine=mine.filter(o=>
       (o.client||"").toLowerCase().includes(q) ||
       (o.id||"").toLowerCase().includes(q) ||
+      String(o.pedidoLinx||"").toLowerCase().includes(q) ||
+      String(o.vendasId||"").includes(q) ||
       (o.items||[]).some(it=>(it.sku||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q))
     );
   }
@@ -3576,8 +3983,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 
   // Contadores para os chips de filtro
   const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
-  const nLate=all.filter(o=>getSLA(o,slaCfg).st==="late").length;
-  const nRisk=all.filter(o=>getSLA(o,slaCfg).st==="risk").length;
+  const nLate=all.filter(o=>getSLA(o,slaCfg,etapa).st==="late").length;
+  const nRisk=all.filter(o=>getSLA(o,slaCfg,etapa).st==="risk").length;
 
   const FilterChip=({id,label,count,color})=>(
     <button onClick={()=>setFiltroSLA(id)}
@@ -3598,7 +4005,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>
             <Ic n="search" s={15} c={C.gray400}/>
           </div>
-          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, SKU ou código..."
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido Linx, ID HubSpot ou SKU..."
             style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
         </div>
         {!finalizado&&<div style={{display:"flex",gap:7,flexWrap:"wrap"}}>
@@ -3618,13 +4025,18 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           {q||filtroSLA!=="todos"?"Nenhum pedido encontrado com esses filtros.":"Nenhum pedido nesta etapa."}
         </div>
         :mine.map(o=>{
-          const sla=getSLA(o,slaCfg);
+          const sla=getSLA(o,slaCfg,etapa);
           const ac=finalizado?C.green:(sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[etapa]||C.gray300);
           const slaLabel=sla.st==="late"?"ATRASADO":sla.st==="risk"?"EM RISCO":"NO PRAZO";
           const slaColor=sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green;
-          const totalPecas=o.items.reduce((s,i)=>s+(i.qty||0),0);
+          // Contagens: snapshot leve não tem items detalhados. Usa qtdTotal
+          // (total de peças) e totalItensSeparacao (nº de SKUs) do snapshot;
+          // só cai pra o.items quando o modal já enriqueceu.
+          const somaItems=o.items.reduce((s,i)=>s+(i.qty||0),0);
+          const totalPecas=somaItems>0?somaItems:Number(o.qtdTotal||0);
+          const totalSKUs=o.items.length>0?o.items.length:Number(o.totalItensSeparacao||0);
           return(
-            <Card key={o.id} onClick={()=>onOpen(o)}
+            <Card key={o.id} onClick={()=>onOpen({...o,_etapaOrigem:etapa})}
               style={{marginBottom:10,borderLeft:`4px solid ${ac}`,cursor:"pointer",transition:"box-shadow 0.15s,transform 0.15s"}}
               onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.08)";e.currentTarget.style.transform="translateY(-1px)";}}
               onMouseLeave={e=>{e.currentTarget.style.boxShadow="";e.currentTarget.style.transform="";}}>
@@ -3632,6 +4044,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</span>
+                    <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
                     {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
@@ -3648,7 +4061,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
                   <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{etapa==="Programação"
                     ? (()=>{const n=(o.bordadosJson||[]).filter(b=>/~prog/i.test(b.fileName||"")).length||(o.bordadosJson||[]).length; return `${n} programaç${n===1?"ão":"ões"}`;})()
-                    : `${fmtR(o.valor)} · ${o.items.length} SKU${o.items.length!==1?"s":""} · ${totalPecas} peça${totalPecas!==1?"s":""}`}</div>
+                    : `${fmtR(o.valor)} · ${totalSKUs} SKU${totalSKUs!==1?"s":""} · ${totalPecas} peça${totalPecas!==1?"s":""}`}</div>
                   {!finalizado&&<div style={{...F.body,fontSize:11,color:o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray600):C.gray400,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
                     <Ic n="clock" s={11} c={o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray500):C.gray300}/>
                     {o.dataVencimento?<>Vence em {fmtDS(o.dataVencimento)}</>:"Vencimento ainda não definido"}
@@ -4198,7 +4611,23 @@ function CodigosBarra({user}){
 
 // ─── IMPRESSÃO DE PEDIDO (folha de separação) ────────────────────────────────
 function Folha({emit,o,fmtDt}){
-  const totalPecas=(o.produtos||[]).reduce((s,p)=>s+p.total,0);
+  const totalPecas=(o.produtos||[]).reduce((s,p)=>s+(p.total||0),0);
+  const totalSeparado=(o.produtos||[]).reduce((s,p)=>s+(p.totalSeparado||0),0);
+  const status=o.statusSeparacao||"pendente";
+  const STATUS_CFG={
+    completa: {lbl:"PEDIDO COMPLETO",     sub:"TODAS AS PEÇAS SEPARADAS",                 cor:"#15803d",bg:"#dcfce7",bd:"#86efac"},
+    parcial:  {lbl:"PEDIDO SEPARADO PARCIAL", sub:totalPecas>0?`${totalSeparado} DE ${totalPecas} PEÇAS SEPARADAS`:"ATENÇÃO: HÁ PEÇAS PENDENTES",cor:"#c2410c",bg:"#ffedd5",bd:"#fdba74"},
+    pendente: {lbl:"SEPARAÇÃO PENDENTE",  sub:"NENHUMA PEÇA FOI SEPARADA AINDA",          cor:"#991b1b",bg:"#fee2e2",bd:"#fca5a5"},
+  };
+  const st=STATUS_CFG[status]||STATUS_CFG.pendente;
+  const ehImg=(n="")=>/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(n);
+  const limpaNome=(n="")=>n.replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
+  const AMBER={cor:"#92400e",bg:"#fef3c7",bd:"#fcd34d"};
+  const pilProduto=(p)=>{
+    if(p.statusProduto==="completo")return {lbl:"SEPARADO",cor:"#15803d",bg:"#dcfce7",bd:"#86efac"};
+    if(p.statusProduto==="parcial") return {lbl:`PARCIAL ${p.gradesSeparadas||0}/${p.qtdGrades||0}`,cor:"#c2410c",bg:"#ffedd5",bd:"#fdba74"};
+    return {lbl:"PENDENTE",cor:"#991b1b",bg:"#fee2e2",bd:"#fca5a5"};
+  };
   return(
     <div className="folha-print" style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 2px 12px rgba(0,0,0,0.08)",width:"100%",maxWidth:820,padding:32,boxSizing:"border-box"}}>
       <div style={{display:"flex",alignItems:"center",gap:16,borderBottom:`2px solid ${C.gray300}`,paddingBottom:14,marginBottom:14}}>
@@ -4213,40 +4642,98 @@ function Folha({emit,o,fmtDt}){
         <div style={{textAlign:"right",flexShrink:0}}>
           <div style={{...F.title,fontSize:10,fontWeight:700,color:C.gray500,letterSpacing:"0.1em"}}>FOLHA DE SEPARAÇÃO</div>
           <div style={{...F.title,fontSize:18,fontWeight:800,color:C.black}}>
-            {o.pedidoLinx ? <>Pedido {o.pedidoLinx} <span style={{fontSize:12,color:C.gray500,fontWeight:600}}>| {o.pedido}</span></> : <>Pedido {o.pedido}</>}
+            {o.pedidoLinx ? <>PED {o.pedidoLinx} <span style={{fontSize:12,color:C.gray500,fontWeight:600}}>| {o.pedido}</span></> : <>PED {o.pedido}</>}
           </div>
           {o.data&&<div style={{...F.body,fontSize:11,color:C.gray500}}>{fmtDt(o.data)}</div>}
         </div>
       </div>
+
+      {/* Banner de status */}
+      <div style={{marginBottom:16,borderRadius:10,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,border:`2px solid ${st.bd}`,background:st.bg,color:st.cor}}>
+        <div>
+          <div style={{...F.title,fontSize:20,fontWeight:800,letterSpacing:"0.04em"}}>{st.lbl}</div>
+          <div style={{...F.title,fontSize:11,fontWeight:700,opacity:0.9,marginTop:3,letterSpacing:"0.05em"}}>{st.sub}</div>
+        </div>
+        <div style={{...F.body,textAlign:"right",fontSize:12,fontWeight:700}}>{totalSeparado} / {totalPecas} peças</div>
+      </div>
+
       <div style={{background:C.gray50,borderRadius:8,padding:"10px 14px",marginBottom:16}}>
         <span style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Cliente: </span>
         <span style={{...F.body,fontSize:14,fontWeight:700,color:C.black}}>{o.cliente||"—"}</span>
         {(o.cnpj||o.endereco)&&<div style={{...F.body,fontSize:11,color:C.gray600,marginTop:2}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.endereco?(o.cnpj?" · ":"")+o.endereco:""}</div>}
       </div>
+
+      <div style={{...F.title,fontSize:12,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",textTransform:"uppercase",margin:"4px 0 8px"}}>Produtos ({(o.produtos||[]).length})</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {(o.produtos||[]).map((p,i)=>(
-          <div key={i} className="produto-row" style={{display:"flex",gap:14,alignItems:"center",border:`1px solid ${C.gray200}`,borderRadius:8,padding:10}}>
+        {(o.produtos||[]).map((p,i)=>{
+          const pil=pilProduto(p);
+          return (
+          <div key={i} className="produto-row" style={{display:"flex",gap:14,alignItems:"stretch",border:`1px solid ${C.gray200}`,borderRadius:8,padding:10}}>
             <div style={{width:84,height:84,border:`1px solid ${C.gray200}`,borderRadius:6,background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",flexShrink:0}}>
               {p.foto?<img src={p.foto} alt="" style={{width:"100%",height:"100%",objectFit:"contain"}}/>:<span style={{...F.body,fontSize:9,color:C.gray400}}>sem foto</span>}
             </div>
-            <div style={{flex:1,minWidth:0}}>
-              <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,fontFamily:"monospace"}}>{p.sku}</div>
-              <div style={{...F.title,fontSize:15,fontWeight:800,color:C.black,marginBottom:5,lineHeight:1.15}}>{p.nome}</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                {p.grades.map((g,j)=>(
-                  <span key={j} style={{...F.body,fontSize:12,fontWeight:600,background:C.gray100,borderRadius:5,padding:"2px 9px"}}>{g.tamanho||"—"}: <strong>{g.qtd}</strong></span>
-                ))}
+            <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
+                <span style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,fontFamily:"monospace"}}>{p.sku}</span>
+                <span style={{...F.title,fontSize:9.5,fontWeight:800,letterSpacing:"0.05em",padding:"2px 8px",borderRadius:5,background:pil.bg,color:pil.cor,border:`1px solid ${pil.bd}`}}>{pil.lbl}</span>
               </div>
+              <div style={{...F.title,fontSize:15,fontWeight:800,color:C.black,lineHeight:1.15}}>{p.nome}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:3}}>
+                {(p.grades||[]).map((g,j)=>{
+                  const corBg=g.separado?"#dcfce7":C.gray100;
+                  const corFg=g.separado?"#15803d":C.gray600;
+                  const corDot=g.separado?"#15803d":C.gray400;
+                  return (
+                    <span key={j} style={{...F.body,fontSize:11,fontWeight:600,background:corBg,color:corFg,borderRadius:5,padding:"2px 8px",display:"inline-flex",alignItems:"center",gap:4}}>
+                      <span style={{width:6,height:6,borderRadius:"50%",background:corDot,display:"inline-block"}}/>
+                      {g.tamanho||"—"}: <strong>{g.qtd}</strong>
+                    </span>
+                  );
+                })}
+              </div>
+              {p.descricao&&<div style={{marginTop:6,background:AMBER.bg,borderLeft:`4px solid ${AMBER.bd}`,borderRadius:4,padding:"6px 9px",...F.body,fontSize:11.5,color:AMBER.cor,fontWeight:600,lineHeight:1.4,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+                <strong>📝 Obs do vendedor:</strong> {p.descricao}
+              </div>}
             </div>
-            <div style={{textAlign:"center",flexShrink:0,paddingLeft:10,borderLeft:`1px solid ${C.gray200}`}}>
+            <div style={{textAlign:"center",flexShrink:0,paddingLeft:10,borderLeft:`1px solid ${C.gray200}`,display:"flex",flexDirection:"column",justifyContent:"center",minWidth:90}}>
               <div style={{...F.body,fontSize:9,color:C.gray400,fontWeight:700}}>TOTAL</div>
-              <div style={{...F.title,fontSize:22,fontWeight:800,color:C.red}}>{p.total}</div>
+              <div style={{...F.title,fontSize:22,fontWeight:800,color:C.red,lineHeight:1}}>{p.total||0}</div>
+              {p.totalSeparado>0&&p.totalSeparado<p.total&&<div style={{...F.body,fontSize:9,color:"#c2410c",fontWeight:700,marginTop:4}}>{p.totalSeparado} SEP.</div>}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
+
+      {(o.bordados||[]).length>0 && <>
+        <div style={{...F.title,fontSize:12,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",textTransform:"uppercase",margin:"18px 0 8px"}}>Bordados ({o.bordados.length})</div>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {o.bordados.map((b,i)=>(
+            <div key={i} className="produto-row" style={{border:`1px solid ${C.gray200}`,borderRadius:8,padding:10,display:"flex",gap:12,alignItems:"flex-start"}}>
+              <div style={{width:72,height:72,border:`1px solid ${C.gray200}`,borderRadius:6,background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden"}}>
+                {b.fileUrl&&ehImg(b.fileName)
+                  ?<img src={b.fileUrl} alt="" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+                  :<span style={{fontSize:24,color:C.gray400}}>🧵</span>}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{...F.title,fontSize:13,fontWeight:800,lineHeight:1.2,wordBreak:"break-word"}}>{limpaNome(b.fileName)}</div>
+                {(b.productName||b.positionLabel)&&<div style={{...F.body,fontSize:10.5,color:C.gray500,fontWeight:600,marginTop:2}}>
+                  {[b.productName,b.positionLabel].filter(Boolean).join(" · ")}
+                </div>}
+                {b.obs_programacao&&<div style={{marginTop:6,background:AMBER.bg,borderLeft:`4px solid ${AMBER.bd}`,borderRadius:4,padding:"6px 9px",...F.body,fontSize:11.5,lineHeight:1.4,color:AMBER.cor,fontWeight:600,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+                  <span style={{marginRight:4}}>📋</span><strong style={{letterSpacing:"0.02em"}}>PROGRAMAÇÃO:</strong> {b.obs_programacao}
+                </div>}
+                {b.obs_bordado&&<div style={{marginTop:6,background:AMBER.bg,borderLeft:`4px solid ${AMBER.bd}`,borderRadius:4,padding:"6px 9px",...F.body,fontSize:11.5,lineHeight:1.4,color:AMBER.cor,fontWeight:600,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+                  <span style={{marginRight:4}}>🧵</span><strong style={{letterSpacing:"0.02em"}}>BORDADO:</strong> {b.obs_bordado}
+                </div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </>}
+
       <div style={{marginTop:14,paddingTop:10,borderTop:`2px solid ${C.gray300}`,display:"flex",justifyContent:"space-between",...F.body,fontSize:13,fontWeight:700}}>
-        <span>{(o.produtos||[]).length} produto(s)</span>
+        <span>{(o.produtos||[]).length} produto(s){(o.bordados||[]).length?` · ${o.bordados.length} bordado(s)`:""}</span>
         <span style={{color:C.red}}>Total de peças: {totalPecas}</span>
       </div>
     </div>
@@ -4258,13 +4745,22 @@ function ImpressaoPedido({user}){
   const hoje=new Date().toISOString().slice(0,10);
   const [de,setDe]=useState(hoje),[ate,setAte]=useState(hoje);
   const [pedido,setPedido]=useState("");
+  const [cliente,setCliente]=useState("");
   const [resp,setResp]=useState(null);
   const [loading,setLoading]=useState(false);
   const [erro,setErro]=useState("");
 
   const buscar=()=>{
     setLoading(true);setErro("");setResp(null);
-    const qs=modo==="pedido"?`?pedido=${encodeURIComponent(pedido.trim())}`:`?de=${de}&ate=${ate}`;
+    let qs;
+    if(modo==="pedido"){
+      // Aceita ID do HubSpot OU código do Linx — o worker resolve
+      qs = `?pedido=${encodeURIComponent(pedido.trim())}`;
+    } else if(modo==="cliente"){
+      qs = `?cliente=${encodeURIComponent(cliente.trim())}`;
+    } else {
+      qs = `?de=${de}&ate=${ate}`;
+    }
     apiFetch("/impressao"+qs).then(r=>{ if(r.success)setResp(r); else setErro(r.error||"Erro ao buscar."); }).catch(e=>setErro(e.message)).finally(()=>setLoading(false));
   };
 
@@ -4280,20 +4776,26 @@ function ImpressaoPedido({user}){
 
       <div className="no-print"><Card>
         <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
-          {[["data","Por intervalo de datas"],["pedido","Por nº do pedido"]].map(([id,l])=>(
+          {[["data","Por intervalo de datas"],["pedido","Por nº do pedido (HubSpot ou Linx)"],["cliente","Por nome do cliente"]].map(([id,l])=>(
             <button key={id} onClick={()=>setModo(id)} style={{padding:"7px 14px",borderRadius:7,border:`1.5px solid ${modo===id?C.red:C.gray200}`,background:modo===id?C.red+"10":C.white,color:modo===id?C.red:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:modo===id?700:500}}>{l}</button>
           ))}
         </div>
         <div style={{display:"flex",gap:10,alignItems:"flex-end",flexWrap:"wrap"}}>
-          {modo==="data"?<>
+          {modo==="data"&&<>
             <div><label style={lbl}>De</label><input type="date" value={de} onChange={e=>setDe(e.target.value)} style={inp}/></div>
             <div><label style={lbl}>Até</label><input type="date" value={ate} onChange={e=>setAte(e.target.value)} style={inp}/></div>
-          </>:(
-            <div style={{flex:1,minWidth:220}}><label style={lbl}>Número do pedido</label>
-              <input value={pedido} onChange={e=>setPedido(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")buscar();}} placeholder="ex.: 61293153208" style={{...inp,width:"100%",boxSizing:"border-box"}}/>
+          </>}
+          {modo==="pedido"&&(
+            <div style={{flex:1,minWidth:220}}><label style={lbl}>ID do HubSpot ou nº Linx</label>
+              <input value={pedido} onChange={e=>setPedido(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")buscar();}} placeholder="ex.: 61293153208 ou 218436" style={{...inp,width:"100%",boxSizing:"border-box"}}/>
             </div>
           )}
-          <button onClick={buscar} disabled={loading} style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:loading?"wait":"pointer",fontWeight:700,fontSize:13,...F.body}}>{loading?"Buscando...":"Buscar"}</button>
+          {modo==="cliente"&&(
+            <div style={{flex:1,minWidth:220}}><label style={lbl}>Nome do cliente (busca parcial)</label>
+              <input value={cliente} onChange={e=>setCliente(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")buscar();}} placeholder="ex.: NW CONTABILIDADE" style={{...inp,width:"100%",boxSizing:"border-box"}}/>
+            </div>
+          )}
+          <button onClick={buscar} disabled={loading||(modo==="pedido"&&!pedido.trim())||(modo==="cliente"&&!cliente.trim())} style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:loading?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,opacity:(modo==="pedido"&&!pedido.trim())||(modo==="cliente"&&!cliente.trim())?0.5:1}}>{loading?"Buscando...":"Buscar"}</button>
           {orders.length>0&&<button onClick={()=>window.print()} style={{background:C.green,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:"pointer",fontWeight:700,fontSize:13,...F.body,display:"inline-flex",alignItems:"center",gap:7}}>
             <Ic n="print" s={15} c={C.white}/> Imprimir / PDF ({orders.length} pedido{orders.length!==1?"s":""})
           </button>}
@@ -4690,7 +5192,7 @@ function PedidosRisco(){
           <div key={idx} style={{...cardBox,marginBottom:12,borderLeft:`5px solid ${corNivel[o.nivel]}`}}>
             <div style={{display:"flex",gap:10,alignItems:"flex-start"}}>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{...F.title,fontWeight:700,fontSize:16}}>Pedido {o.id}</div>
+                <div style={{...F.title,fontWeight:700,fontSize:16}}>{idPedido(o)}</div>
                 <div style={{...F.body,fontSize:13,fontWeight:600,color:C.gray700}}>{o.cli}</div>
                 <div style={{...F.body,fontSize:11.5,color:C.gray500,marginTop:1}}>Está em: {o.etapa} · {o.comBordado?"com bordado":"sem bordado"}</div>
               </div>
@@ -4998,9 +5500,11 @@ function AppInner(){
       _liberar();
     }
 
-    // Sucesso — recarrega as filas. NÃO fecha o modal aqui:
-    // o botão exibe a tela de pós-execução com a mensagem.
-    setTimeout(()=>triggerRefresh(),900);
+    // Sucesso — recarrega as filas E o snapshot geral. NÃO fecha o modal:
+    // o botão exibe a tela de pós-execução com a mensagem. Mas quando o
+    // usuário fechar, a Fila JÁ vai estar atualizada (sem o card processado).
+    // O worker precisa de ~500ms pra HubSpot indexar a nova stage após o PATCH.
+    setTimeout(()=>{ triggerRefresh(); _fetchSnap(true); }, 500);
     return resultMsg||"O pedido foi movimentado com sucesso.";
   };
 
