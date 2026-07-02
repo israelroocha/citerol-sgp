@@ -80,23 +80,22 @@
   .sku{ font-size:10px; color:var(--g600); font-weight:800; font-family:monospace; }
   .nome{ font-family:'Oswald',sans-serif; font-size:14px; font-weight:800; line-height:1.15; color:var(--black); }
   .grades{ display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; }
-  /* Grade — caixinha V/X pra distinguir sem cor */
+  /* Grade — caixinha ✓/✗ pra distinguir sem cor. Sem tachado (prejudica leitura). */
   .grade{
     font-size:11px; font-weight:700; padding:2px 8px; display:inline-flex; align-items:center; gap:5px;
     border-radius:4px; font-family:'Montserrat',sans-serif;
   }
-  .grade.sep{ background:var(--green-bg); color:var(--green); border:1.5px solid var(--green-bd); text-decoration:line-through; text-decoration-thickness:1.5px; }
+  .grade.sep{ background:var(--green-bg); color:var(--green); border:1.5px solid var(--green-bd); }
   .grade.sep::before{
-    content:"V"; display:inline-flex; align-items:center; justify-content:center;
+    content:"✓"; display:inline-flex; align-items:center; justify-content:center;
     width:12px; height:12px; border:2px solid var(--green); border-radius:2px;
-    font-family:'Oswald',monospace; font-size:8px; font-weight:900; color:var(--green);
-    text-decoration:none; line-height:1;
+    font-family:Arial,sans-serif; font-size:10px; font-weight:900; color:var(--green); line-height:1;
   }
   .grade.pen{ background:#fff; color:var(--black); border:2px dashed var(--redx); }
   .grade.pen::before{
-    content:"X"; display:inline-flex; align-items:center; justify-content:center;
+    content:"✗"; display:inline-flex; align-items:center; justify-content:center;
     width:12px; height:12px; border:2px solid var(--redx); border-radius:2px;
-    font-family:'Oswald',monospace; font-size:8px; font-weight:900; color:var(--redx); line-height:1;
+    font-family:Arial,sans-serif; font-size:10px; font-weight:900; color:var(--redx); line-height:1;
   }
   .descr-line{
     font-size:11px; color:var(--black); background:var(--amber-bg); border-left:4px solid var(--amber-bd);
@@ -107,7 +106,7 @@
   .tot{ text-align:center; flex-shrink:0; padding-left:10px; border-left:1px solid var(--g200); display:flex; flex-direction:column; justify-content:center; min-width:78px; }
   .tot .l{ font-size:9px; color:var(--g600); font-weight:800; }
   .tot .v{ font-family:'Oswald',sans-serif; font-size:20px; font-weight:800; color:var(--black); line-height:1; }
-  /* Pill: caixinha com letra + texto */
+  /* Pill: caixinha com símbolo + texto */
   .pill{
     display:inline-flex; align-items:center; gap:5px; padding:2px 7px; border-radius:4px;
     font-size:9.5px; font-weight:800; letter-spacing:.05em; font-family:'Oswald',sans-serif;
@@ -116,14 +115,14 @@
   .pill::before{
     display:inline-flex; align-items:center; justify-content:center;
     width:12px; height:12px; border:2px solid currentColor; border-radius:2px;
-    font-family:'Oswald',monospace; font-size:8px; font-weight:900; line-height:1;
+    font-family:Arial,sans-serif; font-size:10px; font-weight:900; line-height:1;
   }
   .pill.sep{ background:var(--green-bg); color:var(--green); border-color:var(--green); }
-  .pill.sep::before{ content:"V"; }
+  .pill.sep::before{ content:"✓"; }
   .pill.par{ background:var(--orange-bg); color:var(--orange); border-color:var(--orange); }
-  .pill.par::before{ content:"P"; }
+  .pill.par::before{ content:"P"; font-family:'Oswald',monospace; font-size:8px; }
   .pill.pen{ background:#fff; color:var(--redx); border-color:var(--redx); border-style:dashed; }
-  .pill.pen::before{ content:"X"; }
+  .pill.pen::before{ content:"✗"; }
 
   /* Seção bordados */
   .bordados{ display:flex; flex-direction:column; gap:8px; }
@@ -150,8 +149,9 @@
   .legenda-box{
     display:inline-flex; align-items:center; justify-content:center;
     width:12px; height:12px; border:2px solid; border-radius:2px;
-    font-family:'Oswald',monospace; font-size:8px; font-weight:900; line-height:1;
+    font-family:Arial,sans-serif; font-size:10px; font-weight:900; line-height:1;
   }
+  .legenda-box.par{ font-family:'Oswald',monospace; font-size:8px; }
   .legenda-box.sep{ color:var(--green); border-color:var(--green); }
   .legenda-box.par{ color:var(--orange); border-color:var(--orange); }
   .legenda-box.pen{ color:var(--redx); border-color:var(--redx); }
@@ -159,7 +159,7 @@
   .status-icon{
     display:inline-flex; align-items:center; justify-content:center;
     width:26px; height:26px; border:2.5px solid currentColor; border-radius:3px;
-    font-family:'Oswald',monospace; font-size:18px; font-weight:900; line-height:1;
+    font-family:Arial,sans-serif; font-size:22px; font-weight:900; line-height:1;
     margin-right:12px; flex-shrink:0;
   }
 
@@ -278,11 +278,11 @@
       + (o.data?'<div class="data">'+fmtDt(o.data)+'</div>':'')+'</div></div>'
 
       + '<div class="status-banner '+st.cls+'">'
-      + '<div style="display:flex;align-items:center;flex:1"><span class="status-icon">'+(o.statusSeparacao==="completa"?"V":o.statusSeparacao==="parcial"?"P":"X")+'</span><div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div></div>'
+      + '<div style="display:flex;align-items:center;flex:1"><span class="status-icon">'+(o.statusSeparacao==="completa"?"✓":o.statusSeparacao==="parcial"?"P":"✗")+'</span><div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div></div>'
       + '<div class="info-right">'+totalSeparado+' / '+totalPecas+' peças</div>'
       + '</div>'
 
-      + '<div class="legenda"><span><span class="legenda-box sep">V</span> SEPARADO</span><span><span class="legenda-box pen">X</span> PENDENTE</span><span><span class="legenda-box par">P</span> PARCIAL</span></div>'
+      + '<div class="legenda"><span><span class="legenda-box sep">✓</span> SEPARADO</span><span><span class="legenda-box pen">✗</span> PENDENTE</span><span><span class="legenda-box par">P</span> PARCIAL</span></div>'
 
       + '<div class="cliente"><span class="lbl">Cliente: </span><span class="nome">'+esc(o.cliente||"—")+'</span>'
       + ((o.cnpj||o.endereco)?'<div class="sub">'+(o.cnpj?'CNPJ: '+esc(o.cnpj):'')+(o.endereco?(o.cnpj?' · ':'')+esc(o.endereco):'')+'</div>':'')
