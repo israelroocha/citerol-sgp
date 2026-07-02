@@ -80,17 +80,24 @@
   .sku{ font-size:10px; color:var(--g600); font-weight:800; font-family:monospace; }
   .nome{ font-family:'Oswald',sans-serif; font-size:14px; font-weight:800; line-height:1.15; color:var(--black); }
   .grades{ display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; }
-  /* Grade — distinção sem depender de cor:
-     .sep tem [✓] antes, background contrastante, borda dupla
-     .pen tem [ ] antes, background claro, borda simples, fonte pesada */
+  /* Grade — caixinha V/X pra distinguir sem cor */
   .grade{
     font-size:11px; font-weight:700; padding:2px 8px; display:inline-flex; align-items:center; gap:5px;
     border-radius:4px; font-family:'Montserrat',sans-serif;
   }
   .grade.sep{ background:var(--green-bg); color:var(--green); border:1.5px solid var(--green-bd); text-decoration:line-through; text-decoration-thickness:1.5px; }
-  .grade.sep::before{ content:"☑"; font-weight:900; font-size:13px; text-decoration:none; display:inline-block; }
+  .grade.sep::before{
+    content:"V"; display:inline-flex; align-items:center; justify-content:center;
+    width:12px; height:12px; border:2px solid var(--green); border-radius:2px;
+    font-family:'Oswald',monospace; font-size:8px; font-weight:900; color:var(--green);
+    text-decoration:none; line-height:1;
+  }
   .grade.pen{ background:#fff; color:var(--black); border:2px dashed var(--redx); }
-  .grade.pen::before{ content:"☐"; font-weight:900; font-size:13px; display:inline-block; color:var(--redx); }
+  .grade.pen::before{
+    content:"X"; display:inline-flex; align-items:center; justify-content:center;
+    width:12px; height:12px; border:2px solid var(--redx); border-radius:2px;
+    font-family:'Oswald',monospace; font-size:8px; font-weight:900; color:var(--redx); line-height:1;
+  }
   .descr-line{
     font-size:11px; color:var(--black); background:var(--amber-bg); border-left:4px solid var(--amber-bd);
     border-radius:4px; padding:5px 8px; margin-top:5px; font-weight:600; line-height:1.35;
@@ -100,18 +107,23 @@
   .tot{ text-align:center; flex-shrink:0; padding-left:10px; border-left:1px solid var(--g200); display:flex; flex-direction:column; justify-content:center; min-width:78px; }
   .tot .l{ font-size:9px; color:var(--g600); font-weight:800; }
   .tot .v{ font-family:'Oswald',sans-serif; font-size:20px; font-weight:800; color:var(--black); line-height:1; }
-  /* Pill: distingue com símbolo + borda, não só cor */
+  /* Pill: caixinha com letra + texto */
   .pill{
-    display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:4px;
+    display:inline-flex; align-items:center; gap:5px; padding:2px 7px; border-radius:4px;
     font-size:9.5px; font-weight:800; letter-spacing:.05em; font-family:'Oswald',sans-serif;
     border:1.5px solid;
   }
+  .pill::before{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:12px; height:12px; border:2px solid currentColor; border-radius:2px;
+    font-family:'Oswald',monospace; font-size:8px; font-weight:900; line-height:1;
+  }
   .pill.sep{ background:var(--green-bg); color:var(--green); border-color:var(--green); }
-  .pill.sep::before{ content:"✓ "; font-size:11px; }
+  .pill.sep::before{ content:"V"; }
   .pill.par{ background:var(--orange-bg); color:var(--orange); border-color:var(--orange); }
-  .pill.par::before{ content:"⟡ "; font-size:11px; }
+  .pill.par::before{ content:"P"; }
   .pill.pen{ background:#fff; color:var(--redx); border-color:var(--redx); border-style:dashed; }
-  .pill.pen::before{ content:"○ "; font-size:11px; }
+  .pill.pen::before{ content:"X"; }
 
   /* Seção bordados */
   .bordados{ display:flex; flex-direction:column; gap:8px; }
@@ -133,8 +145,23 @@
   .msg{ padding:40px; text-align:center; color:var(--g500); font-size:14px; }
 
   /* Legenda no cabeçalho pra explicar os símbolos em B&W */
-  .legenda{ display:flex; gap:14px; font-size:10px; font-weight:700; color:var(--g600); margin-top:8px; margin-bottom:8px; flex-wrap:wrap; }
-  .legenda span{ display:inline-flex; align-items:center; gap:4px; }
+  .legenda{ display:flex; gap:14px; font-size:10px; font-weight:700; color:var(--g600); margin-top:8px; margin-bottom:8px; flex-wrap:wrap; align-items:center; }
+  .legenda span{ display:inline-flex; align-items:center; gap:5px; }
+  .legenda-box{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:12px; height:12px; border:2px solid; border-radius:2px;
+    font-family:'Oswald',monospace; font-size:8px; font-weight:900; line-height:1;
+  }
+  .legenda-box.sep{ color:var(--green); border-color:var(--green); }
+  .legenda-box.par{ color:var(--orange); border-color:var(--orange); }
+  .legenda-box.pen{ color:var(--redx); border-color:var(--redx); }
+  /* Ícone gigante do banner de status */
+  .status-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border:2.5px solid currentColor; border-radius:3px;
+    font-family:'Oswald',monospace; font-size:18px; font-weight:900; line-height:1;
+    margin-right:12px; flex-shrink:0;
+  }
 
   @media print{
     body{ background:#fff; color:#000; }
@@ -251,11 +278,11 @@
       + (o.data?'<div class="data">'+fmtDt(o.data)+'</div>':'')+'</div></div>'
 
       + '<div class="status-banner '+st.cls+'">'
-      + '<div style="display:flex;align-items:center;flex:1"><span class="icon">'+(o.statusSeparacao==="completa"?"✓":o.statusSeparacao==="parcial"?"⟡":"○")+'</span><div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div></div>'
+      + '<div style="display:flex;align-items:center;flex:1"><span class="status-icon">'+(o.statusSeparacao==="completa"?"V":o.statusSeparacao==="parcial"?"P":"X")+'</span><div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div></div>'
       + '<div class="info-right">'+totalSeparado+' / '+totalPecas+' peças</div>'
       + '</div>'
 
-      + '<div class="legenda"><span>☑ SEPARADO</span><span>☐ PENDENTE</span><span>✓ PRODUTO COMPLETO</span><span>⟡ PARCIAL</span><span>○ NADA SEPARADO</span></div>'
+      + '<div class="legenda"><span><span class="legenda-box sep">V</span> SEPARADO</span><span><span class="legenda-box pen">X</span> PENDENTE</span><span><span class="legenda-box par">P</span> PARCIAL</span></div>'
 
       + '<div class="cliente"><span class="lbl">Cliente: </span><span class="nome">'+esc(o.cliente||"—")+'</span>'
       + ((o.cnpj||o.endereco)?'<div class="sub">'+(o.cnpj?'CNPJ: '+esc(o.cnpj):'')+(o.endereco?(o.cnpj?' · ':'')+esc(o.endereco):'')+'</div>':'')
