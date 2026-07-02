@@ -9,104 +9,142 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Oswald:wght@500;700;800&display=swap" rel="stylesheet"/>
 <style>
   :root{
-    --red:#9E0B0F; --black:#111; --g700:#444; --g600:#666; --g500:#888; --g400:#aaa;
-    --g200:#e4e4e4; --g100:#f0f0f0; --g50:#f7f7f7;
-    --green:#15803d; --green-bg:#dcfce7; --green-bd:#86efac;
-    --orange:#c2410c; --orange-bg:#ffedd5; --orange-bd:#fdba74;
-    --redx:#991b1b; --redx-bg:#fee2e2; --redx-bd:#fca5a5;
-    --amber:#92400e; --amber-bg:#fef3c7; --amber-bd:#fcd34d;
+    /* Cores mais escuras pra impressão B&W ficar legível */
+    --red:#7a0007; --black:#000; --g700:#222; --g600:#333; --g500:#555; --g400:#777;
+    --g200:#c0c0c0; --g100:#e0e0e0; --g50:#f0f0f0;
+    --green:#0d4d24; --green-bg:#e8f5ec; --green-bd:#4a8f5f;
+    --orange:#7a2a06; --orange-bg:#fce8d5; --orange-bd:#c46a2f;
+    --redx:#5c0f0f; --redx-bg:#f5d5d5; --redx-bd:#9e3d3d;
+    --amber:#5a2a06; --amber-bg:#faedcf; --amber-bd:#a67a1a;
   }
   *{ box-sizing:border-box; }
   body{ margin:0; background:#ececed; font-family:'Montserrat',sans-serif; color:var(--black); }
   .wrap{ display:flex; flex-direction:column; align-items:center; gap:18px; padding:18px; }
   .folha{ background:#fff; width:100%; max-width:820px; padding:32px; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
-  .head{ display:flex; align-items:center; gap:16px; border-bottom:2px solid var(--g200); padding-bottom:14px; margin-bottom:14px; }
-  .head img{ height:48px; object-fit:contain; }
+  .head{ display:flex; align-items:center; gap:16px; border-bottom:2px solid var(--g500); padding-bottom:14px; margin-bottom:14px; page-break-inside:avoid; }
+  .head img{ height:44px; object-fit:contain; }
   .brand{ font-family:'Oswald',sans-serif; font-size:20px; font-weight:800; color:var(--red); white-space:nowrap; }
-  .emit-nome{ font-family:'Oswald',sans-serif; font-size:15px; font-weight:800; }
-  .emit-sub{ font-size:11px; color:var(--g600); }
+  .emit-nome{ font-family:'Oswald',sans-serif; font-size:15px; font-weight:800; color:var(--black); }
+  .emit-sub{ font-size:11px; color:var(--g600); font-weight:600; }
   .head .right{ text-align:right; flex-shrink:0; margin-left:auto; }
-  .tag{ font-family:'Oswald',sans-serif; font-size:10px; font-weight:700; color:var(--g500); letter-spacing:.1em; }
-  .pedido{ font-family:'Oswald',sans-serif; font-size:18px; font-weight:800; }
-  .data{ font-size:11px; color:var(--g500); }
+  .tag{ font-family:'Oswald',sans-serif; font-size:10px; font-weight:700; color:var(--g600); letter-spacing:.1em; }
+  .pedido{ font-family:'Oswald',sans-serif; font-size:18px; font-weight:800; color:var(--black); }
+  .data{ font-size:11px; color:var(--g600); font-weight:600; }
 
-  /* Banner de status — bem destacado */
+  /* Banner de status — bem destacado, com símbolo pra distinguir sem cor */
   .status-banner{
-    margin-bottom:16px; border-radius:10px; padding:14px 18px;
+    margin-bottom:16px; border-radius:10px; padding:12px 16px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
-    border:2px solid; font-family:'Oswald',sans-serif;
+    border:2px solid; font-family:'Oswald',sans-serif; page-break-inside:avoid;
   }
-  .status-banner .lbl{ font-size:20px; font-weight:800; letter-spacing:.04em; }
-  .status-banner .sub{ font-size:11px; font-weight:700; opacity:.9; margin-top:3px; letter-spacing:.05em; }
-  .status-banner .info-right{ text-align:right; font-size:12px; font-weight:700; font-family:'Montserrat',sans-serif; }
+  .status-banner .lbl{ font-size:18px; font-weight:800; letter-spacing:.04em; }
+  .status-banner .sub{ font-size:11px; font-weight:700; margin-top:3px; letter-spacing:.05em; }
+  .status-banner .info-right{ text-align:right; font-size:12px; font-weight:800; font-family:'Montserrat',sans-serif; }
+  .status-banner .icon{ font-size:22px; margin-right:10px; }
   .st-completa{ background:var(--green-bg); border-color:var(--green-bd); color:var(--green); }
   .st-parcial { background:var(--orange-bg); border-color:var(--orange-bd); color:var(--orange); }
   .st-pendente{ background:var(--redx-bg); border-color:var(--redx-bd); color:var(--redx); }
 
-  .cliente{ background:var(--g50); border-radius:8px; padding:10px 14px; margin-bottom:16px; }
-  .cliente .lbl{ font-size:10px; color:var(--g400); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
-  .cliente .nome{ font-size:14px; font-weight:700; }
-  .cliente .sub{ font-size:11px; color:var(--g600); margin-top:2px; }
+  .cliente{ background:var(--g50); border:1px solid var(--g200); border-radius:8px; padding:10px 14px; margin-bottom:14px; page-break-inside:avoid; }
+  .cliente .lbl{ font-size:10px; color:var(--g600); font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .cliente .nome{ font-size:14px; font-weight:700; color:var(--black); }
+  .cliente .sub{ font-size:11px; color:var(--g700); margin-top:2px; font-weight:600; }
 
   .sect-title{
-    font-family:'Oswald',sans-serif; font-size:12px; font-weight:700; color:var(--g500);
-    letter-spacing:.1em; text-transform:uppercase; margin:18px 0 8px;
+    font-family:'Oswald',sans-serif; font-size:12px; font-weight:700; color:var(--g600);
+    letter-spacing:.1em; text-transform:uppercase; margin:16px 0 8px;
+    border-bottom:1px solid var(--g200); padding-bottom:4px;
+    page-break-after:avoid;
   }
+  .obs-box{
+    border:1px solid var(--g500); border-radius:8px; padding:10px 12px; margin-top:8px;
+    background:var(--amber-bg); border-left:5px solid var(--amber-bd); page-break-inside:avoid;
+  }
+  .obs-box.roxa{ background:#ece7f5; border-left-color:#4a2b7a; border-color:#4a2b7a; }
+  .obs-box .lbl{
+    font-family:'Oswald',sans-serif; font-size:10px; font-weight:800;
+    color:var(--amber); letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px;
+  }
+  .obs-box.roxa .lbl{ color:#3b1173; }
+  .obs-box .txt{ font-size:12px; color:var(--black); line-height:1.4; white-space:pre-wrap; word-break:break-word; font-weight:600; }
 
-  .produtos{ display:flex; flex-direction:column; gap:10px; }
-  .row{ display:flex; gap:14px; align-items:stretch; border:1px solid var(--g200); border-radius:8px; padding:10px; page-break-inside:avoid; }
-  .foto{ width:84px; height:84px; border:1px solid var(--g200); border-radius:6px; background:var(--g50); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+  .produtos{ display:flex; flex-direction:column; gap:8px; }
+  /* .row com page-break-inside:avoid pra NÃO quebrar produto no meio da página */
+  .row{ display:flex; gap:12px; align-items:stretch; border:1px solid var(--g500); border-radius:8px; padding:8px; page-break-inside:avoid; }
+  /* Fotos menores (era 84px, agora 60px) — cabe mais produto por página */
+  .foto{ width:60px; height:60px; border:1px solid var(--g200); border-radius:6px; background:var(--g50); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
   .foto img{ width:100%; height:100%; object-fit:contain; }
-  .foto .semfoto{ font-size:9px; color:var(--g400); }
+  .foto .semfoto{ font-size:9px; color:var(--g500); font-weight:700; }
   .info{ flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; }
-  .info-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:5px; }
-  .sku{ font-size:10px; color:var(--g400); font-weight:700; font-family:monospace; }
-  .nome{ font-family:'Oswald',sans-serif; font-size:15px; font-weight:800; line-height:1.15; }
-  .grades{ display:flex; flex-wrap:wrap; gap:6px; margin-top:3px; }
-  .grade{ font-size:11px; font-weight:600; background:var(--g100); border-radius:5px; padding:2px 8px; display:inline-flex; align-items:center; gap:4px; }
-  .grade.sep{ background:var(--green-bg); color:var(--green); }
-  .grade.pen{ background:var(--g100); color:var(--g600); }
-  .grade .dot{ width:6px; height:6px; border-radius:50%; display:inline-block; }
-  .grade.sep .dot{ background:var(--green); }
-  .grade.pen .dot{ background:var(--g400); }
+  .info-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+  .sku{ font-size:10px; color:var(--g600); font-weight:800; font-family:monospace; }
+  .nome{ font-family:'Oswald',sans-serif; font-size:14px; font-weight:800; line-height:1.15; color:var(--black); }
+  .grades{ display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; }
+  /* Grade — distinção sem depender de cor:
+     .sep tem [✓] antes, background contrastante, borda dupla
+     .pen tem [ ] antes, background claro, borda simples, fonte pesada */
+  .grade{
+    font-size:11px; font-weight:700; padding:2px 8px; display:inline-flex; align-items:center; gap:5px;
+    border-radius:4px; font-family:'Montserrat',sans-serif;
+  }
+  .grade.sep{ background:var(--green-bg); color:var(--green); border:1.5px solid var(--green-bd); text-decoration:line-through; text-decoration-thickness:1.5px; }
+  .grade.sep::before{ content:"☑"; font-weight:900; font-size:13px; text-decoration:none; display:inline-block; }
+  .grade.pen{ background:#fff; color:var(--black); border:2px dashed var(--redx); }
+  .grade.pen::before{ content:"☐"; font-weight:900; font-size:13px; display:inline-block; color:var(--redx); }
   .descr-line{
-    font-size:11.5px; color:var(--amber); background:var(--amber-bg); border-left:4px solid var(--amber-bd);
-    border-radius:4px; padding:6px 9px; margin-top:6px; font-weight:600; line-height:1.4;
+    font-size:11px; color:var(--black); background:var(--amber-bg); border-left:4px solid var(--amber-bd);
+    border-radius:4px; padding:5px 8px; margin-top:5px; font-weight:600; line-height:1.35;
     white-space:pre-wrap; word-break:break-word;
   }
-  .descr-line::before{ content:"📝 Obs do vendedor: "; font-weight:700; color:var(--amber); }
-  .tot{ text-align:center; flex-shrink:0; padding-left:10px; border-left:1px solid var(--g200); display:flex; flex-direction:column; justify-content:center; min-width:90px; }
-  .tot .l{ font-size:9px; color:var(--g400); font-weight:700; }
-  .tot .v{ font-family:'Oswald',sans-serif; font-size:22px; font-weight:800; color:var(--red); line-height:1; }
+  .descr-line::before{ content:"[OBS] "; font-weight:800; color:var(--amber); font-family:'Oswald',sans-serif; font-size:10px; letter-spacing:.05em; }
+  .tot{ text-align:center; flex-shrink:0; padding-left:10px; border-left:1px solid var(--g200); display:flex; flex-direction:column; justify-content:center; min-width:78px; }
+  .tot .l{ font-size:9px; color:var(--g600); font-weight:800; }
+  .tot .v{ font-family:'Oswald',sans-serif; font-size:20px; font-weight:800; color:var(--black); line-height:1; }
+  /* Pill: distingue com símbolo + borda, não só cor */
   .pill{
-    display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:5px;
+    display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:4px;
     font-size:9.5px; font-weight:800; letter-spacing:.05em; font-family:'Oswald',sans-serif;
-    border:1px solid;
+    border:1.5px solid;
   }
-  .pill.sep{ background:var(--green-bg); color:var(--green); border-color:var(--green-bd); }
-  .pill.par{ background:var(--orange-bg); color:var(--orange); border-color:var(--orange-bd); }
-  .pill.pen{ background:var(--redx-bg); color:var(--redx); border-color:var(--redx-bd); }
+  .pill.sep{ background:var(--green-bg); color:var(--green); border-color:var(--green); }
+  .pill.sep::before{ content:"✓ "; font-size:11px; }
+  .pill.par{ background:var(--orange-bg); color:var(--orange); border-color:var(--orange); }
+  .pill.par::before{ content:"⟡ "; font-size:11px; }
+  .pill.pen{ background:#fff; color:var(--redx); border-color:var(--redx); border-style:dashed; }
+  .pill.pen::before{ content:"○ "; font-size:11px; }
 
   /* Seção bordados */
-  .bordados{ display:flex; flex-direction:column; gap:10px; }
-  .brow{ border:1px solid var(--g200); border-radius:8px; padding:10px; page-break-inside:avoid; display:flex; gap:12px; align-items:flex-start; }
-  .bimg{ width:72px; height:72px; border:1px solid var(--g200); border-radius:6px; background:var(--g50); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+  .bordados{ display:flex; flex-direction:column; gap:8px; }
+  /* .brow com page-break-inside:avoid */
+  .brow{ border:1px solid var(--g500); border-radius:8px; padding:8px; page-break-inside:avoid; display:flex; gap:10px; align-items:flex-start; }
+  /* Imagens bordado menores */
+  .bimg{ width:56px; height:56px; border:1px solid var(--g200); border-radius:6px; background:var(--g50); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
   .bimg img{ width:100%; height:100%; object-fit:contain; }
-  .bimg .placeholder{ font-size:24px; color:var(--g400); }
+  .bimg .placeholder{ font-size:20px; color:var(--g500); font-weight:700; }
   .binfo{ flex:1; min-width:0; }
-  .bnome{ font-family:'Oswald',sans-serif; font-size:13px; font-weight:800; line-height:1.2; word-break:break-word; }
-  .bmeta{ font-size:10.5px; color:var(--g500); font-weight:600; margin-top:2px; }
-  .bobs{ margin-top:6px; background:var(--amber-bg); border-left:4px solid var(--amber-bd); border-radius:4px; padding:6px 9px; font-size:11.5px; line-height:1.4; color:var(--amber); font-weight:600; white-space:pre-wrap; word-break:break-word; }
+  .bnome{ font-family:'Oswald',sans-serif; font-size:12px; font-weight:800; line-height:1.2; word-break:break-word; color:var(--black); }
+  .bmeta{ font-size:10.5px; color:var(--g700); font-weight:700; margin-top:2px; }
+  .bobs{ margin-top:5px; background:var(--amber-bg); border-left:4px solid var(--amber-bd); border-radius:4px; padding:5px 8px; font-size:11px; line-height:1.35; color:var(--black); font-weight:600; white-space:pre-wrap; word-break:break-word; }
   .bobs .icon{ margin-right:4px; }
-  .bobs .who{ font-weight:800; letter-spacing:.02em; }
+  .bobs .who{ font-weight:800; letter-spacing:.02em; color:var(--amber); }
 
-  .foot{ margin-top:14px; padding-top:10px; border-top:2px solid var(--g200); display:flex; justify-content:space-between; font-size:13px; font-weight:700; }
+  .foot{ margin-top:14px; padding-top:10px; border-top:2px solid var(--g500); display:flex; justify-content:space-between; font-size:13px; font-weight:800; page-break-inside:avoid; }
   .foot .pecas{ color:var(--red); }
   .msg{ padding:40px; text-align:center; color:var(--g500); font-size:14px; }
+
+  /* Legenda no cabeçalho pra explicar os símbolos em B&W */
+  .legenda{ display:flex; gap:14px; font-size:10px; font-weight:700; color:var(--g600); margin-top:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .legenda span{ display:inline-flex; align-items:center; gap:4px; }
+
   @media print{
-    body{ background:#fff; }
+    body{ background:#fff; color:#000; }
     .wrap{ padding:0; gap:0; }
-    .folha{ box-shadow:none; border-radius:0; max-width:100%; padding:14mm; page-break-after:always; }
+    .folha{ box-shadow:none; border-radius:0; max-width:100%; padding:12mm; page-break-after:always; }
+    /* Força cores/backgrounds na impressão (necessário no Chrome/Edge) */
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    /* Impede quebra no meio dos blocos importantes */
+    .row, .brow, .obs-box, .status-banner, .cliente, .foot{ page-break-inside:avoid; break-inside:avoid; }
+    .sect-title{ page-break-after:avoid; break-after:avoid; }
   }
 </style>
 </head>
@@ -157,7 +195,8 @@
     var rows = (o.produtos||[]).map(function(p){
       var grades = (p.grades||[]).map(function(g){
         var cls = g.separado ? "sep" : "pen";
-        return '<span class="grade '+cls+'"><span class="dot"></span>'+esc(g.tamanho||"—")+': <strong>'+(g.qtd||0)+'</strong></span>';
+        // Sem .dot — o CSS agora usa ::before com ☑/☐ que distingue sem cor
+        return '<span class="grade '+cls+'">'+esc(g.tamanho||"—")+': <strong>'+(g.qtd||0)+'</strong></span>';
       }).join("");
       var foto = p.foto
         ? '<img src="'+esc(p.foto)+'" alt=""/>'
@@ -212,9 +251,11 @@
       + (o.data?'<div class="data">'+fmtDt(o.data)+'</div>':'')+'</div></div>'
 
       + '<div class="status-banner '+st.cls+'">'
-      + '<div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div>'
+      + '<div style="display:flex;align-items:center;flex:1"><span class="icon">'+(o.statusSeparacao==="completa"?"✓":o.statusSeparacao==="parcial"?"⟡":"○")+'</span><div><div class="lbl">'+st.lbl+'</div><div class="sub">'+subStatus+'</div></div></div>'
       + '<div class="info-right">'+totalSeparado+' / '+totalPecas+' peças</div>'
       + '</div>'
+
+      + '<div class="legenda"><span>☑ SEPARADO</span><span>☐ PENDENTE</span><span>✓ PRODUTO COMPLETO</span><span>⟡ PARCIAL</span><span>○ NADA SEPARADO</span></div>'
 
       + '<div class="cliente"><span class="lbl">Cliente: </span><span class="nome">'+esc(o.cliente||"—")+'</span>'
       + ((o.cnpj||o.endereco)?'<div class="sub">'+(o.cnpj?'CNPJ: '+esc(o.cnpj):'')+(o.endereco?(o.cnpj?' · ':'')+esc(o.endereco):'')+'</div>':'')
@@ -224,6 +265,16 @@
       + '<div class="produtos">'+rows+'</div>'
 
       + bordadosSection
+
+      + ((o.infoImportante||o.dadosAdicionais)
+          ? '<div class="sect-title">Observações do Pedido</div>'
+            + (o.infoImportante
+                ? '<div class="obs-box"><div class="lbl">Informação importante do pedido</div><div class="txt">'+esc(o.infoImportante)+'</div></div>'
+                : "")
+            + (o.dadosAdicionais
+                ? '<div class="obs-box roxa"><div class="lbl">Dados adicionais</div><div class="txt">'+esc(o.dadosAdicionais)+'</div></div>'
+                : "")
+          : "")
 
       + '<div class="foot"><span>'+(o.produtos||[]).length+' produto(s)'
       + ((o.bordados||[]).length ? ' · '+o.bordados.length+' bordado(s)' : '')
