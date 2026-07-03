@@ -6264,6 +6264,7 @@ function AppInner(){
             {page==="pedidos_risco"&&<PedidosRisco/>}
             {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
             {page==="separacao"&&<Fila title="Separação" etapa="Separação" endpoint="/separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
+            {page==="retirar_conferir"&&<Fila title="Retirar e Conferir" etapa="Retirar e Conferir" endpoint="/retirar-conferir" orders={orders} onOpen={setSel} actionLabel="Conferência concluída" actionColor="#059669" slaCfg={slaCfg}/>}
             {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
