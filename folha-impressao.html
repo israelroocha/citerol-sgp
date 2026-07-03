@@ -187,6 +187,7 @@
   var auto = qs.get("auto");
 
   function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function fmtR(v){ return "R$ "+(Number(v)||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function fmtDt(d){ if(!d) return ""; try{ return new Date(d).toLocaleDateString("pt-BR"); }catch(e){ return ""; } }
 
   // Status do pedido → texto + classe
@@ -221,22 +222,29 @@
 
     var rows = (o.produtos||[]).map(function(p){
       var grades = (p.grades||[]).map(function(g){
-        var cls = g.separado ? "sep" : "pen";
-        // Sem .dot — o CSS agora usa ::before com ☑/☐ que distingue sem cor
-        return '<span class="grade '+cls+'">'+esc(g.tamanho||"—")+': <strong>'+(g.qtd||0)+'</strong></span>';
+        var st = g.statusGrade || (g.separado ? "completa" : "pendente");
+        var cls = st === "completa" ? "sep" : st === "parcial" ? "par" : "pen";
+        var qtdSep = g.qtdSeparada != null ? g.qtdSeparada : (g.separado ? g.qtd : 0);
+        var txt = st === "parcial" ? (qtdSep + "/" + (g.qtd||0)) : (g.qtd||0);
+        return '<span class="grade '+cls+'">'+esc(g.tamanho||"—")+': <strong>'+txt+'</strong></span>';
       }).join("");
       var foto = p.foto
         ? '<img src="'+esc(p.foto)+'" alt=""/>'
         : '<span class="semfoto">sem foto</span>';
       var descr = p.descricao ? '<div class="descr-line">'+esc(p.descricao)+'</div>' : '';
+      var saldoTxt = "";
+      if (p.totalSeparado > 0 && p.totalSeparado < p.total) {
+        saldoTxt = '<div class="l" style="color:#7a2a06;margin-top:4px">'+p.totalSeparado+'/'+p.total+' SEP.<br/>SALDO: '+(p.total-p.totalSeparado)+'</div>';
+      } else if (p.totalSeparado >= p.total && p.total > 0) {
+        saldoTxt = '<div class="l" style="color:#0d4d24;margin-top:4px">COMPLETO</div>';
+      }
       return '<div class="row"><div class="foto">'+foto+'</div>'
         + '<div class="info"><div class="info-top"><span class="sku">'+esc(p.sku)+'</span>'+pilProduto(p)+'</div>'
         + '<div class="nome">'+esc(p.nome)+'</div><div class="grades">'+grades+'</div>'
         + descr
         + '</div>'
-        + '<div class="tot"><div class="l">TOTAL</div><div class="v">'+(p.total||0)+'</div>'
-        + (p.totalSeparado>0&&p.totalSeparado<p.total ? '<div style="font-size:9px;color:var(--orange);font-weight:700;margin-top:4px">'+p.totalSeparado+' SEP.</div>' : '')
-        + '</div></div>';
+        + '<div class="tot"><div class="l">TOTAL</div><div class="v">'+(p.total||0)+'</div>'+saldoTxt+'</div>'
+        + '</div>';
     }).join("");
 
     var bordadosSection = "";
@@ -272,7 +280,7 @@
 
     return '<div class="folha">'
       + '<div class="head">'+emitBlock
-      + '<div class="right"><div class="tag">FOLHA DE SEPARAÇÃO</div>'
+      + '<div class="right"><div class="tag">FOLHA DE PROCESSAMENTO</div>'
       + '<div class="pedido">'+(o.pedidoLinx?('PED '+esc(o.pedidoLinx)+' '):'PED ')
       + '<span style="font-size:12px;color:#666;font-weight:600">| '+esc(o.pedido)+'</span></div>'
       + (o.data?'<div class="data">'+fmtDt(o.data)+'</div>':'')+'</div></div>'
@@ -306,7 +314,9 @@
       + '<div class="foot"><span>'+(o.produtos||[]).length+' produto(s)'
       + ((o.bordados||[]).length ? ' · '+o.bordados.length+' bordado(s)' : '')
       + '</span>'
-      + '<span class="pecas">Total de peças: '+totalPecas+'</span></div>'
+      + '<span class="pecas">Total de peças: <strong>'+totalPecas+'</strong></span>'
+      + (o.valorTotal>0 ? '<span class="valor">Valor total: <strong>'+fmtR(o.valorTotal)+'</strong></span>' : '')
+      + '</div>'
       + '</div>';
   }
 
