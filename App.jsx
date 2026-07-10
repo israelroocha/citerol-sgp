@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.9.49";
+const SGP_VERSION = "v2.9.62";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -175,9 +175,10 @@ const C = {
 };
 const STAGE_COLOR = {
   "Programação":C.amber,"Amostra Digital":C.purple,"Amostra Física":"#be185d",
-  "Separação":C.blue,"Retirar e Conferir":"#059669","Direcionamento":"#0369a1",
+  "Em Separação":C.blue,"Conferência Separação":"#0369a1",
+  "Conferência e Direcionamento":"#059669",
   "Bordado Interno":C.green,"Bordado Externo":C.purple,
-  "Expedição":C.teal,"Faturamento":C.green,
+  "Expedição":C.teal,"Análise de Frete":"#0891b2",
 };
 
 // ─── ÍCONES SVG ───────────────────────────────────────────────────────────────
@@ -208,6 +209,8 @@ const ICONS = {
   chevR:     "M9 5l7 7-7 7",
   chevL:     "M15 19l-7-7 7-7",
   send:      "M12 19l9 2-9-18-9 18 9-2zm0 0v-8",
+  phone:     "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
+  image:     "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z",
   download:  "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
   refresh:   "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
   close:     "M6 18L18 6M6 6l12 12",
@@ -234,8 +237,10 @@ function Ic({ n, s = 16, c = "currentColor", style = {} }) {
 // ─── SLA ─────────────────────────────────────────────────────────────────────
 const SLA_DEF = {
   "Programação":8,"Amostra Digital":16,"Amostra Física":24,
-  "Separação":48,"Retirar e Conferir":8,"Direcionamento":4,"Bordado Interno":72,
-  "Bordado Externo":120,"Expedição":8,"Faturamento":4,
+  "Em Separação":24,"Conferência Separação":24,
+  "Conferência e Direcionamento":8,
+  "Bordado Interno":72,"Bordado Externo":120,
+  "Expedição":8,"Análise de Frete":8,
 };
 
 // ─── MÓDULOS DO SISTEMA ───────────────────────────────────────────────────────
@@ -245,30 +250,35 @@ const NAV_ITEMS = [
   {id:"demandas",    label:"Minhas Demandas",    icon:"pin",     grupo:"Principal"},
   {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
   {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
+  {id:"posvenda",    label:"Painel Pós-Venda",   icon:"phone",   grupo:"Principal"},
   // Análise
   {id:"painel_fluxo",    label:"Painel de Fluxo",          icon:"activity",grupo:"Análise"},
   {id:"gestao_vista",    label:"Gestão à Vista",           icon:"monitor", grupo:"Análise"},
   {id:"pedidos_risco",   label:"Pedidos em Risco",         icon:"warn",    grupo:"Análise"},
   {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
   {id:"rel_pendencias",  label:"Relatório de Pendências",  icon:"clock",   grupo:"Análise"},
-  // Operações
-  {id:"pedidos",                 label:"Pedidos em Aberto",         icon:"list",    grupo:"Operações"},
-  {id:"separacao",               label:"Separação",                icon:"inbox",   grupo:"Operações"},
-  {id:"impressao_pedido",        label:"Impressão de Pedido",      icon:"print",   grupo:"Operações"},
-  {id:"retirar_conferir",        label:"Retirar e Conferir",       icon:"check",   grupo:"Operações"},
-  {id:"direcionamento",          label:"Direcionamento",           icon:"arrow",   grupo:"Operações"},
-  {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Operações"},
-  {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Operações"},
-  {id:"aprovacao_amostra_digital",label:"Aprovação Amostra Digital",icon:"check",  grupo:"Operações"},
-  {id:"amostra_fisica",          label:"Amostra Física",           icon:"scissors",grupo:"Operações"},
-  {id:"aprovacao_amostra_fisica",label:"Aprovação Amostra Física", icon:"check",   grupo:"Operações"},
-  {id:"bordado_interno",         label:"Bordado Interno",          icon:"needle",  grupo:"Operações"},
-  {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operações"},
-  {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operações"},
-  {id:"faturamento",             label:"Faturamento",              icon:"dollar",  grupo:"Operações"},
-  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Operações"},
-  {id:"pendencia_comercial",     label:"Pendência Comercial",      icon:"clock",   grupo:"Operações"},
-  {id:"aguardando_pedido",       label:"Aguardando Outro Pedido",  icon:"clock",   grupo:"Operações"},
+  // ── Separação ─────────────────────────────────────────────────────────────
+  {id:"em_separacao",            label:"Em Separação",             icon:"inbox",   grupo:"Separação"},
+  {id:"conferencia_separacao",   label:"Conferência Separação",    icon:"check",   grupo:"Separação"},
+  // ── Amostra ───────────────────────────────────────────────────────────────
+  {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Amostra"},
+  {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Amostra"},
+  {id:"aprovacao_amostra_digital",label:"Aprovação Amostra Digital",icon:"check", grupo:"Amostra"},
+  {id:"amostra_fisica",          label:"Amostra Física",           icon:"scissors",grupo:"Amostra"},
+  {id:"aprovacao_amostra_fisica",label:"Aprovação Amostra Física", icon:"check",   grupo:"Amostra"},
+  // ── Operação ──────────────────────────────────────────────────────────────
+  {id:"conferencia_direcionamento",label:"Conferência e Direcionamento",icon:"arrow",grupo:"Operação"},
+  {id:"bordado_interno",         label:"Bordado Interno",          icon:"needle",  grupo:"Operação"},
+  {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operação"},
+  {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operação"},
+  // ── Outros (fora de grupo, colapsável) ────────────────────────────────────
+  {id:"analise_frete",           label:"Análise de Frete",         icon:"send",    grupo:"Outros"},
+  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Outros"},
+  {id:"impressao_pedido",        label:"Impressão de Pedido",      icon:"print",   grupo:"Outros"},
+  {id:"pendencia_comercial",     label:"Pendência Comercial",      icon:"clock",   grupo:"Outros"},
+  {id:"aguardando_pedido",       label:"Aguardando Outro Pedido",  icon:"clock",   grupo:"Outros"},
+  {id:"pedidos",                 label:"Pedidos em Aberto",        icon:"list",    grupo:"Outros"},
+  {id:"banco_imagens",           label:"Banco de Imagens",         icon:"image",   grupo:"Outros"},
   // Cadastros
   {id:"codigos_barra", label:"Códigos de Barra",   icon:"barcode", grupo:"Cadastros"},
   // Sistema
@@ -278,33 +288,33 @@ const NAV_ITEMS = [
 
 // Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
 const MODULO_ETAPA = {
-  direcionamento:           "Direcionamento",
-  separacao:                "Separação",
-  retirar_conferir:         "Retirar e Conferir",
-  programacao:              "Programação",
-  amostra_digital:          "Amostra Digital",
-  aprovacao_amostra_digital:"Aprovação de Amostra Digital",
-  amostra_fisica:           "Amostra Física",
-  aprovacao_amostra_fisica: "Aprovação de Amostra Física",
-  bordado_interno:          "Bordado Interno",
-  bordado_externo:          "Bordado Externo",
-  expedicao:                "Expedição",
-  faturamento:              "Faturamento",
+  em_separacao:               "Em Separação",
+  conferencia_separacao:      "Conferência Separação",
+  conferencia_direcionamento: "Conferência e Direcionamento",
+  programacao:                "Programação",
+  amostra_digital:            "Amostra Digital",
+  aprovacao_amostra_digital:  "Aprovação de Amostra Digital",
+  amostra_fisica:             "Amostra Física",
+  aprovacao_amostra_fisica:   "Aprovação de Amostra Física",
+  bordado_interno:            "Bordado Interno",
+  bordado_externo:            "Bordado Externo",
+  expedicao:                  "Expedição",
+  analise_frete:              "Análise de Frete",
 };
 // Mapa módulo -> endpoint do Worker (para carregar demandas ao vivo)
 const MODULO_ENDPOINT = {
-  direcionamento:           "/direcionamento",
-  separacao:                "/separacao",
-  retirar_conferir:         "/retirar-conferir",
-  programacao:              "/programacao",
-  amostra_digital:          "/amostra-digital",
-  aprovacao_amostra_digital:"/aprovacao-amostra-digital",
-  amostra_fisica:           "/amostra-fisica",
-  aprovacao_amostra_fisica: "/aprovacao-amostra-fisica",
-  bordado_interno:          "/bordado-interno",
-  bordado_externo:          "/bordado-externo",
-  expedicao:                "/expedicao",
-  faturamento:              "/faturamento",
+  em_separacao:               "/em-separacao",
+  conferencia_separacao:      "/conferencia-separacao",
+  conferencia_direcionamento: "/conferencia-direcionamento",
+  programacao:                "/programacao",
+  amostra_digital:            "/amostra-digital",
+  aprovacao_amostra_digital:  "/aprovacao-amostra-digital",
+  amostra_fisica:             "/amostra-fisica",
+  aprovacao_amostra_fisica:   "/aprovacao-amostra-fisica",
+  bordado_interno:            "/bordado-interno",
+  bordado_externo:            "/bordado-externo",
+  expedicao:                  "/expedicao",
+  analise_frete:              "/analise-frete",
 };
 
 // Mapa de etapa -> propriedade de arquivo no HubSpot
@@ -501,6 +511,7 @@ const normalizarCard=(o,etapa)=>({
   stageIdBordado: o.stageIdBordado || null,
   etapasAtivas: Array.isArray(o.etapasAtivas) ? o.etapasAtivas : [(o.etapa || etapa)],
   etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
+  statusFaturamento: o.statusFaturamento || "",
   entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
   alertas:o.alertas||[],concluido:false,
   bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
@@ -727,7 +738,7 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
-  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
   // Injeta o CSS da scrollbar sutil uma única vez
   useEffect(()=>{
@@ -760,27 +771,15 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
         </button>
       </div>
       <div className="sgp-scroll" style={{flex:1,overflowY:"auto",padding:"6px 0"}}>
-        {groups.map(g=>{
-          const gi=g.items;
-          if(!gi.length)return null;
-          return(
-            <div key={g.label} style={{marginBottom:2}}>
-              {!collapsed&&<div style={{...F.body,fontSize:9,fontWeight:700,color:C.gray400,textTransform:"uppercase",letterSpacing:"0.1em",padding:"10px 20px 4px"}}>{g.label}</div>}
-              {gi.map(n=>{
-                const on=active===n.id;
-                return(
-                  <div key={n.id} onClick={()=>onNav(n.id)}
-                    style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start"}}
-                    onMouseEnter={e=>{if(!on)e.currentTarget.style.background=C.gray50;}}
-                    onMouseLeave={e=>{if(!on)e.currentTarget.style.background="transparent";}}>
-                    <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
-                    {!collapsed&&<span style={{...F.body,fontSize:13,fontWeight:on?600:400,whiteSpace:"nowrap"}}>{n.label}</span>}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+        {groups.map(g => (
+          <MenuGrupo
+            key={g.label}
+            grupo={g}
+            collapsed={collapsed}
+            active={active}
+            onNav={onNav}
+          />
+        ))}
       </div>
       {!collapsed&&<div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",gap:10}}>
         <Av ini={user.ini} size={30}/>
@@ -793,12 +792,70 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
   );
 }
 
+// Item do menu — extraído pra que os hooks (useState) fiquem no topo do componente,
+// respeitando a regra dos Hooks do React (evita o erro #300).
+function MenuGrupo({grupo, collapsed, active, onNav}) {
+  const gi = grupo.items;
+  const podeColapsar = grupo.label === "Outros" || grupo.label === "Cadastros";
+  const chaveLS = "sgp_menu_grupo_" + grupo.label;
+  const [aberto, setAberto] = useState(() => {
+    if (!podeColapsar) return true;
+    const salvo = typeof localStorage !== "undefined" ? localStorage.getItem(chaveLS) : null;
+    // Padrão: "Outros" começa fechado, "Cadastros" começa fechado
+    return salvo === null ? false : salvo === "1";
+  });
+  const toggle = () => {
+    setAberto(v => {
+      const novo = !v;
+      try { localStorage.setItem(chaveLS, novo ? "1" : "0"); } catch {}
+      return novo;
+    });
+  };
+  if (!gi.length) return null;
+  return (
+    <div style={{marginBottom:2}}>
+      {!collapsed && (
+        <div
+          onClick={podeColapsar ? toggle : undefined}
+          style={{
+            ...F.body, fontSize:9, fontWeight:700, color:C.gray400,
+            textTransform:"uppercase", letterSpacing:"0.1em",
+            padding:"10px 20px 4px",
+            display:"flex", alignItems:"center", justifyContent:"space-between",
+            cursor: podeColapsar ? "pointer" : "default",
+            userSelect: "none",
+          }}
+        >
+          <span>{grupo.label}</span>
+          {podeColapsar && (
+            <span style={{display:"inline-flex", transition:"transform 0.15s", transform: aberto ? "rotate(0deg)" : "rotate(-90deg)"}}>
+              <Ic n="chevDown" s={10} c={C.gray400}/>
+            </span>
+          )}
+        </div>
+      )}
+      {(collapsed || !podeColapsar || aberto) && gi.map(n => {
+        const on = active === n.id;
+        return (
+          <div key={n.id} onClick={()=>onNav(n.id)}
+            style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start"}}
+            onMouseEnter={e=>{if(!on)e.currentTarget.style.background=C.gray50;}}
+            onMouseLeave={e=>{if(!on)e.currentTarget.style.background="transparent";}}>
+            <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
+            {!collapsed&&<span style={{...F.body,fontSize:13,fontWeight:on?600:400,whiteSpace:"nowrap"}}>{n.label}</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function BottomNav({user,active,onNav}){
   const allItems=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:allItems.filter(n=>n.grupo===label)}));
 
   return(
@@ -1962,8 +2019,8 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
     "Bordado Interno":          {title:"BORDADO CONCLUÍDO",  sub:"Confirme que o bordado interno foi executado e as peças estão prontas.",        btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
     "Bordado Externo":          {title:"RETORNO DO EXTERNO", sub:"Confirme o recebimento das peças bordadas pelo fornecedor externo.",            btn:"Confirmar retorno das peças", icon:"inbox",  color:C.purple, next:"Expedição"},
     "Bordado Interno e Externo":{title:"BORDADO CONCLUÍDO",  sub:"Confirme a execução do bordado interno e o retorno do externo.",                btn:"Confirmar bordado concluído", icon:"check",  color:C.green,  next:"Expedição"},
-    "Expedição":                {title:"PEDIDO EMBALADO",    sub:"Confirme que o pedido foi embalado e está pronto para faturamento.",            btn:"Enviar para faturamento",     icon:"box",    color:C.teal,   next:"Faturamento"},
-    "Faturamento":              {title:"FATURAR PEDIDO",     sub:"Confirme que o pedido foi faturado e o processo de pós-venda está encerrado.",  btn:"Confirmar faturamento",       icon:"dollar", color:C.green,  next:"Concluído"},
+    "Expedição":                {title:"PEDIDO EMBALADO",    sub:"Confirme que o pedido foi embalado e está pronto para análise de frete.",       btn:"Enviar para análise de frete",icon:"box",    color:C.teal,    next:"Análise de Frete"},
+    "Análise de Frete":         {title:"ANÁLISE DE FRETE",   sub:"Confirme o cálculo/aprovação do frete. Depois disso o pedido é finalizado — o status de faturamento é atualizado pelo ERP.",  btn:"Finalizar pedido",            icon:"check",  color:"#0891b2", next:"Finalizados"},
   }[etapa]||{title:"MOVIMENTAR PEDIDO",sub:"Confirme a execução desta etapa para avançar o pedido.",btn:"Confirmar e avançar",icon:"arrow",color:C.red,next:""};
 
   return(
@@ -2174,7 +2231,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     // Preserva etapasAtivas do snapshot (não vem no enriched)
     etapasAtivas: _orderLeve.etapasAtivas || _enriched.etapasAtivas || [_orderLeve.etapa],
   }:_orderLeve;
-  const ETAPAS_COM_ACAO=["Direcionamento","Retirar e Conferir","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Faturamento"];
+  const ETAPAS_COM_ACAO=["Conferência e Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Análise de Frete"];
   // A "etapa efetiva" é a que o USUÁRIO abriu (vinda da tela — ex.: "Separação"
   // via aba Separação). Se abriu de uma tela sem etapa específica, cai na
   // etapa real do card. Isso deixa a mesma order abrir sem ações quando vista
@@ -2725,6 +2782,118 @@ function MinhasDemandas({user,onOpen,slaCfg}){
 }
 
 // ─── DIRECIONAMENTO (COMPLETO) ────────────────────────────────────────────────
+// ─── CONFERÊNCIA SEPARAÇÃO ──────────────────────────────────────────────────
+// Fila dos pedidos que o WMS bipou (parcial ou completo). O conferidor precisa
+// confirmar manualmente clicando no botão "Conferido". A ação decide:
+//   - Sem bordado → move direto para Expedição
+//   - Com bordado → move para Conferência e Direcionamento
+function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
+  const [pedidos, setPedidos] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [confirming, setConfirming] = useState({});
+  const [confirmed, setConfirmed] = useState({});
+
+  const carregar = () => {
+    setLoading(true);
+    setLoadError(null);
+    apiFetch("/conferencia-separacao")
+      .then(res => {
+        if (res.success) {
+          setPedidos(res.data.map(o => normalizarCard(o, "Conferência Separação")));
+        } else {
+          setLoadError(res.error || "Erro desconhecido");
+        }
+      })
+      .catch(e => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { carregar(); }, []);
+
+  const confirmarConferencia = async (o) => {
+    if (!o.posvendaId) { alert("Pedido sem negócio de Pós-venda."); return; }
+    setConfirming(prev => ({...prev, [o.id]: true}));
+    try {
+      const r = await apiFetch("/conferir-separacao/" + o.posvendaId, "POST", {
+        ctx: { executor: user?.nome || "Usuário SGP" },
+      });
+      if (r.success) {
+        setConfirmed(prev => ({...prev, [o.id]: r.proximaEtapa}));
+        setTimeout(() => carregar(), 1200);
+      } else {
+        alert("Erro: " + (r.error || "desconhecido"));
+      }
+    } catch (e) {
+      alert("Erro: " + e.message);
+    } finally {
+      setConfirming(prev => ({...prev, [o.id]: false}));
+    }
+  };
+
+  const lista = pedidos || [];
+
+  return (
+    <div style={{padding:20}}>
+      <PageH title="Conferência Separação" sub="WMS bipou. Aguardando conferência manual antes de seguir." onRefresh={carregar} refreshing={loading}/>
+      {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:"#0369a1"+"0e",border:`1px solid #0369a128`,borderRadius:8,...F.body,fontSize:13,color:"#0369a1"}}>
+        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0369a1" strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        Carregando pedidos...
+      </div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green,marginBottom:12}}>
+        <Ic n="check" s={13} c={C.green}/> {lista.length} pedido{lista.length!==1?"s":""} aguardando conferência
+      </div>}
+      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando conferência.</div>}
+      {lista.map(o => {
+        const isConfirmed = confirmed[o.id];
+        const isConfirming = confirming[o.id];
+        const sla = getSLA(o, slaCfg);
+        return (
+          <Card key={o.id} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:"#0369a1"}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+              <div style={{flex:1,minWidth:220}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <ETag etapa="Conferência Separação"/>
+                  <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
+                  {o.temBordado===false && <Tag label="Sem bordado" color={C.gray600}/>}
+                  {o.temBordado!==false && <Tag label="Com bordado" color={C.red}/>}
+                  {sla.st!=="ok" && <Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>
+                  {o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças
+                </div>
+                <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>
+                  Separado: <strong style={{color:C.gray700}}>{o.qtdSeparada||0}</strong> de <strong style={{color:C.gray700}}>{o.qtdTotal||0}</strong> peças
+                  {" · próxima etapa: "}
+                  <strong style={{color:C.gray700}}>{o.temBordado===false ? "Expedição" : "Conferência e Direcionamento"}</strong>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
+                {isConfirmed ? (
+                  <span style={{background:C.green+"18",color:"#065f46",border:`1px solid ${C.green}55`,borderRadius:6,padding:"9px 16px",...F.body,fontWeight:700,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}>
+                    <Ic n="check" s={14} c="#065f46"/> Enviado p/ {isConfirmed}
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => confirmarConferencia(o)}
+                    disabled={isConfirming}
+                    style={{background:isConfirming?"#ccc":"#0369a1",color:C.white,border:"none",borderRadius:6,padding:"10px 20px",cursor:isConfirming?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,display:"inline-flex",alignItems:"center",gap:6}}>
+                    <Ic n="check" s={14} c={C.white}/>
+                    {isConfirming ? "Confirmando..." : "Conferido"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── DIRECIONADOR (Conferência e Direcionamento — só COM bordado agora) ────
 function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const [loading,setLoading]=useState(false);
   const [loadError,setLoadError]=useState(null);
@@ -2738,7 +2907,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
     setDestMap({});
     setSel({});
     apiFetch("/capacidade-lotacao").then(r=>{ if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}}); }).catch(()=>{});
-    apiFetch("/direcionamento")
+    apiFetch("/conferencia-direcionamento")
       .then(res=>{
         if(res.success){
           const converted=res.data.map(o=>({
@@ -2748,7 +2917,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
             condicaoPagamento:o.condicaoPagamento||"",vendedor:o.vendedor,valor:o.valor,
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
-            etapa:"Direcionamento",amOk:o.amostrasAprovada,sepOk:o.separacaoCompleta,
+            etapa:"Conferência e Direcionamento",amOk:o.amostrasAprovada,sepOk:o.separacaoCompleta,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
             alertas:o.alertas||[],concluido:false,
             bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
@@ -2761,7 +2930,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
               dest:it.direcionamento?it.direcionamento.toLowerCase():null,
               status:it.status==="faltante"?"faltante":"separado",
             })),
-            timeline:[{stage:"Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
+            timeline:[{stage:"Conferência e Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
             chat:[],
           }));
           setHsOrders(converted);
@@ -2874,7 +3043,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
 
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
-      <PageH title="Direcionamento" sub="Direcione cada item para bordado interno ou externo" onRefresh={carregarDir} refreshing={loading}/>
+      <PageH title="Conferência e Direcionamento" sub="Confira o pedido separado. Se tiver bordado, defina destinos." onRefresh={carregarDir} refreshing={loading}/>
       <PainelLotacao capLot={capLot} destinos={["interno","bordadel","mg_bordados","outros"]} titulo="Capacidade x lotação — usada para a sugestão"/>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
@@ -2913,6 +3082,63 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
       <SecH>Prontos para direcionar — {prontos.length} pedido{prontos.length!==1?"s":""}</SecH>
       {prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando direcionamento.</div>}
       {prontos.map(o=>{
+        // Pedidos SEM bordado: card simplificado com botão "Conferido" só
+        if (o.temBordado === false) {
+          const isConfirmed = confirmed[o.id];
+          const sla = getSLA(o, slaCfg);
+          return (
+            <Card key={o.id} style={{marginBottom:14,borderLeft:`3px solid ${C.teal}`}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+                <div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                    <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                    <Tag label="Sem bordado" color={C.gray600}/>
+                    <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
+                    {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
+                  </div>
+                  <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>
+                    {o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças
+                  </div>
+                  <div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6}}>
+                    Este pedido não tem bordado. Confira fisicamente e envie pra Expedição.
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
+                  <button
+                    onClick={async ()=>{
+                      if (isConfirmed) return;
+                      try {
+                        const r = await apiFetch("/apenas-conferido/" + o.posvendaId, "POST", {
+                          ctx: { executor: user?.nome || "Usuário SGP" },
+                        });
+                        if (r.success) {
+                          setConfirmed(prev => ({ ...prev, [o.id]: true }));
+                          setTimeout(() => carregarDir(), 1000);
+                        } else {
+                          alert("Erro: " + (r.error || "desconhecido"));
+                        }
+                      } catch (e) {
+                        alert("Erro: " + e.message);
+                      }
+                    }}
+                    disabled={isConfirmed}
+                    style={{
+                      background: isConfirmed ? C.gray300 : C.teal,
+                      color: C.white, border: "none", borderRadius: 6,
+                      padding: "10px 20px", cursor: isConfirmed ? "default" : "pointer",
+                      fontWeight: 700, fontSize: 13, ...F.body,
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                    }}>
+                    <Ic n="check" s={14} c={C.white}/> {isConfirmed ? "Enviado ✓" : "Conferido — enviar para Expedição"}
+                  </button>
+                </div>
+              </div>
+            </Card>
+          );
+        }
+
+        // Pedidos COM bordado: card completo com direcionamento (fluxo original)
         // Só itens COM bordado precisam de direcionamento. Fallback legado: sem flag em nenhum → todos.
         // Ordena por SKU (agrupa mesmo produto de grades diferentes) e depois por tamanho.
         const itensComBordado=o.items.filter(it=>it.bordado);
@@ -3219,9 +3445,9 @@ const CENTRO_OPTIONS=[
 ];
 // Etapas em aberto, na ordem do funil, com endpoint
 const ABERTO_ETAPAS=[
-  {nome:"Direcionamento",endpoint:"/direcionamento"},
-  {nome:"Separação",endpoint:"/separacao"},
-  {nome:"Retirar e Conferir",endpoint:"/retirar-conferir"},
+  {nome:"Em Separação",endpoint:"/em-separacao"},
+  {nome:"Conferência Separação",endpoint:"/conferencia-separacao"},
+  {nome:"Conferência e Direcionamento",endpoint:"/conferencia-direcionamento"},
   {nome:"Programação",endpoint:"/programacao"},
   {nome:"Amostra Digital",endpoint:"/amostra-digital"},
   {nome:"Aprovação de Amostra Digital",endpoint:"/aprovacao-amostra-digital"},
@@ -3230,7 +3456,7 @@ const ABERTO_ETAPAS=[
   {nome:"Bordado Interno",endpoint:"/bordado-interno"},
   {nome:"Bordado Externo",endpoint:"/bordado-externo"},
   {nome:"Expedição",endpoint:"/expedicao"},
-  {nome:"Faturamento",endpoint:"/faturamento"},
+  {nome:"Análise de Frete",endpoint:"/analise-frete"},
 ];
 
 // Painel de capacidade x lotação (peças com bordado em aberto) por destino
@@ -4282,9 +4508,10 @@ function BackfillLinxBtn(){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra}){
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra,subTabsReprog}){
   const [busca,setBusca]=useState("");
   const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
+  const [subTab,setSubTab]=useState("normal"); // normal | reprogramacao
 
   // Consome o snapshot único (1 chamada compartilhada com todas as outras telas).
   // Filtra apenas a etapa que essa tela é responsável. Não chama endpoint específico.
@@ -4329,6 +4556,12 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     mine=mine.filter(o=>(o.items||[]).some(it=>(it.bordador||"")===filtroBordador));
   }
 
+  // Filtro por sub-tab (só ativa quando subTabsReprog=true)
+  if(subTabsReprog){
+    if(subTab==="reprogramacao") mine=mine.filter(o=>o.reprogramacao===true);
+    else mine=mine.filter(o=>!o.reprogramacao);
+  }
+
   // Ordena por PRIORIDADE (data de vencimento mais próxima primeiro)
   mine=ordenarPorPrioridade(mine);
 
@@ -4336,6 +4569,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
   const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
   const nLate=all.filter(o=>getSLA(o,slaCfg,etapa).st==="late").length;
   const nRisk=all.filter(o=>getSLA(o,slaCfg,etapa).st==="risk").length;
+  const nReprog=all.filter(o=>o.reprogramacao===true).length;
+  const nNormal=all.filter(o=>!o.reprogramacao).length;
 
   const FilterChip=({id,label,count,color})=>(
     <button onClick={()=>setFiltroSLA(id)}
@@ -4349,6 +4584,55 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}`} onRefresh={carregar} refreshing={loading}/>
 
       {topoExtra}
+
+      {/* Sub-abas estilo Chrome: Normal | Reprogramação (só nas Amostras) */}
+      {subTabsReprog && <div style={{display:"flex",gap:2,marginBottom:16,borderBottom:`1.5px solid ${C.gray200}`,alignItems:"flex-end"}}>
+        <div onClick={()=>setSubTab("normal")}
+          style={{
+            padding:"10px 20px 11px",
+            background: subTab==="normal" ? C.white : "transparent",
+            border: subTab==="normal" ? `1.5px solid ${C.gray200}` : "1.5px solid transparent",
+            borderBottom: subTab==="normal" ? `1.5px solid ${C.white}` : "none",
+            borderRadius: "8px 8px 0 0",
+            marginBottom: -1.5,
+            cursor:"pointer",
+            display:"inline-flex",alignItems:"center",gap:8,
+            ...F.body,
+            fontSize:13,
+            fontWeight: subTab==="normal" ? 700 : 500,
+            color: subTab==="normal" ? C.black : C.gray500,
+            transition:"all 0.15s",
+          }}>
+          Demandas
+          <span style={{background:subTab==="normal"?C.gray100:"transparent",color:C.gray600,padding:"1px 8px",borderRadius:10,fontSize:11,fontWeight:700}}>{nNormal}</span>
+        </div>
+        <div onClick={()=>setSubTab("reprogramacao")}
+          style={{
+            padding:"10px 20px 11px",
+            background: subTab==="reprogramacao" ? C.white : "transparent",
+            border: subTab==="reprogramacao" ? `1.5px solid ${C.gray200}` : "1.5px solid transparent",
+            borderBottom: subTab==="reprogramacao" ? `1.5px solid ${C.white}` : "none",
+            borderRadius: "8px 8px 0 0",
+            marginBottom: -1.5,
+            cursor:"pointer",
+            display:"inline-flex",alignItems:"center",gap:8,
+            position:"relative",
+            ...F.body,
+            fontSize:13,
+            fontWeight: subTab==="reprogramacao" ? 700 : 500,
+            color: subTab==="reprogramacao" ? "#c2410c" : C.gray500,
+            transition:"all 0.15s",
+          }}>
+          <span>↻</span> Reprogramação
+          {nReprog>0 && <span style={{
+            background:"#f97316",color:C.white,
+            padding:"2px 8px",borderRadius:10,
+            fontSize:11,fontWeight:800,
+            minWidth:18,textAlign:"center",
+            boxShadow:"0 0 0 2px "+C.white,
+          }}>{nReprog}</span>}
+        </div>
+      </div>}
 
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
@@ -4396,14 +4680,31 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</span>
                     <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
-                    {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ REPROGRAMAÇÃO</span>}
+                    {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ (ALTERAÇÃO)</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
                     {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
                     {/* Badge de status */}
                     {finalizado
-                      ?<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.green+"15",color:C.green,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
-                        <Ic n="check" s={10} c={C.green}/> CONCLUÍDO
-                      </span>
+                      ?(()=>{
+                        // Tag baseada em status_faturamento: Pendente, Faturado ou Faturado Parcial
+                        const st = (o.statusFaturamento||"").toLowerCase().trim();
+                        let bg, cor, label;
+                        if (st.includes("parcial")) {
+                          bg = C.amber+"20"; cor = "#92400e"; label = "FATURADO PARCIAL";
+                        } else if (st.includes("faturado")) {
+                          bg = C.green+"18"; cor = "#065f46"; label = "FATURADO";
+                        } else {
+                          bg = C.gray100; cor = C.gray600; label = "PENDENTE FATURAMENTO";
+                        }
+                        return (
+                          <span style={{display:"inline-flex",alignItems:"center",gap:5,background:bg,color:cor,border:`1px solid ${cor}33`,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:800,letterSpacing:"0.05em"}}>
+                            {st.includes("faturado")&&!st.includes("parcial")&&<Ic n="check" s={10} c={cor}/>}
+                            {st.includes("parcial")&&<Ic n="warn" s={10} c={cor}/>}
+                            {!st.includes("faturado")&&<Ic n="clock" s={10} c={cor}/>}
+                            {label}
+                          </span>
+                        );
+                      })()
                       :<span style={{display:"inline-flex",alignItems:"center",gap:4,background:slaColor+"15",color:slaColor,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>
                         <span style={{width:6,height:6,borderRadius:"50%",background:slaColor,display:"inline-block"}}/>
                         {slaLabel}
@@ -4535,7 +4836,7 @@ function Usuarios(){
   };
   useEffect(carregar,[]);
 
-  const GRUPOS=["Principal","Análise","Operações","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
 
   const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
   const toggleGrupo=(grupo)=>{
@@ -6118,6 +6419,7 @@ function AppInner(){
           propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
           fileBase64:payload.fileBase64,
           fileName:payload.fileName,
+          sku:payload.sku||o.items?.find(it=>it.bordado)?.sku||"",
           novaEtapa:ETAPA_STAGE_ID[next],
           nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
           ctx,
@@ -6214,18 +6516,20 @@ function AppInner(){
         }
       }
 
-      // ── MOVIMENTAÇÃO PÓS-VENDA (Expedição → Faturamento → Faturado) ────────────
-      else if(tipo==="mover"&&(o.etapa==="Expedição"||o.etapa==="Faturamento")){
+      // ── MOVIMENTAÇÃO PÓS-VENDA (Expedição → Análise de Frete → Finalizado) ────
+      else if(tipo==="mover"&&(o.etapa==="Expedição"||o.etapa==="Análise de Frete")){
         if(!o.posvendaId) throw new Error("Pedido sem negócio de Pós-venda.");
         const stageMap={
-          "Expedição":"1377587761",   // Análise de frete
-          "Faturamento":"1377587762", // Faturado
+          "Expedição":         "1377587761", // → Análise de frete
+          "Análise de Frete":  "1377587762", // → Faturado (Finalizados)
+        };
+        const nomeProx = {
+          "Expedição": "Análise de Frete",
+          "Análise de Frete": "Finalizados",
         };
         const novaEtapa=stageMap[o.etapa];
         await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`,ctx});
-        resultMsg=o.etapa==="Expedição"
-          ?"Pedido enviado para Faturamento."
-          :"Pedido faturado! Processo de pós-venda concluído.";
+        resultMsg = `Pedido movido para ${nomeProx[o.etapa]}.`;
       }
 
       // ── MOVIMENTAÇÃO SIMPLES (fallback) ────────────────────────────────────────
@@ -6281,18 +6585,18 @@ function AppInner(){
             {page==="gestao_vista"&&<GestaoVista/>}
             {page==="pedidos_risco"&&<PedidosRisco/>}
             {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
-            {page==="separacao"&&<Fila title="Separação" etapa="Separação" endpoint="/separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
-            {page==="retirar_conferir"&&<Fila title="Retirar e Conferir" etapa="Retirar e Conferir" endpoint="/retirar-conferir" orders={orders} onOpen={setSel} actionLabel="Conferência concluída" actionColor="#059669" slaCfg={slaCfg}/>}
-            {page==="direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="em_separacao"&&<Fila title="Em Separação" etapa="Em Separação" endpoint="/em-separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
+            {page==="conferencia_separacao"&&<ConferenciaSeparacao orders={orders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="conferencia_direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
-            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg}/>}
-            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg}/>}
+            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg} subTabsReprog/>}
+            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg} subTabsReprog/>}
             {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
             {page==="bordado_externo"&&<BordadoExternoPage orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
-            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ faturamento" actionColor={C.teal} slaCfg={slaCfg}/>}
-            {page==="faturamento"&&<Fila title="Faturamento" etapa="Faturamento" endpoint="/faturamento" orders={orders} onOpen={setSel} actionLabel="Faturar pedido" actionColor={C.green} slaCfg={slaCfg}/>}
+            {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ análise de frete" actionColor={C.teal} slaCfg={slaCfg}/>}
+            {page==="analise_frete"&&<Fila title="Análise de Frete" etapa="Análise de Frete" endpoint="/analise-frete" orders={orders} onOpen={setSel} actionLabel="Finalizar pedido" actionColor="#0891b2" slaCfg={slaCfg}/>}
             {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
             {page==="alteracoes_form"&&<AlteracoesFormList/>}
             {page==="codigos_barra"&&<CodigosBarra user={user}/>}
@@ -6300,6 +6604,8 @@ function AppInner(){
             {page==="pendencia_comercial"&&<PendenciaComercial user={user}/>}
             {page==="aguardando_pedido"&&<AguardandoOutroPedido user={user}/>}
             {page==="rel_pendencias"&&<RelatorioPendencias user={user}/>}
+            {page==="posvenda"&&<PainelPosVenda onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="banco_imagens"&&<BancoImagens user={user}/>}
             {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
@@ -6307,6 +6613,699 @@ function AppInner(){
       </div>
       {isMobile&&<BottomNav user={user} active={page} onNav={nav}/>}
       {sel&&<OrderModal order={sel} me={user} onClose={()=>setSel(null)} usuarios={usuarios} onAction={handleAction} isMobile={isMobile} slaCfg={slaCfg}/>}
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PAINEL PÓS-VENDA
+// Visão de gestão pra equipe de pós-venda. KPIs clicáveis + tabela + painel lateral.
+// ═════════════════════════════════════════════════════════════════════════════
+function PainelPosVenda({onOpen, slaCfg, user}) {
+  const [dados, setDados] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
+  const [filtroChip, setFiltroChip] = useState("todos"); // todos, atrasados, risco, pendencia, aguardando, sem_contato, vencem_hoje
+  const [filtroEtapa, setFiltroEtapa] = useState("");
+  const [filtroVendedores, setFiltroVendedores] = useState([]); // array de nomes
+  const [vendedorDropdownAberto, setVendedorDropdownAberto] = useState(false);
+  const [busca, setBusca] = useState("");
+  const [selecionado, setSelecionado] = useState(null);
+
+  const carregar = async () => {
+    setLoading(true);
+    setErro(null);
+    try {
+      // Passo 1: força carregar snapshot-aberto (popula o cache no worker)
+      // Sem isso, o /painel-posvenda pode retornar 503 se ninguém abriu outras filas antes.
+      await apiFetch("/snapshot-aberto").catch(()=>null);
+      // Passo 2: painel usa o cache do snapshot
+      const r = await apiFetch("/painel-posvenda");
+      if (r.success) setDados(r);
+      else setErro(r.error || "Erro desconhecido");
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => { carregar(); }, []);
+
+  const kpis = dados?.kpis || {};
+  const pedidos = dados?.pedidos || [];
+  const dist = dados?.distribuicaoEtapa || {};
+
+  // Vendedores únicos pra dropdown
+  const vendedores = Array.from(new Set(pedidos.map(p => p.vendedor).filter(Boolean))).sort();
+
+  // Filtra
+  const filtrados = pedidos.filter(p => {
+    if (filtroChip === "atrasados" && !p.atrasado) return false;
+    if (filtroChip === "risco" && !(p.risco && !p.atrasado)) return false;
+    if (filtroChip === "pendencia" && !p.emPendencia) return false;
+    if (filtroChip === "aguardando" && !p.aguardandoCliente) return false;
+    if (filtroChip === "vencem_hoje" && !p.vencemHoje) return false;
+    if (filtroEtapa && p.etapa !== filtroEtapa) return false;
+    if (filtroVendedores.length > 0 && !filtroVendedores.includes(p.vendedor)) return false;
+    if (busca) {
+      const q = busca.toLowerCase();
+      const bate = (p.client || "").toLowerCase().includes(q)
+        || (p.pedidoLinx || "").toLowerCase().includes(q)
+        || (p.cnpj || "").includes(q);
+      if (!bate) return false;
+    }
+    return true;
+  });
+
+  // Cores das etapas
+  const corEtapa = {
+    "Em Separação": "#3b82f6", "Conferência Separação": "#0369a1",
+    "Conferência e Direcionamento": "#059669", "Programação": "#f59e0b",
+    "Amostra Digital": "#8b5cf6", "Aprovação de Amostra Digital": "#7c3aed",
+    "Amostra Física": "#be185d", "Aprovação de Amostra Física": "#9d174d",
+    "Bordado Interno": "#10b981", "Bordado Externo": "#6d28d9",
+    "Bordado Interno e Externo": "#0d9488", "Expedição": "#14b8a6",
+    "Análise de Frete": "#06b6d4",
+  };
+
+  // Dias parado na etapa
+  const diasParado = (p) => {
+    if (!p.etapaAt) return null;
+    return Math.floor((Date.now() - new Date(p.etapaAt).getTime()) / (24*60*60*1000));
+  };
+
+  // Formata prazo
+  const fmtPrazo = (venc) => {
+    if (!venc) return "—";
+    const dv = new Date(venc);
+    const diff = dv.getTime() - Date.now();
+    const dias = Math.floor(diff / (24*60*60*1000));
+    if (dias < 0) return `Vencido ${Math.abs(dias)}d`;
+    if (dias === 0) return "Hoje";
+    if (dias === 1) return "Amanhã";
+    if (dias < 7) return `${dias} dias`;
+    return dv.toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit"});
+  };
+
+  return (
+    <div style={{padding:0}}>
+      <div style={{padding:"20px 32px",background:C.white,borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"flex-end",flexWrap:"wrap",gap:16}}>
+        <div>
+          <h2 style={{...F.title,fontSize:22,fontWeight:800,color:C.black,letterSpacing:"-0.01em"}}>Painel Pós-Venda</h2>
+          <div style={{...F.body,fontSize:13,color:C.gray500,marginTop:2}}>Gestão de carteira e status dos pedidos ativos</div>
+        </div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button onClick={carregar} disabled={loading} style={{background:C.white,border:`1.5px solid ${C.gray300}`,borderRadius:6,padding:"7px 12px",cursor:loading?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.gray700,fontWeight:600,fontSize:12,...F.body}}>
+            <Ic n="refresh" s={13} c={C.gray700}/> {loading?"Carregando...":"Atualizar"}
+          </button>
+        <button onClick={()=>{
+          const cols = ["Pedido","Vendas ID","Cliente","CNPJ","Vendedor","Valor","Etapa","Dias Parado","Entrada Etapa","Vencimento","Status","Contato Cliente"];
+          const linhas = filtrados.map(p=>{
+            const dias = p.etapaAt ? Math.floor((Date.now() - new Date(p.etapaAt).getTime()) / (24*60*60*1000)) : "";
+            const status = p.atrasado ? "Atrasado" : p.risco ? "Em risco" : "No prazo";
+            const contato = p.aguardandoCliente ? "Aguardando cliente" : p.emPendencia ? "Pendência comercial" : "";
+            return [p.pedidoLinx||"",p.vendasId||"",p.client||"",p.cnpj||"",p.vendedor||"",
+              (p.valor||0).toFixed(2).replace(".",","),
+              p.etapa||"", dias,
+              p.etapaAt?new Date(p.etapaAt).toLocaleString("pt-BR"):"",
+              p.dataVencimento?new Date(p.dataVencimento).toLocaleDateString("pt-BR"):"",
+              status, contato];
+          });
+          const csv = "\uFEFF" + [cols, ...linhas].map(row =>
+            row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(";")
+          ).join("\n");
+          const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `painel-posvenda_${new Date().toISOString().slice(0,10)}.csv`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }} style={{background:C.green,border:"none",color:C.white,borderRadius:6,padding:"7px 14px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:6,fontWeight:700,fontSize:12,...F.body,marginLeft:8}}>
+          <Ic n="download" s={13} c={C.white}/> Exportar CSV
+        </button>
+        </div>
+      </div>
+
+      {erro && <div style={{margin:"16px 32px",padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {erro}</div>}
+
+      {/* KPIs clicáveis */}
+      <div style={{padding:"16px 32px",background:C.white,borderBottom:`1px solid ${C.gray200}`}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
+          <KpiCard label="Ativos" value={kpis.totalAtivos||0} sub={`R$ ${((kpis.valorTotalAtendimento||0)/1000).toFixed(1)}k`} color="#4b5563" active={filtroChip==="todos"} onClick={()=>setFiltroChip("todos")}/>
+          <KpiCard label="Atrasados" value={kpis.atrasados||0} sub="Ação urgente" color={C.red} active={filtroChip==="atrasados"} onClick={()=>setFiltroChip("atrasados")}/>
+          <KpiCard label="Em Risco" value={kpis.emRisco||0} sub="Vencem em ≤ 48h" color="#d97706" active={filtroChip==="risco"} onClick={()=>setFiltroChip("risco")}/>
+          <KpiCard label="Vencem Hoje" value={kpis.vencemHoje||0} sub="Prazo do dia" color="#ea580c" active={filtroChip==="vencem_hoje"} onClick={()=>setFiltroChip("vencem_hoje")}/>
+          <KpiCard label="Pendência Comercial" value={kpis.emPendencia||0} sub="Ação interna" color="#7c3aed" active={filtroChip==="pendencia"} onClick={()=>setFiltroChip("pendencia")}/>
+          <KpiCard label="Aguardando Cliente" value={kpis.aguardandoCliente||0} sub="Aprovação amostra" color="#0891b2" active={filtroChip==="aguardando"} onClick={()=>setFiltroChip("aguardando")}/>
+          <KpiCard label="Faturados Hoje" value={kpis.faturadosHoje||0} sub={`R$ ${((kpis.valorFaturadosHoje||0)/1000).toFixed(1)}k`} color={C.green}/>
+        </div>
+      </div>
+
+      {/* Distribuição por etapa */}
+      <div style={{padding:"14px 32px",background:C.white,borderBottom:`1px solid ${C.gray200}`}}>
+        <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Distribuição por etapa</div>
+        <div style={{display:"flex",height:32,borderRadius:6,overflow:"hidden",border:`1px solid ${C.gray200}`}}>
+          {Object.entries(dist).map(([etapa,count])=>{
+            const total = Object.values(dist).reduce((s,n)=>s+n,0);
+            if (!total) return null;
+            const pct = (count/total)*100;
+            return (
+              <div key={etapa}
+                onClick={()=>setFiltroEtapa(filtroEtapa===etapa?"":etapa)}
+                title={`${etapa}: ${count} pedidos`}
+                style={{width:`${pct}%`,background:corEtapa[etapa]||C.gray400,display:"flex",alignItems:"center",justifyContent:"center",color:C.white,fontSize:11,fontWeight:700,...F.body,cursor:"pointer",transition:"opacity 0.15s",opacity:filtroEtapa && filtroEtapa!==etapa?0.4:1}}>
+                {pct>4?count:""}
+              </div>
+            );
+          })}
+        </div>
+        {filtroEtapa && <div style={{marginTop:8,...F.body,fontSize:11,color:C.gray600}}>
+          Filtrado por: <strong>{filtroEtapa}</strong> · <span onClick={()=>setFiltroEtapa("")} style={{color:C.red,cursor:"pointer",fontWeight:600}}>limpar</span>
+        </div>}
+      </div>
+
+      {/* Alerta */}
+      {kpis.vencemHoje > 0 && filtroChip !== "vencem_hoje" && <div style={{margin:"14px 32px",padding:"12px 16px",background:"#fef3c7",border:"1px solid #fcd34d",borderLeft:"4px solid #f59e0b",borderRadius:8,display:"flex",alignItems:"center",gap:12,...F.body,fontSize:13,color:"#92400e"}}>
+        <span style={{fontSize:18}}>⚠️</span>
+        <div style={{flex:1}}>
+          <strong>{kpis.vencemHoje} pedido{kpis.vencemHoje!==1?"s":""}</strong> {kpis.vencemHoje!==1?"vencem":"vence"} hoje
+        </div>
+        <button onClick={()=>setFiltroChip("vencem_hoje")} style={{padding:"6px 12px",background:"#f59e0b",color:C.white,border:"none",borderRadius:5,fontSize:12,fontWeight:600,cursor:"pointer",...F.body}}>Ver</button>
+      </div>}
+
+      {/* Filtros */}
+      <div style={{padding:"12px 32px",background:C.gray50,borderBottom:`1px solid ${C.gray200}`,display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+        <div style={{position:"relative",flex:1,maxWidth:340}}>
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:C.gray400}}>
+            <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          </div>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido, CNPJ..."
+            style={{width:"100%",padding:"8px 12px 8px 34px",fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,outline:"none",background:C.white,...F.body,boxSizing:"border-box"}}/>
+        </div>
+        <select value={filtroEtapa} onChange={e=>setFiltroEtapa(e.target.value)} style={{padding:"8px 12px",fontSize:12,border:`1.5px solid ${C.gray200}`,background:C.white,borderRadius:6,color:C.gray700,cursor:"pointer",...F.body}}>
+          <option value="">Todas as etapas</option>
+          {Object.keys(dist).sort().map(e=><option key={e} value={e}>{e} ({dist[e]})</option>)}
+        </select>
+        <div style={{position:"relative"}}>
+          <button onClick={()=>setVendedorDropdownAberto(v=>!v)}
+            style={{padding:"8px 12px",fontSize:12,border:`1.5px solid ${filtroVendedores.length?C.red:C.gray200}`,background:C.white,borderRadius:6,color:filtroVendedores.length?C.red:C.gray700,cursor:"pointer",...F.body,display:"inline-flex",alignItems:"center",gap:6,fontWeight:filtroVendedores.length?600:400}}>
+            {filtroVendedores.length===0 ? "Todos vendedores"
+              : filtroVendedores.length===1 ? filtroVendedores[0]
+              : `${filtroVendedores.length} vendedores`}
+            <span style={{fontSize:10,marginLeft:2}}>▾</span>
+          </button>
+          {vendedorDropdownAberto && <>
+            <div onClick={()=>setVendedorDropdownAberto(false)} style={{position:"fixed",inset:0,zIndex:19}}/>
+            <div style={{position:"absolute",top:"100%",left:0,marginTop:4,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:6,boxShadow:"0 8px 24px rgba(0,0,0,0.08)",zIndex:20,minWidth:220,maxHeight:340,overflowY:"auto"}}>
+              <div style={{padding:"8px 12px",borderBottom:`1px solid ${C.gray100}`,display:"flex",justifyContent:"space-between",gap:8}}>
+                <span onClick={()=>setFiltroVendedores(vendedores)} style={{...F.body,fontSize:11,color:C.red,cursor:"pointer",fontWeight:600}}>Todos</span>
+                <span onClick={()=>setFiltroVendedores([])} style={{...F.body,fontSize:11,color:C.gray600,cursor:"pointer",fontWeight:600}}>Limpar</span>
+              </div>
+              {vendedores.map(v => {
+                const checked = filtroVendedores.includes(v);
+                return (
+                  <div key={v} onClick={()=>{
+                    setFiltroVendedores(prev => checked ? prev.filter(x=>x!==v) : [...prev, v]);
+                  }} style={{padding:"8px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderBottom:`1px solid ${C.gray50}`}}
+                    onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <input type="checkbox" checked={checked} readOnly style={{cursor:"pointer",accentColor:C.red}}/>
+                    <span style={{...F.body,fontSize:12,color:C.gray700}}>{v}</span>
+                  </div>
+                );
+              })}
+              {vendedores.length===0 && <div style={{padding:"12px",...F.body,fontSize:12,color:C.gray400,textAlign:"center"}}>Nenhum vendedor</div>}
+            </div>
+          </>}
+        </div>
+        <span style={{marginLeft:"auto",...F.body,fontSize:11,color:C.gray500}}>Mostrando <strong style={{color:C.black}}>{filtrados.length}</strong> de {pedidos.length}</span>
+      </div>
+
+      {/* Tabela */}
+      <div style={{padding:"0 32px 24px",overflowX:"auto"}}>
+        <div style={{background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`,marginTop:16,overflow:"hidden"}}>
+          <table style={{width:"100%",borderCollapse:"separate",borderSpacing:0,minWidth:1000}}>
+            <thead>
+              <tr>
+                {["Pedido","Cliente","Vendedor","Valor","Etapa","Dias parado","Vencimento","Status","Ações"].map(h=>
+                  <th key={h} style={{background:C.gray50,padding:"11px 12px",textAlign:"left",fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",borderBottom:`1px solid ${C.gray200}`,...F.body,position:"sticky",top:0,zIndex:1}}>{h}</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {filtrados.length===0 && <tr><td colSpan={9} style={{padding:"32px",textAlign:"center",color:C.gray400,...F.body,fontSize:13}}>Nenhum pedido corresponde aos filtros.</td></tr>}
+              {filtrados.map(p=>{
+                const dias = diasParado(p);
+                const critico = p.atrasado;
+                const risco = p.risco && !p.atrasado;
+                return (
+                  <tr key={p.id}
+                    onClick={()=>setSelecionado(p)}
+                    style={{background:critico?"#fef2f2":"transparent",cursor:"pointer",borderBottom:`1px solid ${C.gray100}`}}
+                    onMouseEnter={e=>{e.currentTarget.style.background=critico?"#fee2e2":"#fef7f6";}}
+                    onMouseLeave={e=>{e.currentTarget.style.background=critico?"#fef2f2":"transparent";}}>
+                    <td style={{padding:"11px 12px",fontSize:12,...F.body}}>
+                      <div style={{fontWeight:700,color:C.black,fontSize:13}}>PED {p.pedidoLinx||"—"}</div>
+                      <div style={{color:C.gray400,fontSize:10}}>{p.vendasId}</div>
+                    </td>
+                    <td style={{padding:"11px 12px",fontSize:12,...F.body}}>
+                      <div style={{fontWeight:600,color:C.black,fontSize:12}}>{p.client||"—"}</div>
+                      <div style={{color:C.gray500,fontSize:10}}>{p.cnpj||""}</div>
+                    </td>
+                    <td style={{padding:"11px 12px",fontSize:12,color:C.gray600,...F.body}}>{p.vendedor||"—"}</td>
+                    <td style={{padding:"11px 12px",fontSize:13,fontWeight:700,color:C.black,...F.body}}>{fmtR(p.valor)}</td>
+                    <td style={{padding:"11px 12px"}}>
+                      <span style={{display:"inline-flex",alignItems:"center",gap:5,padding:"3px 9px",borderRadius:20,fontSize:11,fontWeight:700,background:(corEtapa[p.etapa]||C.gray400)+"20",color:corEtapa[p.etapa]||C.gray600,...F.body,whiteSpace:"nowrap"}}>
+                        <span style={{width:6,height:6,borderRadius:"50%",background:corEtapa[p.etapa]||C.gray400}}/>{p.etapa}
+                      </span>
+                    </td>
+                    <td style={{padding:"11px 12px",fontSize:11,...F.body}}>
+                      <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,fontWeight:700,background:dias>=4?"#fee2e2":dias>=2?"#fef3c7":C.gray100,color:dias>=4?"#991b1b":dias>=2?"#92400e":C.gray600}}>
+                        {dias>=4?"🔴":dias>=2?"⚠":""} {dias===0?"hoje":dias===1?"1 dia":`${dias||0} dias`}
+                      </span>
+                    </td>
+                    <td style={{padding:"11px 12px",fontSize:12,color:C.gray600,...F.body}}>{fmtPrazo(p.dataVencimento)}</td>
+                    <td style={{padding:"11px 12px",fontSize:11,fontWeight:700,...F.body}}>
+                      {p.atrasado ? <span style={{color:C.red}}>● Atrasado</span>
+                        : risco ? <span style={{color:"#d97706"}}>● Em risco</span>
+                        : <span style={{color:C.green}}>● No prazo</span>}
+                    </td>
+                    <td style={{padding:"11px 12px"}} onClick={e=>e.stopPropagation()}>
+                      <div style={{display:"flex",gap:4}}>
+                        <button title="Ver detalhes" onClick={()=>{onOpen(p);}}
+                          style={{width:28,height:28,borderRadius:5,background:C.gray100,border:"none",display:"inline-flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:C.gray600}}>
+                          <Ic n="pin" s={14} c={C.gray600}/>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {selecionado && <PainelDetalhePedido pedido={selecionado} onClose={()=>setSelecionado(null)} onAbrirDetalhe={()=>{onOpen(selecionado); setSelecionado(null);}} user={user}/>}
+    </div>
+  );
+}
+
+// KPI Card clicável
+function KpiCard({label, value, sub, color, active, onClick}) {
+  return (
+    <div onClick={onClick}
+      style={{
+        background:C.white, border:`1px solid ${active?color:C.gray200}`,
+        borderLeft:`3px solid ${color}`,
+        borderRadius:8, padding:"12px 14px", cursor:onClick?"pointer":"default",
+        boxShadow:active?`0 0 0 3px ${color}22`:"none",
+        transition:"all 0.15s",
+      }}
+      onMouseEnter={e=>{if(onClick)e.currentTarget.style.borderColor=color;}}
+      onMouseLeave={e=>{if(onClick)e.currentTarget.style.borderColor=active?color:C.gray200;}}
+    >
+      <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em"}}>{label}</div>
+      <div style={{...F.title,fontSize:22,fontWeight:800,color,lineHeight:1,marginTop:4}}>{value}</div>
+      {sub && <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:2}}>{sub}</div>}
+    </div>
+  );
+}
+
+// Painel lateral de detalhes
+function PainelDetalhePedido({pedido, onClose, onAbrirDetalhe, user}) {
+  const [nota, setNota] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const enviarNota = async () => {
+    if (!nota.trim()) return;
+    setEnviando(true);
+    try {
+      const r = await apiFetch("/painel-posvenda/nota/" + pedido.posvendaId, "POST", {
+        texto: nota.trim(),
+        ctx: { executor: user?.nome || "Usuário SGP" },
+      });
+      if (r.success) { setNota(""); alert("Nota registrada no timeline do pedido."); }
+      else alert("Erro: " + (r.error||"desconhecido"));
+    } catch (e) { alert("Erro: " + e.message); }
+    setEnviando(false);
+  };
+  const telefone = ""; // TODO: buscar do card completo
+  return (
+    <>
+      <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.15)",zIndex:9}}/>
+      <div style={{position:"fixed",right:0,top:0,width:420,maxWidth:"90vw",height:"100vh",background:C.white,borderLeft:`1px solid ${C.gray200}`,boxShadow:"-8px 0 24px rgba(0,0,0,0.06)",zIndex:10,overflowY:"auto"}}>
+        <div style={{padding:"16px 20px",borderBottom:`1px solid ${C.gray200}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{...F.title,fontSize:15,fontWeight:700}}>PED {pedido.pedidoLinx||"—"}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>{pedido.client}</div>
+          </div>
+          <div onClick={onClose} style={{cursor:"pointer",color:C.gray500,padding:6}}>
+            <Ic n="close" s={16} c={C.gray500}/>
+          </div>
+        </div>
+
+        <div style={{padding:"16px 20px"}}>
+          <div style={{marginBottom:20}}>
+            <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Dados do pedido</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:12}}>
+              <InfoBox label="Cliente" value={pedido.client}/>
+              <InfoBox label="CNPJ" value={pedido.cnpj}/>
+              <InfoBox label="Valor" value={fmtR(pedido.valor)}/>
+              <InfoBox label="Vendedor" value={pedido.vendedor}/>
+              <InfoBox label="Etapa" value={pedido.etapa} highlight/>
+              <InfoBox label="Vencimento" value={pedido.dataVencimento?new Date(pedido.dataVencimento).toLocaleDateString("pt-BR"):"—"} color={pedido.atrasado?C.red:pedido.risco?"#d97706":C.green}/>
+            </div>
+          </div>
+
+          <div style={{marginBottom:20}}>
+            <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Ações</div>
+            <button onClick={onAbrirDetalhe} style={{width:"100%",padding:"10px 12px",background:C.red,color:C.white,border:"none",borderRadius:6,marginBottom:6,fontSize:12,fontWeight:700,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:6,...F.body}}>
+              <Ic n="pin" s={14} c={C.white}/> Abrir pedido completo
+            </button>
+          </div>
+
+          <div>
+            <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Adicionar nota interna</div>
+            <textarea value={nota} onChange={e=>setNota(e.target.value)} rows={3}
+              placeholder="Ex: Cliente informou que amostra digital ficou boa, aguardando confirmação por email..."
+              style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",boxSizing:"border-box",resize:"vertical",marginBottom:8}}/>
+            <button onClick={enviarNota} disabled={!nota.trim()||enviando}
+              style={{width:"100%",padding:"10px 12px",background:!nota.trim()||enviando?C.gray200:"#0369a1",color:!nota.trim()||enviando?C.gray500:C.white,border:"none",borderRadius:6,fontSize:12,fontWeight:700,cursor:!nota.trim()||enviando?"not-allowed":"pointer",...F.body}}>
+              {enviando?"Salvando...":"Registrar nota no timeline"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function InfoBox({label, value, highlight, color}) {
+  return (
+    <div style={{padding:"8px 10px",background:C.gray50,borderRadius:5}}>
+      <div style={{...F.body,fontSize:9,color:C.gray400,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:2}}>{label}</div>
+      <div style={{...F.body,fontSize:12,fontWeight:highlight?700:600,color:color||C.black}}>{value||"—"}</div>
+    </div>
+  );
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BANCO DE IMAGENS
+// Pesquisa cliente → lista pedidos → galeria de arquivos com preview lazy.
+// ═════════════════════════════════════════════════════════════════════════════
+function BancoImagens({user}) {
+  const [busca, setBusca] = useState("");
+  const [clientes, setClientes] = useState([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [pedidos, setPedidos] = useState([]);
+  const [produtosCliente, setProdutosCliente] = useState([]);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(""); // sku ou "" pra todos
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+  const [filtroTipo, setFiltroTipo] = useState("todos");
+  const [loading, setLoading] = useState(false);
+  const [buscando, setBuscando] = useState(false);
+  const [arquivos, setArquivos] = useState({}); // fileId → { fileName, tamanho, url, ehImagem }
+  const searchTimeoutRef = useRef(null);
+
+  // Debounce busca (200ms — mais rápido)
+  useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (busca.trim().length < 2) { setClientes([]); setBuscando(false); return; }
+    // Se o texto atual é exatamente o nome do cliente selecionado, não redispara
+    // a busca (evita reabrir dropdown depois de selecionar).
+    if (clienteSelecionado && busca.trim() === clienteSelecionado.razaoSocial.trim()) {
+      setClientes([]);
+      setBuscando(false);
+      return;
+    }
+    setBuscando(true);
+    searchTimeoutRef.current = setTimeout(() => {
+      apiFetch("/banco-imagens/buscar-clientes?q=" + encodeURIComponent(busca.trim()))
+        .then(r => {
+          if (r.success) setClientes(r.clientes||[]);
+        })
+        .finally(() => setBuscando(false));
+    }, 200);
+    return () => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); };
+  }, [busca, clienteSelecionado]);
+
+  const selecionarCliente = (c) => {
+    setClienteSelecionado(c);
+    setClientes([]);
+    setBusca(c.razaoSocial);
+    setPedidoSelecionado(null);
+    setProdutoSelecionado("");
+    setLoading(true);
+    const params = c.cnpj ? "cnpj="+encodeURIComponent(c.cnpj) : "razao="+encodeURIComponent(c.razaoSocial);
+    apiFetch("/banco-imagens/pedidos-cliente?" + params)
+      .then(r => {
+        if (r.success) {
+          setPedidos(r.pedidos||[]);
+          setProdutosCliente(r.produtos||[]);
+          if (r.pedidos?.length > 0) setPedidoSelecionado(r.pedidos[0]);
+        }
+      })
+      .finally(() => setLoading(false));
+  };
+
+  // Carrega metadados dos arquivos do pedido selecionado
+  useEffect(() => {
+    if (!pedidoSelecionado) return;
+    const idsNaoCarregados = pedidoSelecionado.arquivos
+      .map(a => a.fileId)
+      .filter(id => !arquivos[id]);
+    if (!idsNaoCarregados.length) return;
+
+    // Batch de 20 em 20
+    const chunks = [];
+    for (let i = 0; i < idsNaoCarregados.length; i += 20) {
+      chunks.push(idsNaoCarregados.slice(i, i+20));
+    }
+    Promise.all(chunks.map(chunk =>
+      apiFetch("/banco-imagens/file-batch?ids=" + chunk.join(","))
+    )).then(results => {
+      const novo = {...arquivos};
+      for (const r of results) {
+        for (const f of (r.files||[])) {
+          novo[f.fileId] = f;
+        }
+      }
+      setArquivos(novo);
+    });
+  }, [pedidoSelecionado]);
+
+  // Filtra pedidos por produto selecionado
+  const pedidosFiltrados = produtoSelecionado
+    ? pedidos.filter(p => (p.produtos||[]).some(prod => (prod.sku||prod.nome) === produtoSelecionado))
+    : pedidos;
+
+  // Se pedido selecionado foi filtrado fora, seleciona o primeiro
+  useEffect(() => {
+    if (produtoSelecionado && pedidoSelecionado) {
+      if (!pedidosFiltrados.find(p => p.dealId === pedidoSelecionado.dealId)) {
+        setPedidoSelecionado(pedidosFiltrados[0] || null);
+      }
+    }
+  }, [produtoSelecionado]);
+
+  // Filtra arquivos por tipo E por produto (matching no nome do arquivo pelo SKU)
+  const filtrarArquivos = (lista) => {
+    let out = lista;
+    if (filtroTipo !== "todos") out = out.filter(a => a.tipo === filtroTipo);
+    if (produtoSelecionado) {
+      const sku = produtoSelecionado.trim();
+      out = out.filter(a => {
+        const meta = arquivos[a.fileId];
+        const nome = (meta?.fileName || "").toLowerCase();
+        return nome.includes(sku.toLowerCase());
+      });
+    }
+    return out;
+  };
+
+  // Conta por tipo
+  const contagem = { programacao:0, amostra_digital:0, amostra_fisica:0, bordado:0, dtf_silk:0 };
+  const arquivosDoPedido = pedidoSelecionado?.arquivos || [];
+  for (const a of arquivosDoPedido) contagem[a.tipo] = (contagem[a.tipo]||0) + 1;
+
+  const TIPOS = [
+    { key: "todos",           label: "Todos",           cor: "#4b5563" },
+    { key: "programacao",     label: "Programação",     cor: "#f59e0b" },
+    { key: "amostra_digital", label: "Amostra Digital", cor: "#8b5cf6" },
+    { key: "amostra_fisica",  label: "Amostra Física",  cor: "#be185d" },
+    { key: "bordado",         label: "Arquivos Bordado",cor: "#ef4444" },
+    { key: "dtf_silk",        label: "DTF / Silk",      cor: "#0891b2" },
+  ];
+
+  const arquivosFiltrados = filtrarArquivos(arquivosDoPedido);
+  const totalTodos = arquivosDoPedido.length;
+
+  return (
+    <div style={{padding:0,display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
+      <div style={{padding:"20px 32px 12px",background:C.white,borderBottom:`1px solid ${C.gray200}`}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:16}}>
+          <div>
+            <h2 style={{...F.title,fontSize:22,fontWeight:800,color:C.black}}>Banco de Imagens</h2>
+            <div style={{...F.body,fontSize:13,color:C.gray500,marginTop:2}}>Arquivos históricos de pedidos por cliente</div>
+          </div>
+        </div>
+        <div style={{position:"relative",maxWidth:560}}>
+          <div style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",color:C.gray400}}>
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          </div>
+          <input value={busca} onChange={e=>{setBusca(e.target.value);if(clienteSelecionado)setClienteSelecionado(null);}}
+            placeholder="Buscar por Razão Social ou CNPJ..."
+            style={{width:"100%",padding:"12px 16px 12px 44px",fontSize:14,border:`1.5px solid ${C.gray200}`,borderRadius:8,outline:"none",background:C.gray50,...F.body,boxSizing:"border-box"}}/>
+          {(buscando || clientes.length>0) && <div style={{position:"absolute",top:"100%",left:0,right:0,marginTop:6,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,boxShadow:"0 8px 24px rgba(0,0,0,0.08)",zIndex:5,maxHeight:400,overflowY:"auto"}}>
+            {buscando && <div style={{padding:"12px 16px",...F.body,fontSize:13,color:C.gray500}}>Buscando...</div>}
+            {!buscando && clientes.length===0 && <div style={{padding:"12px 16px",...F.body,fontSize:13,color:C.gray500}}>Nenhum cliente encontrado.</div>}
+            {clientes.map((c,i) => (
+              <div key={i} onClick={()=>selecionarCliente(c)} style={{padding:"10px 16px",borderBottom:i===clientes.length-1?"none":`1px solid ${C.gray100}`,cursor:"pointer"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                <div style={{...F.body,fontSize:13,fontWeight:600,color:C.black}}>{c.razaoSocial||"—"}</div>
+                <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>
+                  {c.cnpj||"sem CNPJ"} · {c.totalPedidos} pedido{c.totalPedidos!==1?"s":""}
+                </div>
+              </div>
+            ))}
+          </div>}
+        </div>
+      </div>
+
+      {clienteSelecionado && <>
+        {/* Filtros de tipo + produto */}
+        <div style={{padding:"12px 32px",background:C.gray50,borderBottom:`1px solid ${C.gray200}`,display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+          {produtosCliente.length > 0 && <>
+            <span style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em"}}>PRODUTO:</span>
+            <select value={produtoSelecionado} onChange={e=>setProdutoSelecionado(e.target.value)}
+              style={{padding:"6px 12px",fontSize:12,border:`1.5px solid ${C.gray200}`,background:C.white,borderRadius:6,color:C.gray700,cursor:"pointer",...F.body,maxWidth:340,marginRight:12}}>
+              <option value="">Todos os produtos ({produtosCliente.length})</option>
+              {produtosCliente.map((p,i) => (
+                <option key={i} value={p.sku||p.nome}>
+                  {p.nome || p.sku}
+                </option>
+              ))}
+            </select>
+          </>}
+          <span style={{...F.body,fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em"}}>TIPO:</span>
+          {TIPOS.map(t => {
+            const count = t.key === "todos" ? totalTodos : (contagem[t.key]||0);
+            return (
+              <span key={t.key} onClick={()=>setFiltroTipo(t.key)}
+                style={{padding:"6px 14px",borderRadius:20,fontSize:12,fontWeight:600,background:filtroTipo===t.key?t.cor:C.white,color:filtroTipo===t.key?C.white:t.cor,border:`1.5px solid ${filtroTipo===t.key?t.cor:C.gray200}`,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:6,...F.body,transition:"all 0.15s"}}>
+                {t.label} <span style={{background:filtroTipo===t.key?"rgba(255,255,255,0.25)":C.gray100,color:filtroTipo===t.key?C.white:C.gray600,padding:"1px 7px",borderRadius:10,fontSize:10,fontWeight:700}}>{count}</span>
+              </span>
+            );
+          })}
+        </div>
+
+        <div style={{flex:1,display:"flex",overflow:"hidden"}}>
+          {/* Coluna pedidos */}
+          <div style={{width:320,background:C.white,borderRight:`1px solid ${C.gray200}`,overflowY:"auto"}}>
+            <div style={{padding:"14px 20px",background:"#f0f9ff",borderLeft:"3px solid #0369a1",borderBottom:`1px solid ${C.gray100}`}}>
+              <div style={{...F.body,fontSize:14,fontWeight:700,color:C.black}}>{clienteSelecionado.razaoSocial}</div>
+              <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>CNPJ: {clienteSelecionado.cnpj||"—"}</div>
+              <div style={{...F.body,fontSize:11,color:"#0369a1",fontWeight:700,marginTop:6}}>
+                📁 {pedidosFiltrados.length} pedido{pedidosFiltrados.length!==1?"s":""}{produtoSelecionado?" com esse produto":""} · {pedidosFiltrados.reduce((s,p)=>s+p.totalArquivos,0)} arquivos
+              </div>
+            </div>
+            <div style={{padding:"14px 20px 10px",fontSize:11,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.08em",borderBottom:`1px solid ${C.gray200}`,position:"sticky",top:0,background:C.white,zIndex:1,display:"flex",justifyContent:"space-between",...F.body}}>
+              <span>PEDIDOS</span>
+              <span style={{textTransform:"none",fontWeight:500,color:C.gray400,letterSpacing:0}}>mais recente ▼</span>
+            </div>
+            {loading && <div style={{padding:20,textAlign:"center",color:C.gray400,...F.body,fontSize:12}}>Carregando pedidos...</div>}
+            {!loading && pedidosFiltrados.length===0 && <div style={{padding:20,textAlign:"center",color:C.gray400,...F.body,fontSize:12}}>
+              {produtoSelecionado?"Nenhum pedido com esse produto.":"Nenhum pedido com arquivos encontrado."}
+            </div>}
+            {pedidosFiltrados.map(p => (
+              <div key={p.dealId} onClick={()=>setPedidoSelecionado(p)}
+                style={{padding:"12px 20px",borderBottom:`1px solid ${C.gray100}`,cursor:"pointer",background:pedidoSelecionado?.dealId===p.dealId?"#C6282808":"transparent",borderLeft:pedidoSelecionado?.dealId===p.dealId?"3px solid "+C.red:"3px solid transparent",paddingLeft:pedidoSelecionado?.dealId===p.dealId?17:20}}>
+                <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black}}>
+                  PED {p.pedidoLinx||"—"} <span style={{color:C.gray400,fontWeight:400}}>({p.vendasId})</span>
+                </div>
+                <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>
+                  {new Date(p.data).toLocaleDateString("pt-BR")} · {fmtR(p.valor)}
+                </div>
+                <div style={{...F.body,fontSize:10,color:C.gray500,marginTop:6,display:"flex",alignItems:"center",gap:4}}>
+                  📎 <strong style={{color:C.black}}>{p.totalArquivos}</strong> arquivo{p.totalArquivos!==1?"s":""}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Coluna galeria */}
+          <div style={{flex:1,overflowY:"auto",padding:"20px 32px"}}>
+            {!pedidoSelecionado && <div style={{textAlign:"center",padding:80,color:C.gray400}}>
+              <div style={{fontSize:60,opacity:0.3,marginBottom:16}}>📁</div>
+              <div style={{...F.body,fontSize:16,fontWeight:700,color:C.gray500}}>Selecione um pedido</div>
+              <div style={{...F.body,fontSize:13,marginTop:6}}>Escolha um pedido à esquerda pra ver os arquivos</div>
+            </div>}
+
+            {pedidoSelecionado && <>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+                <h3 style={{...F.title,fontSize:16,fontWeight:700,color:C.black}}>
+                  PED {pedidoSelecionado.pedidoLinx||"—"} — {new Date(pedidoSelecionado.data).toLocaleDateString("pt-BR")}
+                </h3>
+                <span style={{...F.body,fontSize:12,color:C.gray500}}>
+                  {arquivosFiltrados.length} arquivo{arquivosFiltrados.length!==1?"s":""}
+                </span>
+              </div>
+
+              {arquivosFiltrados.length===0 && <div style={{padding:40,textAlign:"center",color:C.gray400,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`,...F.body,fontSize:13}}>
+                Nenhum arquivo desse tipo no pedido.
+              </div>}
+
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:16}}>
+                {arquivosFiltrados.map((a,i) => {
+                  const meta = arquivos[a.fileId];
+                  const tipoObj = TIPOS.find(t => t.key === a.tipo);
+                  const badgeCor = tipoObj?.cor || C.gray500;
+                  const ehImagem = meta?.ehImagem;
+                  return (
+                    <div key={a.fileId+"-"+i} onClick={()=>{ if (meta?.url) window.open(meta.url, "_blank"); }}
+                      style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,overflow:"hidden",cursor:meta?.url?"pointer":"default",transition:"all 0.15s"}}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor=C.red;e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.08)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray200;e.currentTarget.style.boxShadow="none";}}>
+                      <div style={{width:"100%",aspectRatio:"1",background:ehImagem?C.gray100:tipoObj?.cor+"15","display":"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}>
+                        <span style={{position:"absolute",top:8,left:8,padding:"3px 8px",background:badgeCor,color:C.white,fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",borderRadius:4,zIndex:2,...F.body}}>
+                          {tipoObj?.label.slice(0,8).toUpperCase() || "ARQ"}
+                        </span>
+                        {ehImagem && meta?.url && <img loading="lazy" src={meta.url} alt=""
+                          style={{width:"100%",height:"100%",objectFit:"cover"}}/>}
+                        {!ehImagem && <span style={{fontSize:42,color:"rgba(0,0,0,0.35)"}}>{
+                          meta?.extension==="pdf"?"📄":
+                          meta?.extension==="dst"||meta?.extension==="emb"?"🧵":
+                          "📎"
+                        }</span>}
+                        {!meta && <div style={{position:"absolute",inset:0,background:`linear-gradient(90deg, ${C.gray100} 25%, ${C.gray200} 50%, ${C.gray100} 75%)`,backgroundSize:"200% 100%",animation:"shimmer 1.4s infinite"}}/>}
+                      </div>
+                      <div style={{padding:"10px 12px",borderTop:`1px solid ${C.gray100}`}}>
+                        <div style={{...F.body,fontSize:12,fontWeight:600,color:C.black,marginBottom:4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                          {meta?.fileName || "carregando..."}
+                        </div>
+                        <div style={{...F.body,fontSize:10,color:C.gray500,display:"flex",justifyContent:"space-between"}}>
+                          <span>{meta?.extension?.toUpperCase() || "—"}</span>
+                          <span>{meta?.tamanho ? (meta.tamanho/1024/1024).toFixed(1)+"MB" : ""}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>}
+          </div>
+        </div>
+      </>}
+
+      {!clienteSelecionado && <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",color:C.gray400}}>
+        <div style={{textAlign:"center"}}>
+          <div style={{fontSize:60,opacity:0.3,marginBottom:16}}>🔍</div>
+          <div style={{...F.body,fontSize:16,fontWeight:700,color:C.gray500}}>Comece buscando um cliente</div>
+          <div style={{...F.body,fontSize:13,marginTop:6,maxWidth:320}}>Digite pelo menos 2 caracteres da razão social ou do CNPJ</div>
+        </div>
+      </div>}
     </div>
   );
 }
