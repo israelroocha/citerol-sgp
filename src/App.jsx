@@ -5762,7 +5762,7 @@ function Folha({emit,o,fmtDt}){
       <div className="produto-row" style={{background:"#f0f0f0",border:"1px solid #c0c0c0",borderRadius:8,padding:"10px 14px",marginBottom:14}}>
         <span style={{...F.body,fontSize:10,color:"#333",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Cliente: </span>
         <span style={{...F.body,fontSize:14,fontWeight:700,color:"#000"}}>{o.cliente||"—"}</span>
-        {(o.cnpj||o.endereco)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.endereco?(o.cnpj?" · ":"")+o.endereco:""}</div>}
+        {(o.cnpj||o.endereco||o.clifor)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.clifor?((o.cnpj?" · ":"")+`Clifor: ${o.clifor}`):""}{o.endereco?((o.cnpj||o.clifor)?" · ":"")+o.endereco:""}</div>}
       </div>
 
       {/* Produtos */}
