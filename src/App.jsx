@@ -3206,6 +3206,7 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
   const [loadError, setLoadError] = useState(null);
   const [confirming, setConfirming] = useState({});
   const [confirmed, setConfirmed] = useState({});
+  const [busca, setBusca] = useState("");
 
   const carregar = () => {
     setLoading(true);
@@ -3246,11 +3247,30 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
     }
   };
 
-  const lista = pedidos || [];
+  const q = busca.trim().toLowerCase();
+  const lista = (pedidos || []).filter(o => {
+    if (!q) return true;
+    const alvo = [
+      o.pedidoLinx,
+      o.vendasId,
+      String(o.id || "").replace(/^PED-/, ""),
+      o.client,
+      o.razaoSocial,
+    ].map(x => String(x || "").toLowerCase()).join(" ");
+    return alvo.includes(q);
+  });
 
   return (
     <div style={{padding:20}}>
       <PageH title="Conferência Separação" sub="WMS bipou. Aguardando conferência manual antes de seguir." onRefresh={carregar} refreshing={loading}/>
+      <div style={{marginBottom:12}}>
+        <input
+          value={busca}
+          onChange={e=>setBusca(e.target.value)}
+          placeholder="Buscar por Pedido Linx, ID HubSpot ou cliente..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}
+        />
+      </div>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:"#0369a1"+"0e",border:`1px solid #0369a128`,borderRadius:8,...F.body,fontSize:13,color:"#0369a1"}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#0369a1" strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         Carregando pedidos...
@@ -3259,7 +3279,7 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
       {!loading&&!loadError&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green,marginBottom:12}}>
         <Ic n="check" s={13} c={C.green}/> {lista.length} pedido{lista.length!==1?"s":""} aguardando conferência
       </div>}
-      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando conferência.</div>}
+      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado para a busca.":"Nenhum pedido aguardando conferência."}</div>}
       {lista.map(o => {
         const isConfirmed = confirmed[o.id];
         const isConfirming = confirming[o.id];
