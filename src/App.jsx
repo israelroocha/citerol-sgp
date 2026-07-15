@@ -1558,6 +1558,20 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
         })
       : bordados;
     if (ehProgAssumivel && !bordadosPraExecutar.length) {
+      // Caso especial: TODOS os bordados já foram executados (por qualquer um da
+      // equipe), mas o pedido não avançou de etapa. Aí não faz sentido exigir
+      // "assumir" — não sobrou nada pra executar. Só falta avançar a etapa.
+      const faltamExecutar = bordados.filter(b => !findExecutado(b.fileName || ""));
+      if (bordados.length > 0 && faltamExecutar.length === 0) {
+        setEnviando(true);
+        try {
+          const m = await onAction(order.id, "avancar_programacao", {});
+          try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+          setActionMsg(m || "Etapa avançada."); setActionDone(true);
+        } catch (e) { alert("Erro ao avançar: " + e.message); }
+        finally { setEnviando(false); }
+        return;
+      }
       alert("Você não assumiu nenhum bordado. Clique em 'Assumir esta programação' primeiro.");
       return;
     }
@@ -6864,6 +6878,25 @@ function AppInner(){
           ctx,
         });
         if(res.error) throw new Error(res.error);
+      }
+
+      // ── AVANÇAR ETAPA quando todos os bordados já foram executados ─────────
+      // Não há nada novo pra enviar — só move o deal de Bordado pra próxima etapa.
+      else if(tipo==="avancar_programacao"){
+        if(!bordadoId){ alert("Pedido sem negócio de Bordado associado."); return; }
+        const nextMap={
+          "Programação":"Amostra Digital",
+          "Amostra Digital":"Aprovação de Amostra Digital",
+          "Amostra Física":"Aprovação de Amostra Física",
+        };
+        const next=nextMap[o.etapa]||o.etapa;
+        const res=await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{
+          novaEtapa:ETAPA_STAGE_ID[next],
+          nota:`${o.etapa} → ${next} (todos os bordados já executados)`,
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
+        resultMsg=`Pedido avançado para ${next}.`;
       }
 
       // ── EXECUÇÃO POR BORDADO (Programação c/ dificuldade · Amostras s/ dificuldade) ─
