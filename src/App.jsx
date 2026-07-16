@@ -260,6 +260,10 @@ const NAV_ITEMS = [
   // ── Separação ─────────────────────────────────────────────────────────────
   {id:"em_separacao",            label:"Em Separação",             icon:"inbox",   grupo:"Separação"},
   {id:"conferencia_separacao",   label:"Conferência Separação",    icon:"check",   grupo:"Separação"},
+  // ── PCP (pedidos separados parciais) ──────────────────────────────────────
+  {id:"analise_pcp",             label:"Análise PCP",              icon:"activity",grupo:"PCP"},
+  {id:"buscar_loja",             label:"Buscar Produto em Loja",   icon:"inbox",   grupo:"PCP"},
+  {id:"analise_producao",        label:"Análise da Produção",      icon:"box",     grupo:"PCP"},
   // ── Amostra ───────────────────────────────────────────────────────────────
   {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Amostra"},
   {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Amostra"},
@@ -290,6 +294,9 @@ const NAV_ITEMS = [
 const MODULO_ETAPA = {
   em_separacao:               "Em Separação",
   conferencia_separacao:      "Conferência Separação",
+  analise_pcp:                "Análise PCP",
+  buscar_loja:                "Buscar em Loja",
+  analise_producao:           "Análise Produção",
   conferencia_direcionamento: "Conferência e Direcionamento",
   programacao:                "Programação",
   amostra_digital:            "Amostra Digital",
@@ -307,6 +314,9 @@ const MODULO_ETAPA = {
 const MODULO_ENDPOINT = {
   em_separacao:               "/em-separacao",
   conferencia_separacao:      "/conferencia-separacao",
+  analise_pcp:                "/analise-pcp",
+  buscar_loja:                "/buscar-loja",
+  analise_producao:           "/analise-producao",
   conferencia_direcionamento: "/conferencia-direcionamento",
   programacao:                "/programacao",
   amostra_digital:            "/amostra-digital",
@@ -878,7 +888,7 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
-  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
   // Injeta o CSS da scrollbar sutil uma única vez
   useEffect(()=>{
@@ -995,7 +1005,7 @@ function BottomNav({user,active,onNav}){
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:allItems.filter(n=>n.grupo===label)}));
 
   return(
@@ -1337,6 +1347,28 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   const filtro=ehAmostra?/~(prog|amostra)/i:/~prog/i;
   let bordados=todos.filter(b=>filtro.test(b.fileName||""));
   if(!bordados.length) bordados=todos;
+  // Multi-produto: o mesmo arquivo (fileId) pode ficar anexado a vários
+  // produtos numa MESMA posição (ex.: peito da camiseta preta e da azul) — aí
+  // é UMA só programação. Mas a MESMA arte em posição diferente (ex.: costas)
+  // muda a dimensão e é OUTRA programação. Então a demanda é única por
+  // (fileId + posição), não só por fileId. As demais entradas com essa mesma
+  // combinação herdam a execução (o worker fecha por fileId+posição).
+  // Entradas sem fileId ficam como estavam.
+  const chaveDemanda=(b)=>{
+    const fid=b&&b.fileId?String(b.fileId):"";
+    if(!fid) return "";
+    const pos=b&&(b.position||b.positionLabel)?String(b.position||b.positionLabel):"";
+    return fid+"|"+pos;
+  };
+  bordados=(()=>{
+    const vistos=new Set(); const out=[];
+    for(const b of bordados){
+      const chave=chaveDemanda(b);
+      if(chave){ if(vistos.has(chave)) continue; vistos.add(chave); }
+      out.push(b);
+    }
+    return out;
+  })();
   // Lógica de assumir tarefa — só aplica na Programação. Múltiplos usuários
   // podem assumir bordados diferentes do mesmo pedido, mas só quem assumiu
   // pode executar aquele bordado específico.
@@ -1472,6 +1504,9 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   // não achar o arquivo que quer. Amostras: só imagens (é o que a operação
   // sempre anexa nessa etapa).
   const ACCEPT=comDificuldade?"":"image/*";
+  // Amostra Digital agora é responsável por anexar o EMB de programação (campo
+  // adicional, além da amostra digital). O EMB aceita qualquer formato.
+  const temEmb=etapa==="Amostra Digital";
   const BTN=comDificuldade?"Confirmar programação":etapa==="Amostra Digital"?"Enviar amostra digital":"Confirmar amostra";
   const motivoRej=etapa==="Amostra Digital"?order.motivoRejAmDigital:etapa==="Amostra Física"?order.motivoRejAmFisica:"";
   // Key estável baseada em fileName (existe no snapshot leve E no enriched).
@@ -1519,6 +1554,7 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   // Refs estáveis dos inputs file (um por bordado). Evita bugs onde
   // getElementById pega input desmontado depois de re-render.
   const inputsRef = useRef({});
+  const embInputsRef = useRef({});
   // Reporta pra o OrderModal quantos arquivos estão anexados mas não enviados
   useEffect(()=>{
     if (!setTemPendencias) return;
@@ -1544,9 +1580,12 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   },[data]);
   const ehImagem=(n="")=>/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(n);
   const nomeLimpo=(n="")=>n.replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
-  const setDif=(k,d)=>setData(p=>({...p,[k]:{dificuldade:d,files:p[k]?.files||[]}}));
-  const addFiles=(k,fl)=>setData(p=>({...p,[k]:{dificuldade:p[k]?.dificuldade||"",files:[...(p[k]?.files||[]),...Array.from(fl)]}}));
-  const rmFile=(k,idx)=>setData(p=>({...p,[k]:{dificuldade:p[k]?.dificuldade||"",files:(p[k]?.files||[]).filter((_,i)=>i!==idx)}}));
+  const setDif=(k,d)=>setData(p=>({...p,[k]:{...(p[k]||{}),dificuldade:d,files:p[k]?.files||[]}}));
+  const addFiles=(k,fl)=>setData(p=>({...p,[k]:{...(p[k]||{}),dificuldade:p[k]?.dificuldade||"",files:[...(p[k]?.files||[]),...Array.from(fl)]}}));
+  const rmFile=(k,idx)=>setData(p=>({...p,[k]:{...(p[k]||{}),dificuldade:p[k]?.dificuldade||"",files:(p[k]?.files||[]).filter((_,i)=>i!==idx)}}));
+  // EMB de programação (Amostra Digital) — arquivos separados dos da amostra.
+  const addEmbFiles=(k,fl)=>setData(p=>({...p,[k]:{...(p[k]||{}),embFiles:[...(p[k]?.embFiles||[]),...Array.from(fl)]}}));
+  const rmEmbFile=(k,idx)=>setData(p=>({...p,[k]:{...(p[k]||{}),embFiles:(p[k]?.embFiles||[]).filter((_,i)=>i!==idx)}}));
   const DIFS=[["Fácil",C.green],["Médio",C.amber],["Difícil",C.red]];
 
   const confirmar=async()=>{
@@ -1579,7 +1618,9 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
       const i=bordados.indexOf(b);
       const st=data[keyOf(b,i)]||{dificuldade:"",files:[]};
       if(comDificuldade&&!st.dificuldade){alert(`Defina a dificuldade do bordado: ${nomeLimpo(b.fileName)}`);return;}
-      if(!st.files.length){alert(`Anexe ao menos um arquivo para: ${nomeLimpo(b.fileName)}`);return;}
+      // Programação não anexa mais arquivo (o EMB é responsabilidade da Amostra
+      // Digital). Só as amostras exigem o anexo principal.
+      if(!comDificuldade&&!st.files.length){alert(`Anexe ao menos um arquivo para: ${nomeLimpo(b.fileName)}`);return;}
     }
     setEnviando(true);
     try{
@@ -1590,9 +1631,12 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
         const st=data[keyOf(b,i)]||{dificuldade:"",files:[]};
         const arquivos=[];
         for(const f of st.files) arquivos.push({fileBase64:await toB64(f),fileName:f.name});
-        execucoes.push({nomeArquivo:nomeLimpo(b.fileName),dificuldade:comDificuldade?st.dificuldade:"",arquivos});
+        // Amostra Digital: EMB de programação (campo adicional) → propriedadeEmb
+        const arquivosEmb=[];
+        if(temEmb) for(const f of (st.embFiles||[])) arquivosEmb.push({fileBase64:await toB64(f),fileName:f.name});
+        execucoes.push({nomeArquivo:nomeLimpo(b.fileName),fileId:b.fileId?String(b.fileId):"",position:(b.position||b.positionLabel)?String(b.position||b.positionLabel):"",dificuldade:comDificuldade?st.dificuldade:"",arquivos,arquivosEmb});
       }
-      const m=await onAction(order.id,"exec_bordado",{execucoes});
+      const m=await onAction(order.id,"exec_bordado",{execucoes,propriedadeEmb:temEmb?"programacao_de_bordado":""});
       // Registra quem executou cada bordado (só na Programação assumível)
       if(ehProgAssumivel&&order.bordadoId){
         try{
@@ -1845,37 +1889,64 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
               </div>
             </div>}
             {!bloqueado && !precisaAssumir && !jaExecutado && <div>
-              <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>{comDificuldade?"Arquivo(s) programado(s)":"Arquivo(s) da amostra"}</div>
-              <input type="file" multiple accept={ACCEPT}
-                ref={el => { if (el) inputsRef.current[k] = el; }}
-                style={{display:"none"}}
-                onChange={e=>{
-                  const files = e.target.files;
-                  if (files && files.length) addFiles(k, files);
-                  // Reset APÓS microtask pra o React processar addFiles antes
-                  setTimeout(() => { if (e.target) e.target.value = ""; }, 0);
-                }}/>
-              <button type="button"
-                onClick={()=>{
-                  const el = inputsRef.current[k];
-                  if (el) el.click();
-                }}
-                style={{padding:"9px 14px",borderRadius:7,border:`1.5px dashed ${C.gray300}`,background:C.gray50,color:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6,userSelect:"none"}}>
-                <Ic n="box" s={14} c={C.gray500}/> Anexar arquivo
-              </button>
+              {/* Programação NÃO anexa mais arquivo — só define dificuldade e
+                  (opcionalmente) dispensa. O anexo (EMB) migrou pra Amostra
+                  Digital. Amostras continuam anexando o arquivo principal. */}
+              {!comDificuldade && <>
+                <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Arquivo(s) da amostra</div>
+                <input type="file" multiple accept={ACCEPT}
+                  ref={el => { if (el) inputsRef.current[k] = el; }}
+                  style={{display:"none"}}
+                  onChange={e=>{
+                    const files = e.target.files;
+                    if (files && files.length) addFiles(k, files);
+                    setTimeout(() => { if (e.target) e.target.value = ""; }, 0);
+                  }}/>
+                <button type="button"
+                  onClick={()=>{ const el = inputsRef.current[k]; if (el) el.click(); }}
+                  style={{padding:"9px 14px",borderRadius:7,border:`1.5px dashed ${C.gray300}`,background:C.gray50,color:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6,userSelect:"none"}}>
+                  <Ic n="box" s={14} c={C.gray500}/> Anexar arquivo
+                </button>
+                {st.files.length>0&&<div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+                  {st.files.map((f,idx)=>(
+                    <div key={idx} style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,background:C.green+"0e",border:`1px solid ${C.green}30`,borderRadius:6,padding:"7px 10px"}}>
+                      <span style={{...F.body,fontSize:12,color:C.gray700,wordBreak:"break-all",display:"inline-flex",alignItems:"center",gap:6}}><Ic n="check" s={12} c={C.green}/> {f.name}</span>
+                      <button onClick={()=>rmFile(k,idx)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,fontSize:15,lineHeight:1,flexShrink:0}}>✕</button>
+                    </div>
+                  ))}
+                </div>}
+              </>}
+              {/* Dispensar — só na Programação (arquivo dispensável não registra). */}
               {ehProgAssumivel && ehMeu && !jaExecutado && <button type="button"
                 onClick={()=>dispensarBordado(b)}
                 disabled={dispensandoKey===b.fileName}
-                style={{marginLeft:8,padding:"9px 14px",borderRadius:7,border:`1.5px solid ${C.amber}`,background:"#fef3c7",color:"#92400e",cursor:dispensandoKey===b.fileName?"wait":"pointer",...F.body,fontSize:12,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6,userSelect:"none"}}>
+                style={{padding:"9px 14px",borderRadius:7,border:`1.5px solid ${C.amber}`,background:"#fef3c7",color:"#92400e",cursor:dispensandoKey===b.fileName?"wait":"pointer",...F.body,fontSize:12,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6,userSelect:"none"}}>
                 <span style={{fontSize:14}}>⊘</span> {dispensandoKey===b.fileName ? "Dispensando..." : "Não precisa programar"}
               </button>}
-              {st.files.length>0&&<div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
-                {st.files.map((f,idx)=>(
-                  <div key={idx} style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,background:C.green+"0e",border:`1px solid ${C.green}30`,borderRadius:6,padding:"7px 10px"}}>
-                    <span style={{...F.body,fontSize:12,color:C.gray700,wordBreak:"break-all",display:"inline-flex",alignItems:"center",gap:6}}><Ic n="check" s={12} c={C.green}/> {f.name}</span>
-                    <button onClick={()=>rmFile(k,idx)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,fontSize:15,lineHeight:1,flexShrink:0}}>✕</button>
-                  </div>
-                ))}
+              {/* EMB de programação — só na Amostra Digital (campo adicional). */}
+              {temEmb && <div style={{marginTop:14,paddingTop:14,borderTop:`1px dashed ${C.gray200}`}}>
+                <div style={{...F.body,fontSize:11,fontWeight:700,color:"#6b21a8",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6,display:"flex",alignItems:"center",gap:6}}>🧵 Programação (EMB) <span style={{color:C.gray400,fontWeight:500,textTransform:"none",letterSpacing:0}}>· opcional</span></div>
+                <input type="file" multiple accept=""
+                  ref={el => { if (el) embInputsRef.current[k] = el; }}
+                  style={{display:"none"}}
+                  onChange={e=>{
+                    const files = e.target.files;
+                    if (files && files.length) addEmbFiles(k, files);
+                    setTimeout(() => { if (e.target) e.target.value = ""; }, 0);
+                  }}/>
+                <button type="button"
+                  onClick={()=>{ const el = embInputsRef.current[k]; if (el) el.click(); }}
+                  style={{padding:"9px 14px",borderRadius:7,border:`1.5px dashed #a78bfa`,background:"#faf5ff",color:"#6b21a8",cursor:"pointer",...F.body,fontSize:13,fontWeight:600,display:"inline-flex",alignItems:"center",gap:6,userSelect:"none"}}>
+                  <Ic n="box" s={14} c="#7c3aed"/> Anexar EMB de programação
+                </button>
+                {(st.embFiles||[]).length>0&&<div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
+                  {st.embFiles.map((f,idx)=>(
+                    <div key={idx} style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,background:"#f3e8ff",border:`1px solid #a78bfa55`,borderRadius:6,padding:"7px 10px"}}>
+                      <span style={{...F.body,fontSize:12,color:"#6b21a8",wordBreak:"break-all",display:"inline-flex",alignItems:"center",gap:6}}><Ic n="check" s={12} c="#7c3aed"/> {f.name}</span>
+                      <button onClick={()=>rmEmbFile(k,idx)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,fontSize:15,lineHeight:1,flexShrink:0}}>✕</button>
+                    </div>
+                  ))}
+                </div>}
               </div>}
             </div>}
           </div>
@@ -3214,6 +3285,107 @@ function MinhasDemandas({user,onOpen,slaCfg}){
 // confirmar manualmente clicando no botão "Conferido". A ação decide:
 //   - Sem bordado → move direto para Expedição
 //   - Com bordado → move para Conferência e Direcionamento
+// ─── MÓDULO ANÁLISE PCP ───────────────────────────────────────────────────
+// Componente genérico das 3 caixas do PCP:
+//  - Análise PCP  → roteia o pedido parcial pra loja ou produção (2 botões)
+//  - Buscar em Loja / Análise Produção → botão "Concluído" (volta pra Retirar
+//    e Conferir).
+// `acoes` = [{label, cor, icon, apiPath, body, confirmMsg}].
+function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user}) {
+  const [pedidos, setPedidos] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [agindo, setAgindo] = useState({});
+  const [feito, setFeito]   = useState({});
+  const [busca, setBusca]   = useState("");
+
+  const carregar = () => {
+    setLoading(true); setLoadError(null);
+    apiFetch(endpoint)
+      .then(res => {
+        if (res.success) setPedidos((res.data || []).map(o => normalizarCard(o, etapaLabel)));
+        else setLoadError(res.error || "Erro desconhecido");
+      })
+      .catch(e => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { carregar(); }, [endpoint]);
+
+  const executar = async (o, acao) => {
+    if (!o.posvendaId) { alert("Pedido sem negócio de Pós-venda."); return; }
+    if (acao.confirmMsg && !confirm(acao.confirmMsg)) return;
+    setAgindo(prev => ({...prev, [o.id]: acao.label}));
+    try {
+      const r = await apiFetch(acao.apiPath + "/" + o.posvendaId, "POST", {
+        ...(acao.body || {}),
+        ctx: { executor: user?.nome || "Usuário SGP" },
+      });
+      if (r.success) {
+        setFeito(prev => ({...prev, [o.id]: r.proximaEtapa || acao.label}));
+        setTimeout(() => carregar(), 1200);
+      } else alert("Erro: " + (r.error || "desconhecido"));
+    } catch (e) { alert("Erro: " + e.message); }
+    finally { setAgindo(prev => ({...prev, [o.id]: false})); }
+  };
+
+  const q = busca.trim().toLowerCase();
+  const lista = (pedidos || []).filter(o => {
+    if (!q) return true;
+    const alvo = [o.pedidoLinx, o.vendasId, String(o.id||"").replace(/^PED-/,""), o.client, o.razaoSocial]
+      .map(x => String(x||"").toLowerCase()).join(" ");
+    return alvo.includes(q);
+  });
+
+  return (
+    <div style={{padding:20}}>
+      <PageH title={title} sub={sub} onRefresh={carregar} refreshing={loading}/>
+      <div style={{marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)}
+          placeholder="Buscar por Pedido Linx, ID HubSpot ou cliente..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando pedidos...</div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} pedido{lista.length!==1?"s":""} nesta caixa</div>}
+      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado para a busca.":"Nenhum pedido nesta caixa."}</div>}
+      {lista.map(o => {
+        const done = feito[o.id];
+        const busy = agindo[o.id];
+        const sla = getSLA(o, slaCfg);
+        return (
+          <Card key={o.id} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+              <div style={{flex:1,minWidth:220}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <ETag etapa={etapaLabel}/>
+                  <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
+                {(o.qtdSeparada!=null)&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Separado: <strong style={{color:C.gray700}}>{o.qtdSeparada||0}</strong> de <strong style={{color:C.gray700}}>{o.qtdTotal||0}</strong> peças</div>}
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
+                {done ? (
+                  <span style={{background:C.green+"18",color:"#065f46",border:`1px solid ${C.green}55`,borderRadius:6,padding:"9px 16px",...F.body,fontWeight:700,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}>
+                    <Ic n="check" s={14} c="#065f46"/> Enviado p/ {done}
+                  </span>
+                ) : acoes.map((acao,ai)=>(
+                  <button key={ai} onClick={()=>executar(o,acao)} disabled={!!busy}
+                    style={{background:busy?"#ccc":acao.cor,color:C.white,border:"none",borderRadius:6,padding:"10px 18px",cursor:busy?"wait":"pointer",fontWeight:700,fontSize:13,...F.body,display:"inline-flex",alignItems:"center",gap:6}}>
+                    {acao.icon&&<Ic n={acao.icon} s={14} c={C.white}/>}
+                    {busy===acao.label ? "Enviando..." : acao.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
   const [pedidos, setPedidos] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -3246,6 +3418,7 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
     setConfirming(prev => ({...prev, [o.id]: true}));
     try {
       const r = await apiFetch("/conferir-separacao/" + o.posvendaId, "POST", {
+        statusSeparacao: o.statusSeparacao,
         ctx: { executor: user?.nome || "Usuário SGP" },
       });
       if (r.success) {
@@ -3316,7 +3489,7 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
                 <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>
                   Separado: <strong style={{color:C.gray700}}>{o.qtdSeparada||0}</strong> de <strong style={{color:C.gray700}}>{o.qtdTotal||0}</strong> peças
                   {" · próxima etapa: "}
-                  <strong style={{color:C.gray700}}>{o.temBordado===false ? "Expedição" : "Conferência e Direcionamento"}</strong>
+                  <strong style={{color:C.gray700}}>{o.statusSeparacao==="parcial" ? "Análise PCP" : (o.temBordado===false ? "Expedição" : "Conferência e Direcionamento")}</strong>
                 </div>
               </div>
               <div style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -5289,7 +5462,7 @@ function Usuarios(){
   };
   useEffect(carregar,[]);
 
-  const GRUPOS=["Principal","Análise","Separação","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
 
   const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
   const toggleGrupo=(grupo)=>{
@@ -6913,6 +7086,7 @@ function AppInner(){
           execucoes:payload.execucoes,
           propriedade:ETAPA_PROPRIEDADE[o.etapa],
           propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
+          propriedadeEmb:payload.propriedadeEmb||"",
           novaEtapa:ETAPA_STAGE_ID[next],
           nota:`${o.etapa} → ${next}`,
           ctx,
@@ -7045,6 +7219,7 @@ function AppInner(){
     painel_fluxo:"Painel de Fluxo",gestao_vista:"Gestão à Vista",pedidos_risco:"Pedidos em Risco",
     gerencial:"Gerencial",historico:"Histórico",ranking:"Ranking / Premiação",
     pedidos:"Pedidos em Aberto",direcionamento:"Direcionamento",
+    analise_pcp:"Análise PCP",buscar_loja:"Buscar Produto em Loja",analise_producao:"Análise da Produção",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
     expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",codigos_barra:"Códigos de Barra",impressao_pedido:"Impressão de Pedido",sla:"Configurações",usuarios:"Usuários",
@@ -7070,6 +7245,16 @@ function AppInner(){
             {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
             {page==="em_separacao"&&<Fila title="Em Separação" etapa="Em Separação" endpoint="/em-separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
             {page==="conferencia_separacao"&&<ConferenciaSeparacao orders={orders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="analise_pcp"&&<CaixaPCP title="Análise PCP" sub="Pedidos separados parciais aguardando decisão do PCP." endpoint="/analise-pcp" etapaLabel="Análise PCP" acoes={[
+              {label:"Buscar em loja", cor:C.purple, icon:"inbox", apiPath:"/pcp-rotear", body:{destino:"loja"}},
+              {label:"Enviar p/ produção", cor:"#0891b2", icon:"box", apiPath:"/pcp-rotear", body:{destino:"producao"}},
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="buscar_loja"&&<CaixaPCP title="Buscar Produto em Loja" sub="Ao concluir a busca, o pedido vai pra Retirar e Conferir." endpoint="/buscar-loja" etapaLabel="Buscar em Loja" acoes={[
+              {label:"Concluído", cor:C.green, icon:"check", apiPath:"/pcp-concluir", confirmMsg:"Concluir a busca em loja e mandar o pedido pra Retirar e Conferir?"},
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="analise_producao"&&<CaixaPCP title="Análise da Produção" sub="Ao concluir a análise, o pedido vai pra Retirar e Conferir." endpoint="/analise-producao" etapaLabel="Análise Produção" acoes={[
+              {label:"Concluído", cor:C.green, icon:"check", apiPath:"/pcp-concluir", confirmMsg:"Concluir a análise da produção e mandar o pedido pra Retirar e Conferir?"},
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="conferencia_direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg} subTabsReprog/>}
