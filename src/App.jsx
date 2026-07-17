@@ -2693,6 +2693,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   useEffect(()=>{
     if(!_orderLeve)return;
     _setEnriched(null);
+    setSepEdits({}); setSepMsg("");
     const params=_orderLeve.posvendaId?"?posvenda="+_orderLeve.posvendaId
                 :_orderLeve.bordadoId?"?bordado="+_orderLeve.bordadoId:null;
     if(!params){_setLoadingDet(false);return;}
@@ -2743,12 +2744,38 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
   const[actionMsg,setActionMsg]=useState("");
+  // Edição manual da quantidade separada (só nas etapas de separação/conferência)
+  const[sepEdits,setSepEdits]=useState({});   // objId -> valor (string) editado
+  const[savingSep,setSavingSep]=useState(false);
+  const[sepMsg,setSepMsg]=useState("");
   // Direcionamento local state — apenas itens COM bordado precisam de direcionamento.
   // Fallback (pedido legado sem a flag em nenhum item): usa todos os itens.
   const itensComBordado=order.items.filter(it=>it.bordado);
   const itensDirecionaveis=itensComBordado.length?itensComBordado:order.items;
   const skus=itensDirecionaveis.map(it=>it.sku);
   const itemKeys=itensDirecionaveis.map((it,i)=>it.id||i);
+  // Edição da separação: liberada só quando o pedido está em Em Separação ou
+  // Conferência Separação (o worker também valida isso pelo dealstage).
+  const podeEditarSep = ["1377587072","1377587077"].includes(order.stageIdPV||"")
+    || [order.etapa,...(order.etapasAtivas||[])].some(e=>e==="Em Separação"||e==="Conferência Separação");
+  const salvarSeparacao=async()=>{
+    if(!order.posvendaId){alert("Pedido sem negócio de Pós-venda.");return;}
+    const alterados=(order.items||[])
+      .filter(it=>!it.naoSeparavel && it.id && (it.id in sepEdits))
+      .map(it=>({objId:it.id, qtdSeparada:Number(sepEdits[it.id])}))
+      .filter(it=>!isNaN(it.qtdSeparada) && it.qtdSeparada>=0
+        && it.qtdSeparada !== Number((order.items.find(x=>x.id===it.objId)?.qtdSeparada)||0));
+    if(!alterados.length){setSepMsg("Nenhuma alteração para salvar.");return;}
+    setSavingSep(true); setSepMsg("");
+    try{
+      const r=await apiFetch("/editar-separacao/"+order.posvendaId,"POST",{itens:alterados,ctx:{executor:me?.nome||"Usuário SGP"}});
+      if(r.success){
+        const falhas=(r.resultados||[]).filter(x=>!x.ok).length;
+        setSepMsg(falhas?`Salvo com ${falhas} falha(s). Confira.`:"Quantidades salvas no HubSpot ✓");
+      } else setSepMsg("Erro: "+(r.error||"desconhecido"));
+    }catch(e){ setSepMsg("Erro: "+e.message); }
+    finally{ setSavingSep(false); }
+  };
   const[itemSel,setItemSel]=useState({});
   const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach((it,i)=>{if(it.dest)m[it.id||i]=it.dest;});return m;});
   // Quando items chegam pelo enriquecimento sob demanda (eram [] no card leve),
@@ -2976,15 +3003,35 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                 <span style={{...F.body,fontSize:12,color:C.blue,fontWeight:600}}>Para definir Interno/Externo, use a aba <strong>▶ Executar</strong></span>
               </div>
             )}
+            {podeEditarSep && (
+              <div style={{background:"#eff6ff",border:`1.5px solid ${C.blue}44`,borderLeft:`5px solid ${C.blue}`,borderRadius:8,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+                <div style={{...F.body,fontSize:12,color:C.gray700,lineHeight:1.5,flex:1,minWidth:220}}>
+                  <strong style={{color:C.blue}}>Corrigir separação:</strong> edite a coluna <strong>Qtd Separada</strong> e salve. Grava direto no HubSpot (Pedidos Aprovados). Disponível só em <strong>Em Separação</strong> e <strong>Conferência Separação</strong>.
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  {sepMsg && <span style={{...F.body,fontSize:12,fontWeight:600,color:sepMsg.startsWith("Erro")?C.red:sepMsg.startsWith("Nenhuma")?C.gray500:C.green}}>{sepMsg}</span>}
+                  <button onClick={salvarSeparacao} disabled={savingSep}
+                    style={{background:savingSep?"#ccc":C.blue,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:savingSep?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,whiteSpace:"nowrap",display:"inline-flex",alignItems:"center",gap:6}}>
+                    <Ic n="check" s={14} c={C.white}/> {savingSep?"Salvando...":"Salvar quantidades"}
+                  </button>
+                </div>
+              </div>
+            )}
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:560}}>
               <thead><tr style={{borderBottom:`2px solid ${C.gray200}`}}>
                 {["SKU","Descrição","TAM","Qtd","Qtd Separada","Saldo","Bordado","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
               </tr></thead>
               <tbody>{order.items.map((it,i)=>{
                 const qtd=Number(it.qty||0);
-                const qtdSep=Number(it.qtdSeparada!=null?it.qtdSeparada:0);
+                const qtdSepOrig=Number(it.qtdSeparada!=null?it.qtdSeparada:0);
+                const editandoSep = podeEditarSep && !it.naoSeparavel;
+                // Valor exibido: se está editando e tem edição pendente, usa ela
+                // (preview ao vivo de saldo/status). Senão, o valor original.
+                const qtdSep = (editandoSep && (it.id in sepEdits)) ? (Number(sepEdits[it.id])||0) : qtdSepOrig;
                 const saldo=Math.max(0,qtd-qtdSep);
-                const stSep=it.statusSeparacao||(qtdSep===0?"pendente":(qtdSep<qtd?"parcial":"completa"));
+                const stSep=it.naoSeparavel
+                  ? (it.statusSeparacao||"personalizacao")
+                  : (qtdSep===0?"pendente":(qtdSep<qtd?"parcial":"completa"));
                 const corSep=it.naoSeparavel?C.purple:(stSep==="completa"?C.green:stSep==="parcial"?C.amber:C.red);
                 return(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`,background:it.naoSeparavel?"#faf5ff":"transparent"}}>
@@ -3002,7 +3049,14 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                   </td>
                   <td style={{padding:"9px 10px",...F.body,color:C.gray500,verticalAlign:"top"}}>{it.cor}</td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body,verticalAlign:"top"}}>{qtd}</td>
-                  <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:corSep,verticalAlign:"top"}}>{it.naoSeparavel?"—":qtdSep}</td>
+                  <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:corSep,verticalAlign:"top"}}>
+                    {it.naoSeparavel ? "—" : (editandoSep ? (
+                      <input type="number" min="0"
+                        value={it.id in sepEdits ? sepEdits[it.id] : String(qtdSepOrig)}
+                        onChange={e=>setSepEdits(p=>({...p,[it.id]:e.target.value}))}
+                        style={{width:60,padding:"5px 6px",border:`1.5px solid ${C.gray300}`,borderRadius:6,fontSize:13,...F.body,textAlign:"center"}}/>
+                    ) : qtdSep)}
+                  </td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:(saldo>0?C.red:C.gray400),verticalAlign:"top"}}>{it.naoSeparavel?"—":(saldo>0?saldo:"—")}</td>
                   <td style={{padding:"9px 10px",verticalAlign:"top"}}>{it.bordado?<Tag label="Bordado" color={C.red}/>:<span style={{color:C.gray400}}>—</span>}</td>
                   <td style={{padding:"9px 10px",verticalAlign:"top"}}>{it.dest?<Tag label={it.dest==="interno"?"Interno":"Externo"} color={it.dest==="interno"?C.green:C.purple}/>:<span style={{color:C.gray400}}>—</span>}</td>
@@ -3018,8 +3072,8 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               <tfoot><tr style={{borderTop:`2px solid ${C.gray200}`,background:C.gray50}}>
                 <td colSpan={3} style={{padding:"9px 10px",fontWeight:700,fontSize:11,...F.body,color:C.gray500,textTransform:"uppercase"}}>Total</td>
                 <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body}}>{total}</td>
-                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.green}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+Number(i.qtdSeparada||0),0)}</td>
-                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.red}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+Math.max(0,Number(i.qty||0)-Number(i.qtdSeparada||0)),0)||"—"}</td>
+                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.green}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+((podeEditarSep&&(i.id in sepEdits))?(Number(sepEdits[i.id])||0):Number(i.qtdSeparada||0)),0)}</td>
+                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.red}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>{const qs=(podeEditarSep&&(i.id in sepEdits))?(Number(sepEdits[i.id])||0):Number(i.qtdSeparada||0);return s+Math.max(0,Number(i.qty||0)-qs);},0)||"—"}</td>
                 <td colSpan={3}/>
               </tr></tfoot>
             </table>
