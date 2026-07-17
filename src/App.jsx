@@ -1468,34 +1468,11 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   //  - loadingDet && bordados vazio → mostra "Carregando bordados..."
   //  - !loadingDet && bordados vazio → mostra alerta "Nenhum bordado pra ..."
   //  - bordados existem → renderiza normal
-  if(!bordados.length){
-    const carregando = loadingDet===true;
-    return (
-      <div style={{padding:"32px 24px",background:carregando?C.gray50:"#fff8f1",border:`1.5px solid ${carregando?C.gray200:C.amber+"55"}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:12,textAlign:"center"}}>
-        {carregando ? (
-          <>
-            <Ic n="spin" s={22} c={C.gray500}/>
-            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.gray600}}>Carregando bordados...</div>
-            <div style={{...F.body,fontSize:12,color:C.gray500,maxWidth:420}}>
-              Aguarde enquanto buscamos os arquivos anexados ao pedido.
-            </div>
-          </>
-        ) : (
-          <>
-            <Ic n="warn" s={22} c={C.amber}/>
-            <div style={{...F.title,fontSize:14,fontWeight:700,color:"#92400e"}}>
-              {comDificuldade ? "Nenhum bordado pra programar" : "Nenhum bordado pra amostrar"}
-            </div>
-            <div style={{...F.body,fontSize:12,color:"#92400e",maxWidth:460,lineHeight:1.55}}>
-              Este pedido está na etapa <strong>{etapa}</strong>, mas não tem nenhum arquivo/bordado anexado que precise dessa ação.
-              <br/><br/>
-              Verifique com o <strong>vendedor</strong> se o pedido está no fluxo correto. Nenhuma execução pode ser feita sem arquivo referência.
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
+  // NOTA: a guarda "sem bordados" NÃO pode ficar aqui — abaixo ainda há hooks
+  // (useState/useEffect/useRef). Um return condicional antes deles muda a
+  // contagem de hooks entre renders (vazio → enriquecido) e quebra com o
+  // React #300. Por isso ela foi movida pra logo antes do return principal,
+  // depois de TODOS os hooks.
   const TITULOS={"Programação":"PROGRAMAÇÃO DE BORDADO","Amostra Digital":"ENVIAR AMOSTRA DIGITAL","Amostra Física":"CONFIRMAR AMOSTRA FÍSICA"};
   const HINTS={"Programação":"Para cada bordado: baixe a referência, informe a dificuldade e anexe o(s) arquivo(s) programado(s).","Amostra Digital":"Para cada bordado: baixe a referência e anexe a(s) imagem(ns) da amostra digital.","Amostra Física":"Para cada bordado: baixe a referência e anexe a(s) foto(s) da amostra física."};
   // Programação: aceita QUALQUER formato (a programadora pode anexar .emb, .dst,
@@ -1657,6 +1634,35 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     finally{setEnviando(false);}
   };
 
+  // Guarda "sem bordados" — agora DEPOIS de todos os hooks (early return seguro).
+  if(!bordados.length){
+    const carregando = loadingDet===true;
+    return (
+      <div style={{padding:"32px 24px",background:carregando?C.gray50:"#fff8f1",border:`1.5px solid ${carregando?C.gray200:C.amber+"55"}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:12,textAlign:"center"}}>
+        {carregando ? (
+          <>
+            <Ic n="spin" s={22} c={C.gray500}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.gray600}}>Carregando bordados...</div>
+            <div style={{...F.body,fontSize:12,color:C.gray500,maxWidth:420}}>
+              Aguarde enquanto buscamos os arquivos anexados ao pedido.
+            </div>
+          </>
+        ) : (
+          <>
+            <Ic n="warn" s={22} c={C.amber}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:"#92400e"}}>
+              {comDificuldade ? "Nenhum bordado pra programar" : "Nenhum bordado pra amostrar"}
+            </div>
+            <div style={{...F.body,fontSize:12,color:"#92400e",maxWidth:460,lineHeight:1.55}}>
+              Este pedido está na etapa <strong>{etapa}</strong>, mas não tem nenhum arquivo/bordado anexado que precise dessa ação.
+              <br/><br/>
+              Verifique com o <strong>vendedor</strong> se o pedido está no fluxo correto. Nenhuma execução pode ser feita sem arquivo referência.
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
   return(
     <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
       {/* Arquivos de referência das etapas anteriores — a bordadeira/operadora
