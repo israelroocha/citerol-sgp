@@ -1408,17 +1408,28 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   };
   const meuId = String(me?.id || me?.email || me?.nome || "user");
   const meuNome = me?.nome || me?.email || "Usuário";
-  const assumirBordado = async (b) => {
+  const assumirBordado = async (b, forcar=false) => {
     if (!order.bordadoId) { alert("Pedido sem negócio de Bordado."); return; }
     setAssumindoKey(b.fileName);
     try {
       const r = await apiFetch("/programacao-assumir","POST",{
         bordadoId: order.bordadoId, fileName: b.fileName || "",
-        userId: meuId, userName: meuNome,
+        userId: meuId, userName: meuNome, forcar,
       });
       if (r.success) setAssumidos(r.assumidos);
       else alert("Não foi possível assumir: " + (r.error||"erro desconhecido"));
-    } catch(e) { alert("Erro: "+e.message); }
+    } catch(e) {
+      // 409 = já assumido por outra pessoa (tela pode estar defasada). Oferece
+      // tomar a programação pra si e reenvia forçando.
+      if (!forcar && String(e.message||"").includes("409")) {
+        setAssumindoKey(null);
+        if (confirm("Este bordado já foi assumido por outra pessoa (ou a tela está desatualizada).\n\nDeseja assumir mesmo assim, tomando a programação pra você?")) {
+          return assumirBordado(b, true);
+        }
+        return;
+      }
+      alert("Erro: "+e.message);
+    }
     setAssumindoKey(null);
   };
   const liberarBordado = async (b) => {
@@ -2676,6 +2687,47 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 }
 
 // ─── ORDER MODAL ─────────────────────────────────────────────────────────────
+// ─── ABA: BORDADOS EXECUTADOS (programação) ───────────────────────────────
+// Mostra o que já foi executado na programação: quem, quando, dificuldade e,
+// se foi dispensado, o motivo. Arquivos aparecem só se houver (no fluxo novo a
+// programadora não anexa — o EMB vem da Amostra Digital).
+function ExecutadosTab({order}){
+  const execs = order.programacaoExecutados || [];
+  const limpo=(n="")=>String(n).replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
+  if(!execs.length) return (
+    <div style={{padding:20}}>
+      <div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum bordado executado ainda.</div>
+    </div>
+  );
+  return (
+    <div style={{padding:20,display:"flex",flexDirection:"column",gap:12}}>
+      <SecH>Bordados executados ({execs.length})</SecH>
+      {execs.map((e,i)=>{
+        const disp=!!e.dispensado;
+        const cor=disp?C.amber:C.green;
+        const bg=disp?"#fffbeb":C.green+"0e";
+        return (
+          <div key={i} style={{border:`1.5px solid ${cor}44`,borderLeft:`5px solid ${cor}`,background:bg,borderRadius:8,padding:"12px 14px"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10,flexWrap:"wrap"}}>
+              <div style={{...F.body,fontSize:13,fontWeight:700,color:C.gray700,wordBreak:"break-word",flex:1,minWidth:200}}>
+                {disp?"⊘ ":"✓ "}{limpo(e.nomeArquivo||e.fileName||"(sem nome)")}
+              </div>
+              {!disp&&e.dificuldade&&<Tag label={"Dificuldade: "+e.dificuldade} color={e.dificuldade==="Fácil"?C.green:e.dificuldade==="Médio"?C.amber:C.red}/>}
+              {disp&&<Tag label="Dispensado" color={C.amber}/>}
+            </div>
+            <div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6}}>
+              Por <strong>{e.executor||"—"}</strong>
+              {e.executadoEm&&" · "+new Date(e.executadoEm).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+            </div>
+            {disp&&e.motivo&&<div style={{...F.body,fontSize:12,color:"#92400e",fontStyle:"italic",marginTop:6,background:C.white,border:`1px dashed ${C.amber}55`,borderRadius:6,padding:"6px 10px"}}>💬 {e.motivo}</div>}
+            {!disp&&(e.fileIds&&e.fileIds.length>0)&&<div style={{marginTop:8}}><ArquivosBox fileIds={e.fileIds} emptyText=""/></div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,slaCfg}){
   // Carrega detalhes completos sob demanda (sem essa busca, o snapshot fica leve e
   // a lista carrega rápido — só pagamos o custo de detalhes quando o usuário abre).
@@ -2816,6 +2868,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     ...(order.etapa==="Programação"?[]:[{id:"info",l:"Negócio"}]),
     {id:"sla",l:"SLA / Prazo"},
     {id:"bordado",l:"Bordado"},
+    ...((order.programacaoExecutados||[]).length?[{id:"executados",l:"✓ Executados"}]:[]),
     {id:"itens",l:"Todos os itens"},
     {id:"tl",l:"Timeline"},
     {id:"alteracao",l:order.houveAlteracaoForm?"⚠ Alteração de Formulário":"Alteração de Formulário"},
@@ -3084,6 +3137,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               </tr></tfoot>
             </table>
           </div>}
+          {tab==="executados"&&<ExecutadosTab order={order}/>}
           {tab==="tl"&&<Timeline order={order}/>}
           {tab==="alteracao"&&<AlteracaoFormTab order={order} onAction={onAction} me={me}/>}
           {tab==="chat"&&<div style={{height:isMobile?380:420}}><Chat order={order} me={me} usuarios={usuarios}/></div>}
