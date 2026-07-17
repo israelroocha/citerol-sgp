@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.9.88";
+const SGP_VERSION = "v2.11.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -1408,17 +1408,28 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   };
   const meuId = String(me?.id || me?.email || me?.nome || "user");
   const meuNome = me?.nome || me?.email || "Usuário";
-  const assumirBordado = async (b) => {
+  const assumirBordado = async (b, forcar=false) => {
     if (!order.bordadoId) { alert("Pedido sem negócio de Bordado."); return; }
     setAssumindoKey(b.fileName);
     try {
       const r = await apiFetch("/programacao-assumir","POST",{
         bordadoId: order.bordadoId, fileName: b.fileName || "",
-        userId: meuId, userName: meuNome,
+        userId: meuId, userName: meuNome, forcar,
       });
       if (r.success) setAssumidos(r.assumidos);
       else alert("Não foi possível assumir: " + (r.error||"erro desconhecido"));
-    } catch(e) { alert("Erro: "+e.message); }
+    } catch(e) {
+      // 409 = já assumido por outra pessoa (tela pode estar defasada). Oferece
+      // tomar a programação pra si e reenvia forçando.
+      if (!forcar && String(e.message||"").includes("409")) {
+        setAssumindoKey(null);
+        if (confirm("Este bordado já foi assumido por outra pessoa (ou a tela está desatualizada).\n\nDeseja assumir mesmo assim, tomando a programação pra você?")) {
+          return assumirBordado(b, true);
+        }
+        return;
+      }
+      alert("Erro: "+e.message);
+    }
     setAssumindoKey(null);
   };
   const liberarBordado = async (b) => {
@@ -1437,6 +1448,20 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   // Adiciona ao programacao_executados sem anexar arquivo. Só disponível se
   // etapa é Programação.
   const [dispensandoKey, setDispensandoKey] = useState(null);
+  // Seleção múltipla (tabela de execução) + ações em massa.
+  const [selKeys, setSelKeys] = useState(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState("");
+  // Faz a dispensa com o motivo JÁ pronto (reusado no individual e no em massa).
+  const dispensarComMotivo = async (b, motivo) => {
+    const r = await apiFetch("/programacao-dispensar","POST",{
+      bordadoId: order.bordadoId,
+      nomeArquivo: b.fileName || "",
+      motivo: motivo,
+      executor: meuNome,
+    });
+    if (r && r.success && r.executados) setExecutados(r.executados);
+    return r;
+  };
   const dispensarBordado = async (b) => {
     if (!order.bordadoId) return;
     const motivo = prompt(
@@ -1447,19 +1472,27 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     if (!motivo || !motivo.trim()) return;
     setDispensandoKey(b.fileName);
     try {
-      const r = await apiFetch("/programacao-dispensar","POST",{
-        bordadoId: order.bordadoId,
-        nomeArquivo: b.fileName || "",
-        motivo: motivo.trim(),
-        executor: meuNome,
-      });
-      if (r.success) {
-        setExecutados(r.executados || []);
-      } else {
-        alert("Erro: "+(r.error||"desconhecido"));
-      }
+      const r = await dispensarComMotivo(b, motivo.trim());
+      if (!r || !r.success) alert("Erro: "+((r&&r.error)||"desconhecido"));
     } catch(e) { alert("Erro: "+e.message); }
     setDispensandoKey(null);
+  };
+  // Retomar: desfaz a dispensa (ou a execução) — remove o registro de executado
+  // pra o bordado voltar a precisar de programação.
+  const [retomandoKey, setRetomandoKey] = useState(null);
+  const retomarBordado = async (b) => {
+    if (!order.bordadoId) return;
+    if (!confirm("Retomar a programação deste bordado? Ele volta a precisar ser programado.")) return;
+    setRetomandoKey(b.fileName);
+    try {
+      const r = await apiFetch("/programacao-reverter","POST",{
+        bordadoId: order.bordadoId,
+        nomeArquivo: b.fileName || "",
+      });
+      if (r.success) setExecutados(r.executados || []);
+      else alert("Erro: "+(r.error||"desconhecido"));
+    } catch(e) { alert("Erro: "+e.message); }
+    setRetomandoKey(null);
   };                                   // legado: sem termo → todos
   // REGRA CRÍTICA: se não temos bordado real pra programar/amostrar, NUNCA
   // criamos item fictício ("Programação geral"). Pra a Programação isso é
@@ -1468,34 +1501,11 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   //  - loadingDet && bordados vazio → mostra "Carregando bordados..."
   //  - !loadingDet && bordados vazio → mostra alerta "Nenhum bordado pra ..."
   //  - bordados existem → renderiza normal
-  if(!bordados.length){
-    const carregando = loadingDet===true;
-    return (
-      <div style={{padding:"32px 24px",background:carregando?C.gray50:"#fff8f1",border:`1.5px solid ${carregando?C.gray200:C.amber+"55"}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:12,textAlign:"center"}}>
-        {carregando ? (
-          <>
-            <Ic n="spin" s={22} c={C.gray500}/>
-            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.gray600}}>Carregando bordados...</div>
-            <div style={{...F.body,fontSize:12,color:C.gray500,maxWidth:420}}>
-              Aguarde enquanto buscamos os arquivos anexados ao pedido.
-            </div>
-          </>
-        ) : (
-          <>
-            <Ic n="warn" s={22} c={C.amber}/>
-            <div style={{...F.title,fontSize:14,fontWeight:700,color:"#92400e"}}>
-              {comDificuldade ? "Nenhum bordado pra programar" : "Nenhum bordado pra amostrar"}
-            </div>
-            <div style={{...F.body,fontSize:12,color:"#92400e",maxWidth:460,lineHeight:1.55}}>
-              Este pedido está na etapa <strong>{etapa}</strong>, mas não tem nenhum arquivo/bordado anexado que precise dessa ação.
-              <br/><br/>
-              Verifique com o <strong>vendedor</strong> se o pedido está no fluxo correto. Nenhuma execução pode ser feita sem arquivo referência.
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
+  // NOTA: a guarda "sem bordados" NÃO pode ficar aqui — abaixo ainda há hooks
+  // (useState/useEffect/useRef). Um return condicional antes deles muda a
+  // contagem de hooks entre renders (vazio → enriquecido) e quebra com o
+  // React #300. Por isso ela foi movida pra logo antes do return principal,
+  // depois de TODOS os hooks.
   const TITULOS={"Programação":"PROGRAMAÇÃO DE BORDADO","Amostra Digital":"ENVIAR AMOSTRA DIGITAL","Amostra Física":"CONFIRMAR AMOSTRA FÍSICA"};
   const HINTS={"Programação":"Para cada bordado: baixe a referência, informe a dificuldade e anexe o(s) arquivo(s) programado(s).","Amostra Digital":"Para cada bordado: baixe a referência e anexe a(s) imagem(ns) da amostra digital.","Amostra Física":"Para cada bordado: baixe a referência e anexe a(s) foto(s) da amostra física."};
   // Programação: aceita QUALQUER formato (a programadora pode anexar .emb, .dst,
@@ -1592,6 +1602,9 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     // Se etapa é Programação com sistema de "assumir": só valida/envia os que EU assumi
     const bordadosPraExecutar = ehProgAssumivel
       ? bordados.filter(b => {
+          // Já executado OU dispensado → não entra na validação nem no envio.
+          // (Corrige o erro "Defina a dificuldade" em bordado já dispensado.)
+          if (findExecutado(b.fileName || "")) return false;
           const a = findAssumido(b.fileName || "");
           return a && String(a.userId) === meuId;
         })
@@ -1657,6 +1670,96 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     finally{setEnviando(false);}
   };
 
+  // ── AÇÕES EM MASSA (tabela de execução da Programação) ───────────────────
+  const chavesSelecionaveis = () => bordados
+    .map((b,i)=>({b,i,k:keyOf(b,i)}))
+    .filter(({b})=>{
+      // não deixa selecionar bordado assumido por OUTRA pessoa
+      const a = ehProgAssumivel ? findAssumido(b.fileName||"") : null;
+      return !(a && String(a.userId)!==meuId);
+    });
+  const toggleSel = (k)=>setSelKeys(prev=>{const n=new Set(prev);n.has(k)?n.delete(k):n.add(k);return n;});
+  const selAllToggle = ()=>{
+    const todas = chavesSelecionaveis().map(x=>x.k);
+    const todasMarcadas = todas.length>0 && todas.every(k=>selKeys.has(k));
+    setSelKeys(todasMarcadas?new Set():new Set(todas));
+  };
+  const bordadosSelecionados = ()=>bordados.filter((b,i)=>selKeys.has(keyOf(b,i)));
+  const bulkAssumir = async ()=>{
+    const alvos = bordadosSelecionados().filter(b=>{
+      if(findExecutado(b.fileName||"")) return false;
+      const a=findAssumido(b.fileName||"");
+      return !(a && String(a.userId)===meuId);
+    });
+    if(!alvos.length){alert("Nada para assumir nos selecionados.");return;}
+    setBulkBusy("assumir");
+    for(const b of alvos){ try{ await assumirBordado(b); }catch(e){} }
+    setBulkBusy("");
+  };
+  const bulkDispensar = async ()=>{
+    const alvos = bordadosSelecionados().filter(b=>!findExecutado(b.fileName||""));
+    if(!alvos.length){alert("Nada para dispensar nos selecionados.");return;}
+    const motivo = prompt(`Motivo para dispensar a programação dos ${alvos.length} bordado(s) selecionado(s)?\n\nO MESMO motivo vale para todos.\n\n(Cancelar para desistir)`);
+    if(!motivo||!motivo.trim())return;
+    setBulkBusy("dispensar");
+    for(const b of alvos){ try{ await dispensarComMotivo(b, motivo.trim()); }catch(e){} }
+    setBulkBusy(""); setSelKeys(new Set());
+  };
+  const bulkSetDif = (d)=>{
+    bordadosSelecionados().filter(b=>!findExecutado(b.fileName||""))
+      .forEach(b=>{ const i=bordados.indexOf(b); setDif(keyOf(b,i), d); });
+  };
+  const bulkExecutar = async ()=>{
+    const alvos = bordadosSelecionados().filter(b=>{
+      if(findExecutado(b.fileName||"")) return false;
+      const a=findAssumido(b.fileName||"");
+      if(!a || String(a.userId)!==meuId) return false;
+      const i=bordados.indexOf(b); const st=data[keyOf(b,i)]||{};
+      return !!st.dificuldade;
+    });
+    if(!alvos.length){alert("Nenhum selecionado pronto para executar. Precisa estar assumido por você e com a dificuldade definida.");return;}
+    setBulkBusy("executar");
+    try{
+      const execucoes = alvos.map(b=>{
+        const i=bordados.indexOf(b); const st=data[keyOf(b,i)]||{};
+        return {nomeArquivo:nomeLimpo(b.fileName),fileId:b.fileId?String(b.fileId):"",position:(b.position||b.positionLabel)?String(b.position||b.positionLabel):"",dificuldade:st.dificuldade,arquivos:[],arquivosEmb:[]};
+      });
+      const m = await onAction(order.id,"exec_bordado",{execucoes});
+      try{ sessionStorage.removeItem(STORAGE_KEY); }catch{}
+      setActionMsg(m||"Registrado."); setActionDone(true);
+    }catch(e){ alert("Erro ao executar: "+e.message); }
+    setBulkBusy(""); setSelKeys(new Set());
+  };
+
+  // Guarda "sem bordados" — agora DEPOIS de todos os hooks (early return seguro).
+  if(!bordados.length){
+    const carregando = loadingDet===true;
+    return (
+      <div style={{padding:"32px 24px",background:carregando?C.gray50:"#fff8f1",border:`1.5px solid ${carregando?C.gray200:C.amber+"55"}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:12,textAlign:"center"}}>
+        {carregando ? (
+          <>
+            <Ic n="spin" s={22} c={C.gray500}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:C.gray600}}>Carregando bordados...</div>
+            <div style={{...F.body,fontSize:12,color:C.gray500,maxWidth:420}}>
+              Aguarde enquanto buscamos os arquivos anexados ao pedido.
+            </div>
+          </>
+        ) : (
+          <>
+            <Ic n="warn" s={22} c={C.amber}/>
+            <div style={{...F.title,fontSize:14,fontWeight:700,color:"#92400e"}}>
+              {comDificuldade ? "Nenhum bordado pra programar" : "Nenhum bordado pra amostrar"}
+            </div>
+            <div style={{...F.body,fontSize:12,color:"#92400e",maxWidth:460,lineHeight:1.55}}>
+              Este pedido está na etapa <strong>{etapa}</strong>, mas não tem nenhum arquivo/bordado anexado que precise dessa ação.
+              <br/><br/>
+              Verifique com o <strong>vendedor</strong> se o pedido está no fluxo correto. Nenhuma execução pode ser feita sem arquivo referência.
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
   return(
     <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
       {/* Arquivos de referência das etapas anteriores — a bordadeira/operadora
@@ -1759,7 +1862,83 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
           </div>
         );
       })()}
-      {bordados.map((b,i)=>{
+      {/* NOVA TABELA DE EXECUÇÃO (Programação) — seleção múltipla + ações em massa */}
+      {ehProgAssumivel && (() => {
+        const selCount = selKeys.size;
+        const selavel = chavesSelecionaveis();
+        const todasMarcadas = selavel.length>0 && selavel.every(x=>selKeys.has(x.k));
+        const gcols = "36px 56px 1fr 168px 168px";
+        return (
+          <div>
+            {/* Barra de ações em massa */}
+            <div style={{position:"sticky",top:0,zIndex:3,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:"10px 10px 0 0",padding:"10px 14px",display:"flex",alignItems:"center",gap:9,flexWrap:"wrap"}}>
+              <label style={{display:"flex",alignItems:"center",gap:7,...F.body,fontSize:13,fontWeight:600,color:C.gray700,cursor:"pointer"}}>
+                <input type="checkbox" checked={todasMarcadas} onChange={selAllToggle} style={{width:16,height:16,accentColor:C.red,cursor:"pointer"}}/> Selecionar todos
+              </label>
+              <span style={{background:selCount?C.red:C.gray100,color:selCount?"#fff":C.gray600,borderRadius:20,padding:"3px 11px",...F.body,fontSize:12,fontWeight:700}}>{selCount} selecionado{selCount!==1?"s":""}</span>
+              <div style={{flex:1}}/>
+              <div style={{display:"flex",alignItems:"center",gap:5,...F.body,fontSize:11.5,color:C.gray500}}>
+                Dificuldade:
+                {DIFS.map(([d,cor])=>(
+                  <button key={d} onClick={()=>bulkSetDif(d)} disabled={!selCount} style={{border:`1.5px solid ${C.gray200}`,background:"#fff",color:cor,borderRadius:6,padding:"5px 10px",...F.body,fontSize:11.5,fontWeight:700,cursor:selCount?"pointer":"not-allowed",opacity:selCount?1:.5}}>{d}</button>
+                ))}
+              </div>
+              <button onClick={bulkAssumir} disabled={!selCount||!!bulkBusy} style={{background:(!selCount||bulkBusy)?"#ccc":C.blue,color:"#fff",border:"none",borderRadius:7,padding:"8px 13px",...F.body,fontSize:12.5,fontWeight:700,cursor:(!selCount||bulkBusy)?"not-allowed":"pointer",whiteSpace:"nowrap"}}>{bulkBusy==="assumir"?"...":"▲ Assumir"}</button>
+              <button onClick={bulkDispensar} disabled={!selCount||!!bulkBusy} style={{background:"#fef3c7",color:"#92400e",border:`1.5px solid ${C.amber}`,borderRadius:7,padding:"7px 12px",...F.body,fontSize:12.5,fontWeight:700,cursor:(!selCount||bulkBusy)?"not-allowed":"pointer",whiteSpace:"nowrap",opacity:(!selCount||bulkBusy)?.5:1}}>{bulkBusy==="dispensar"?"...":"⊘ Dispensar"}</button>
+              <button onClick={bulkExecutar} disabled={!selCount||!!bulkBusy} style={{background:(!selCount||bulkBusy)?"#ccc":C.red,color:"#fff",border:"none",borderRadius:7,padding:"8px 13px",...F.body,fontSize:12.5,fontWeight:700,cursor:(!selCount||bulkBusy)?"not-allowed":"pointer",whiteSpace:"nowrap"}}>{bulkBusy==="executar"?"...":"✔ Executar"}</button>
+            </div>
+            {/* Cabeçalho */}
+            <div style={{display:"grid",gridTemplateColumns:gcols,gap:10,alignItems:"center",padding:"9px 14px",borderLeft:`1px solid ${C.gray200}`,borderRight:`1px solid ${C.gray200}`,background:C.gray50,...F.body,fontSize:10.5,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.05em"}}>
+              <div/><div>Foto</div><div>Bordado</div><div>Status / Dificuldade</div><div style={{textAlign:"right"}}>Ações</div>
+            </div>
+            {/* Linhas */}
+            {bordados.map((b,i)=>{
+              const k=keyOf(b,i); const st=data[k]||{dificuldade:""}; const img=ehImagem(b.fileName||"");
+              const assumido=findAssumido(b.fileName||""); const executado=findExecutado(b.fileName||"");
+              const ehMeu=assumido && String(assumido.userId)===meuId;
+              const jaExecutado=!!executado; const disp=jaExecutado&&executado.dispensado;
+              const bloqueado=assumido&&!ehMeu;
+              const isSel=selKeys.has(k);
+              return (
+                <div key={k} style={{display:"grid",gridTemplateColumns:gcols,gap:10,alignItems:"center",padding:"10px 14px",borderLeft:`1px solid ${C.gray200}`,borderRight:`1px solid ${C.gray200}`,borderBottom:`1px solid ${C.gray100}`,background:isSel?"#fdf3f3":disp?"#fffbeb":jaExecutado?"#f0fdf4":bloqueado?C.gray50:"#fff",opacity:bloqueado?0.65:1}}>
+                  <div>{!bloqueado&&<input type="checkbox" checked={isSel} onChange={()=>toggleSel(k)} style={{width:16,height:16,accentColor:C.red,cursor:"pointer"}}/>}</div>
+                  <div style={{width:52,height:52,borderRadius:8,border:`1px solid ${C.gray200}`,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+                    {img&&b.fileUrl?<img src={b.fileUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<Ic n="box" s={20} c={C.gray400}/>}
+                  </div>
+                  <div style={{minWidth:0}}>
+                    <div style={{...F.body,fontSize:12.5,fontWeight:700,color:C.gray800,wordBreak:"break-word"}}>{nomeLimpo(b.fileName)}</div>
+                    <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>
+                      {b.productName&&<span>👕 {b.productName}</span>}{b.productName&&b.positionLabel?<span> · </span>:null}{b.positionLabel&&<span style={{color:"#6b21a8"}}>📍 {b.positionLabel}</span>}
+                    </div>
+                    {disp&&executado.motivo&&<div style={{...F.body,fontSize:11,color:"#92400e",fontStyle:"italic",marginTop:2}}>💬 {executado.motivo}</div>}
+                  </div>
+                  <div>
+                    {jaExecutado
+                      ? <span style={{...F.body,fontSize:11,fontWeight:700,color:disp?"#92400e":"#15803d"}}>{disp?"⊘ Dispensado":"✔ Executado"}{executado.executor?" · "+executado.executor:""}</span>
+                      : bloqueado
+                        ? <span style={{...F.body,fontSize:11,color:C.gray500}}>🔒 Com {assumido.userName||"outro"}</span>
+                        : <div style={{display:"flex",gap:4}}>
+                            {DIFS.map(([d,cor])=>(
+                              <button key={d} onClick={()=>setDif(k,d)} style={{border:`1.5px solid ${st.dificuldade===d?cor:C.gray200}`,background:st.dificuldade===d?cor+"14":"#fff",color:st.dificuldade===d?cor:C.gray500,borderRadius:6,padding:"4px 8px",...F.body,fontSize:11,fontWeight:700,cursor:"pointer"}}>{d}</button>
+                            ))}
+                          </div>}
+                  </div>
+                  <div style={{display:"flex",gap:5,justifyContent:"flex-end",flexWrap:"wrap"}}>
+                    {jaExecutado
+                      ? <button onClick={()=>retomarBordado(b)} disabled={retomandoKey===b.fileName} style={{border:`1.5px solid ${C.amber}`,background:"#fffbeb",color:"#92400e",borderRadius:6,padding:"5px 9px",...F.body,fontSize:11,fontWeight:700,cursor:"pointer"}}>{retomandoKey===b.fileName?"...":"↩ Retomar"}</button>
+                      : bloqueado ? <span style={{...F.body,fontSize:11,color:C.gray400}}>—</span>
+                      : ehMeu
+                        ? <><button onClick={()=>dispensarBordado(b)} disabled={dispensandoKey===b.fileName} style={{border:`1.5px solid ${C.amber}`,background:"#fffbeb",color:"#92400e",borderRadius:6,padding:"5px 9px",...F.body,fontSize:11,fontWeight:600,cursor:"pointer"}}>⊘</button><button onClick={()=>liberarBordado(b)} style={{border:`1.5px solid ${C.gray300}`,background:"#fff",color:C.gray600,borderRadius:6,padding:"5px 9px",...F.body,fontSize:11,cursor:"pointer"}}>Liberar</button></>
+                        : <><button onClick={()=>assumirBordado(b)} style={{border:`1.5px solid ${C.blue}`,background:"#fff",color:C.blue,borderRadius:6,padding:"5px 9px",...F.body,fontSize:11,fontWeight:700,cursor:"pointer"}}>▲ Assumir</button><button onClick={()=>dispensarBordado(b)} style={{border:`1.5px solid ${C.amber}`,background:"#fffbeb",color:"#92400e",borderRadius:6,padding:"5px 9px",...F.body,fontSize:11,fontWeight:600,cursor:"pointer"}}>⊘</button></>}
+                  </div>
+                </div>
+              );
+            })}
+            <div style={{border:`1px solid ${C.gray200}`,borderTop:"none",borderRadius:"0 0 10px 10px",height:8}}/>
+          </div>
+        );
+      })()}
+      {!ehProgAssumivel && bordados.map((b,i)=>{
         const k=keyOf(b,i);const st=data[k]||{dificuldade:"",files:[]};const img=ehImagem(b.fileName||"");
         // Arquivos gerais de programação (todos os fileIds gravados). Usado como
         // fallback quando o registro do executado não tem fileIds específicos
@@ -1796,7 +1975,12 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
                   {" · " + new Date(executado.executadoEm).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}
                 </span>}
               </div>
-              <span style={{...F.body,fontSize:11,color:C.gray500}}>{executado.dispensado ? "Não precisa programar" : "Você pode substituir se necessário"}</span>
+              {executado.dispensado
+                ? <button onClick={()=>retomarBordado(b)} disabled={retomandoKey===b.fileName}
+                    style={{background:C.white,border:`1.5px solid ${C.amber}`,color:"#92400e",borderRadius:6,padding:"5px 12px",cursor:retomandoKey===b.fileName?"wait":"pointer",...F.body,fontSize:11,fontWeight:700,whiteSpace:"nowrap",flexShrink:0}}>
+                    {retomandoKey===b.fileName ? "..." : "↩ Retomar programação"}
+                  </button>
+                : <span style={{...F.body,fontSize:11,color:C.gray500}}>Você pode substituir se necessário</span>}
             </div>}
             {/* Motivo da dispensa (se houver) */}
             {jaExecutado && executado.dispensado && executado.motivo && <div style={{background:C.white,border:`1px dashed ${C.amber+"55"}`,borderRadius:6,padding:"6px 10px",...F.body,fontSize:12,color:C.gray700,fontStyle:"italic"}}>
@@ -2200,6 +2384,9 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   const[uploading,setUploading]=useState(false);
   const[bipReady,setBipReady]=useState(false);
   const bipInfoRef=useRef({});
+  // Fornecedor externo por item (quando o destino é Externo). Igual à tela.
+  const[bordadorSel,setBordadorSel]=useState({});
+  const BORDADORES=[["bordadel","Bordadel"],["mg_bordados","MG Bordados"],["outros","Outros"]];
 
   // Pedido já concluído — apenas consulta, sem ação
   if(etapa==="Finalizado"){
@@ -2243,7 +2430,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── DIRECIONADOR ────────────────────────────────────────────────────────────
-  if(etapa==="Direcionamento"){
+  // A etapa foi renomeada de "Direcionamento" → "Conferência e Direcionamento".
+  // Mostra os controles de direcionar quando a amostra está aprovada / não é
+  // necessária (order.amOk). Sem isso, o pedido caía no "Confirmar e avançar"
+  // genérico e não aparecia o Interno/Externo.
+  if(etapa==="Direcionamento" || (etapa==="Conferência e Direcionamento" && order.amOk)){
     const itensDir=itensDirecionaveis||order.items;
     const internos=itensDir.filter((it,i)=>itemDest[it.id||i]==="interno").length;
     const externos=itensDir.filter((it,i)=>itemDest[it.id||i]==="externo").length;
@@ -2301,15 +2492,24 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
                   <td style={{padding:"9px 10px",...F.body,color:C.gray500,fontSize:12}}>{it.cor}</td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body}}>{it.qty}</td>
                   <td style={{padding:"9px 10px"}}>
-                    <div style={{display:"flex",gap:5}}>
-                      <button onClick={()=>setDestOne(it.id||i,"interno")}
-                        style={{background:dest==="interno"?C.green:C.white,color:dest==="interno"?C.white:C.gray700,border:`1.5px solid ${dest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
-                        Interno
-                      </button>
-                      <button onClick={()=>setDestOne(it.id||i,"externo")}
-                        style={{background:dest==="externo"?C.purple:C.white,color:dest==="externo"?C.white:C.gray700,border:`1.5px solid ${dest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
-                        Externo
-                      </button>
+                    <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                      <div style={{display:"flex",gap:5}}>
+                        <button onClick={()=>setDestOne(it.id||i,"interno")}
+                          style={{background:dest==="interno"?C.green:C.white,color:dest==="interno"?C.white:C.gray700,border:`1.5px solid ${dest==="interno"?C.green:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
+                          Interno
+                        </button>
+                        <button onClick={()=>{setDestOne(it.id||i,"externo");setBordadorSel(p=>({...p,[it.id||i]:p[it.id||i]||"outros"}));}}
+                          style={{background:dest==="externo"?C.purple:C.white,color:dest==="externo"?C.white:C.gray700,border:`1.5px solid ${dest==="externo"?C.purple:C.gray300}`,borderRadius:5,padding:"4px 12px",...F.body,fontSize:12,cursor:"pointer",fontWeight:600}}>
+                          Externo
+                        </button>
+                      </div>
+                      {dest==="externo"&&<div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+                        {BORDADORES.map(([val,lbl])=>{
+                          const on=(bordadorSel[it.id||i]||"outros")===val;
+                          return <button key={val} onClick={()=>setBordadorSel(p=>({...p,[it.id||i]:val}))}
+                            style={{background:on?C.purple+"18":C.white,color:on?C.purple:C.gray600,border:`1.5px solid ${on?C.purple:C.gray200}`,borderRadius:5,padding:"3px 9px",...F.body,fontSize:11,cursor:"pointer",fontWeight:on?700:500}}>{lbl}</button>;
+                        })}
+                      </div>}
                     </div>
                   </td>
                 </tr>
@@ -2327,7 +2527,11 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
           <button onClick={()=>{if(!allDestDefined){alert("Defina o destino de todos os itens.");return;}onAction(order.id,"direcionamento",{
               destinos: Object.fromEntries(
-                itensDir.map((it,i)=>[it.id||it.sku,(itemDest[it.id||i]||"")])
+                itensDir.map((it,i)=>{
+                  const key=it.id||it.sku;
+                  const d=itemDest[it.id||i];
+                  return [key, d==="interno" ? {dir:"Interno"} : {dir:"Externo",bordador:bordadorSel[it.id||i]||"outros"}];
+                })
               )
             });setActionDone(true);}}
             disabled={!allDestDefined}
@@ -2670,6 +2874,61 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 }
 
 // ─── ORDER MODAL ─────────────────────────────────────────────────────────────
+// ─── SUB-ABA "EXECUTADOS" (dentro da Programação) ──────────────────────────
+// Lista os bordados que a pessoa já programou/avançou (fonte: relatório de
+// programação no Supabase). Por padrão mostra só as dela; dá pra ver de todos.
+// Renderizada dentro da Fila da Programação (sem header próprio).
+function ExecutadosLista({user}){
+  const [rows,setRows]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [busca,setBusca]=useState("");
+  const [soMeus,setSoMeus]=useState(true);
+  const meuNome=user?.nome||user?.email||"";
+  const carregar=()=>{
+    setLoading(true); setErro("");
+    apiFetch("/relatorio-programacao")
+      .then(r=>{ setRows(Array.isArray(r.data)?r.data:[]); if(r.aviso) setErro(r.aviso); })
+      .catch(e=>setErro(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(()=>{carregar();},[]);
+  const limpo=(n="")=>String(n).replace(/\s*~(PROG|AMOSTRA)/gi,"").trim()||n;
+  const norm=(s)=>String(s||"").trim().toLowerCase();
+  const q=busca.trim().toLowerCase();
+  const lista=(rows||[]).filter(r=>{
+    if(soMeus && norm(r.programador)!==norm(meuNome)) return false;
+    if(!q) return true;
+    return [r.nome_arquivo,r.pedido_id,r.dificuldade,r.programador].map(x=>norm(x)).join(" ").includes(q);
+  });
+  return (
+    <div>
+      <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por pedido, arquivo, dificuldade..." style={{flex:1,minWidth:220,maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+        <button onClick={()=>setSoMeus(s=>!s)} style={{padding:"9px 14px",borderRadius:8,border:`1.5px solid ${soMeus?C.blue:C.gray300}`,background:soMeus?C.blue+"12":C.white,color:soMeus?C.blue:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>{soMeus?"Só as minhas":"De todos"}</button>
+        <button onClick={carregar} disabled={loading} style={{padding:"9px 12px",borderRadius:8,border:`1px solid ${C.gray200}`,background:C.white,color:C.gray600,cursor:"pointer",...F.body,fontSize:12,fontWeight:600,whiteSpace:"nowrap"}}>{loading?"...":"↻ Atualizar"}</button>
+      </div>
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando...</div>}
+      {erro&&<div style={{padding:"12px 16px",background:C.amber+"14",border:`1px solid ${C.amber}44`,borderRadius:8,...F.body,fontSize:12,color:"#92400e",marginBottom:12}}>{erro}</div>}
+      {!loading&&!erro&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} programaç{lista.length!==1?"ões":"ão"}</div>}
+      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhuma programação encontrada.</div>}
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {lista.map((r,i)=>(
+          <div key={i} style={{background:C.white,border:`1px solid ${C.gray200}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+            <div style={{flex:1,minWidth:200}}>
+              <div style={{...F.body,fontSize:13,fontWeight:700,color:C.gray700,wordBreak:"break-word"}}>{limpo(r.nome_arquivo)}</div>
+              <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:3}}>
+                Pedido <strong>{r.pedido_id||"—"}</strong>{!soMeus&&r.programador?` · ${r.programador}`:""}{r.data_execucao?` · ${new Date(r.data_execucao).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}`:""}
+              </div>
+            </div>
+            {r.dificuldade&&<Tag label={r.dificuldade} color={r.dificuldade==="Fácil"?C.green:r.dificuldade==="Médio"?C.amber:C.red}/>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,slaCfg}){
   // Carrega detalhes completos sob demanda (sem essa busca, o snapshot fica leve e
   // a lista carrega rápido — só pagamos o custo de detalhes quando o usuário abre).
@@ -2693,6 +2952,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   useEffect(()=>{
     if(!_orderLeve)return;
     _setEnriched(null);
+    setSepEdits({}); setSepMsg("");
     const params=_orderLeve.posvendaId?"?posvenda="+_orderLeve.posvendaId
                 :_orderLeve.bordadoId?"?bordado="+_orderLeve.bordadoId:null;
     if(!params){_setLoadingDet(false);return;}
@@ -2743,12 +3003,38 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
   const[actionMsg,setActionMsg]=useState("");
+  // Edição manual da quantidade separada (só nas etapas de separação/conferência)
+  const[sepEdits,setSepEdits]=useState({});   // objId -> valor (string) editado
+  const[savingSep,setSavingSep]=useState(false);
+  const[sepMsg,setSepMsg]=useState("");
   // Direcionamento local state — apenas itens COM bordado precisam de direcionamento.
   // Fallback (pedido legado sem a flag em nenhum item): usa todos os itens.
   const itensComBordado=order.items.filter(it=>it.bordado);
   const itensDirecionaveis=itensComBordado.length?itensComBordado:order.items;
   const skus=itensDirecionaveis.map(it=>it.sku);
   const itemKeys=itensDirecionaveis.map((it,i)=>it.id||i);
+  // Edição da separação: liberada só quando o pedido está em Em Separação ou
+  // Conferência Separação (o worker também valida isso pelo dealstage).
+  const podeEditarSep = ["1377587072","1377587077"].includes(order.stageIdPV||"")
+    || [order.etapa,...(order.etapasAtivas||[])].some(e=>e==="Em Separação"||e==="Conferência Separação");
+  const salvarSeparacao=async()=>{
+    if(!order.posvendaId){alert("Pedido sem negócio de Pós-venda.");return;}
+    const alterados=(order.items||[])
+      .filter(it=>!it.naoSeparavel && it.id && (it.id in sepEdits))
+      .map(it=>({objId:it.id, qtdSeparada:Number(sepEdits[it.id])}))
+      .filter(it=>!isNaN(it.qtdSeparada) && it.qtdSeparada>=0
+        && it.qtdSeparada !== Number((order.items.find(x=>x.id===it.objId)?.qtdSeparada)||0));
+    if(!alterados.length){setSepMsg("Nenhuma alteração para salvar.");return;}
+    setSavingSep(true); setSepMsg("");
+    try{
+      const r=await apiFetch("/editar-separacao/"+order.posvendaId,"POST",{itens:alterados,ctx:{executor:me?.nome||"Usuário SGP"}});
+      if(r.success){
+        const falhas=(r.resultados||[]).filter(x=>!x.ok).length;
+        setSepMsg(falhas?`Salvo com ${falhas} falha(s). Confira.`:"Quantidades salvas no HubSpot ✓");
+      } else setSepMsg("Erro: "+(r.error||"desconhecido"));
+    }catch(e){ setSepMsg("Erro: "+e.message); }
+    finally{ setSavingSep(false); }
+  };
   const[itemSel,setItemSel]=useState({});
   const[itemDest,setItemDest]=useState(()=>{const m={};order.items.forEach((it,i)=>{if(it.dest)m[it.id||i]=it.dest;});return m;});
   // Quando items chegam pelo enriquecimento sob demanda (eram [] no card leve),
@@ -2976,15 +3262,35 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                 <span style={{...F.body,fontSize:12,color:C.blue,fontWeight:600}}>Para definir Interno/Externo, use a aba <strong>▶ Executar</strong></span>
               </div>
             )}
+            {podeEditarSep && (
+              <div style={{background:"#eff6ff",border:`1.5px solid ${C.blue}44`,borderLeft:`5px solid ${C.blue}`,borderRadius:8,padding:"12px 16px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+                <div style={{...F.body,fontSize:12,color:C.gray700,lineHeight:1.5,flex:1,minWidth:220}}>
+                  <strong style={{color:C.blue}}>Corrigir separação:</strong> edite a coluna <strong>Qtd Separada</strong> e salve. Grava direto no HubSpot (Pedidos Aprovados). Disponível só em <strong>Em Separação</strong> e <strong>Conferência Separação</strong>.
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  {sepMsg && <span style={{...F.body,fontSize:12,fontWeight:600,color:sepMsg.startsWith("Erro")?C.red:sepMsg.startsWith("Nenhuma")?C.gray500:C.green}}>{sepMsg}</span>}
+                  <button onClick={salvarSeparacao} disabled={savingSep}
+                    style={{background:savingSep?"#ccc":C.blue,color:C.white,border:"none",borderRadius:7,padding:"10px 18px",cursor:savingSep?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,whiteSpace:"nowrap",display:"inline-flex",alignItems:"center",gap:6}}>
+                    <Ic n="check" s={14} c={C.white}/> {savingSep?"Salvando...":"Salvar quantidades"}
+                  </button>
+                </div>
+              </div>
+            )}
             <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:560}}>
               <thead><tr style={{borderBottom:`2px solid ${C.gray200}`}}>
                 {["SKU","Descrição","TAM","Qtd","Qtd Separada","Saldo","Bordado","Destino","Status"].map(hd=><th key={hd} style={{padding:"9px 10px",textAlign:"left",fontWeight:700,color:C.gray500,fontSize:11,...F.body,textTransform:"uppercase",letterSpacing:"0.05em"}}>{hd}</th>)}
               </tr></thead>
               <tbody>{order.items.map((it,i)=>{
                 const qtd=Number(it.qty||0);
-                const qtdSep=Number(it.qtdSeparada!=null?it.qtdSeparada:0);
+                const qtdSepOrig=Number(it.qtdSeparada!=null?it.qtdSeparada:0);
+                const editandoSep = podeEditarSep && !it.naoSeparavel;
+                // Valor exibido: se está editando e tem edição pendente, usa ela
+                // (preview ao vivo de saldo/status). Senão, o valor original.
+                const qtdSep = (editandoSep && (it.id in sepEdits)) ? (Number(sepEdits[it.id])||0) : qtdSepOrig;
                 const saldo=Math.max(0,qtd-qtdSep);
-                const stSep=it.statusSeparacao||(qtdSep===0?"pendente":(qtdSep<qtd?"parcial":"completa"));
+                const stSep=it.naoSeparavel
+                  ? (it.statusSeparacao||"personalizacao")
+                  : (qtdSep===0?"pendente":(qtdSep<qtd?"parcial":"completa"));
                 const corSep=it.naoSeparavel?C.purple:(stSep==="completa"?C.green:stSep==="parcial"?C.amber:C.red);
                 return(
                 <tr key={i} style={{borderBottom:`1px solid ${C.gray100}`,background:it.naoSeparavel?"#faf5ff":"transparent"}}>
@@ -3002,7 +3308,14 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                   </td>
                   <td style={{padding:"9px 10px",...F.body,color:C.gray500,verticalAlign:"top"}}>{it.cor}</td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body,verticalAlign:"top"}}>{qtd}</td>
-                  <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:corSep,verticalAlign:"top"}}>{it.naoSeparavel?"—":qtdSep}</td>
+                  <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:corSep,verticalAlign:"top"}}>
+                    {it.naoSeparavel ? "—" : (editandoSep ? (
+                      <input type="number" min="0"
+                        value={it.id in sepEdits ? sepEdits[it.id] : String(qtdSepOrig)}
+                        onChange={e=>setSepEdits(p=>({...p,[it.id]:e.target.value}))}
+                        style={{width:60,padding:"5px 6px",border:`1.5px solid ${C.gray300}`,borderRadius:6,fontSize:13,...F.body,textAlign:"center"}}/>
+                    ) : qtdSep)}
+                  </td>
                   <td style={{padding:"9px 10px",fontWeight:700,...F.body,color:it.naoSeparavel?C.gray400:(saldo>0?C.red:C.gray400),verticalAlign:"top"}}>{it.naoSeparavel?"—":(saldo>0?saldo:"—")}</td>
                   <td style={{padding:"9px 10px",verticalAlign:"top"}}>{it.bordado?<Tag label="Bordado" color={C.red}/>:<span style={{color:C.gray400}}>—</span>}</td>
                   <td style={{padding:"9px 10px",verticalAlign:"top"}}>{it.dest?<Tag label={it.dest==="interno"?"Interno":"Externo"} color={it.dest==="interno"?C.green:C.purple}/>:<span style={{color:C.gray400}}>—</span>}</td>
@@ -3018,8 +3331,8 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               <tfoot><tr style={{borderTop:`2px solid ${C.gray200}`,background:C.gray50}}>
                 <td colSpan={3} style={{padding:"9px 10px",fontWeight:700,fontSize:11,...F.body,color:C.gray500,textTransform:"uppercase"}}>Total</td>
                 <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body}}>{total}</td>
-                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.green}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+Number(i.qtdSeparada||0),0)}</td>
-                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.red}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+Math.max(0,Number(i.qty||0)-Number(i.qtdSeparada||0)),0)||"—"}</td>
+                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.green}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>s+((podeEditarSep&&(i.id in sepEdits))?(Number(sepEdits[i.id])||0):Number(i.qtdSeparada||0)),0)}</td>
+                <td style={{padding:"9px 10px",fontWeight:800,fontSize:15,...F.body,color:C.red}}>{order.items.filter(i=>!i.naoSeparavel).reduce((s,i)=>{const qs=(podeEditarSep&&(i.id in sepEdits))?(Number(sepEdits[i.id])||0):Number(i.qtdSeparada||0);return s+Math.max(0,Number(i.qty||0)-qs);},0)||"—"}</td>
                 <td colSpan={3}/>
               </tr></tfoot>
             </table>
@@ -3570,8 +3883,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
 
   // Usa dados reais se carregados, senão usa mock
   const activeOrders = hsOrders !== null ? hsOrders : orders;
+  // amOk = amostra aprovada OU não necessária (bordado em "Liberado para bordar"+).
+  // "Prontos" não pode filtrar por etapa==="Direcionamento" (etapa foi renomeada
+  // pra "Conferência e Direcionamento") — senão a lista fica sempre vazia.
   const pendentes=activeOrders.filter(o=>!o.amOk&&!o.concluido);
-  const prontos=activeOrders.filter(o=>o.amOk&&o.etapa==="Direcionamento"&&!o.concluido);
+  const prontos=activeOrders.filter(o=>o.amOk&&!o.concluido);
   // Estado local de seleção por pedido: {orderId: {sku: true/false}}
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
@@ -5134,7 +5450,7 @@ function BackfillLinxBtn(){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra,subTabsReprog}){
+function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra,subTabsReprog,subTabExecutados,user}){
   const [busca,setBusca]=useState("");
   const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
   const [subTab,setSubTab]=useState("normal"); // normal | reprogramacao
@@ -5211,8 +5527,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 
       {topoExtra}
 
-      {/* Sub-abas estilo Chrome: Normal | Reprogramação (só nas Amostras) */}
-      {subTabsReprog && <div style={{display:"flex",gap:2,marginBottom:16,borderBottom:`1.5px solid ${C.gray200}`,alignItems:"flex-end"}}>
+      {/* Sub-abas estilo Chrome: Demandas | Reprogramação (Amostras) | Executados (Programação) */}
+      {(subTabsReprog||subTabExecutados) && <div style={{display:"flex",gap:2,marginBottom:16,borderBottom:`1.5px solid ${C.gray200}`,alignItems:"flex-end"}}>
         <div onClick={()=>setSubTab("normal")}
           style={{
             padding:"10px 20px 11px",
@@ -5232,7 +5548,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           Demandas
           <span style={{background:subTab==="normal"?C.gray100:"transparent",color:C.gray600,padding:"1px 8px",borderRadius:10,fontSize:11,fontWeight:700}}>{nNormal}</span>
         </div>
-        <div onClick={()=>setSubTab("reprogramacao")}
+        {subTabsReprog && <div onClick={()=>setSubTab("reprogramacao")}
           style={{
             padding:"10px 20px 11px",
             background: subTab==="reprogramacao" ? C.white : "transparent",
@@ -5257,9 +5573,14 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             minWidth:18,textAlign:"center",
             boxShadow:"0 0 0 2px "+C.white,
           }}>{nReprog}</span>}
-        </div>
+        </div>}
+        {subTabExecutados && <div onClick={()=>setSubTab("executados")}
+          style={{padding:"10px 20px 11px",background:subTab==="executados"?C.white:"transparent",border:subTab==="executados"?`1.5px solid ${C.gray200}`:"1.5px solid transparent",borderBottom:subTab==="executados"?`1.5px solid ${C.white}`:"none",borderRadius:"8px 8px 0 0",marginBottom:-1.5,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:8,...F.body,fontSize:13,fontWeight:subTab==="executados"?700:500,color:subTab==="executados"?C.green:C.gray500,transition:"all 0.15s"}}>
+          ✓ Executados
+        </div>}
       </div>}
 
+      {subTab==="executados" ? <ExecutadosLista user={user}/> : <>
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{position:"relative",flex:1,minWidth:220}}>
@@ -5359,6 +5680,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
           );
         })
       }
+      </>}
     </div>
   );
 }
@@ -7256,7 +7578,7 @@ function AppInner(){
               {label:"Concluído", cor:C.green, icon:"check", apiPath:"/pcp-concluir", confirmMsg:"Concluir a análise da produção e mandar o pedido pra Retirar e Conferir?"},
             ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="conferencia_direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
-            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg}/>}
+            {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg} subTabExecutados user={user}/>}
             {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg} subTabsReprog/>}
             {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg} subTabsReprog/>}
             {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
