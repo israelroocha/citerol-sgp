@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.22.0";
+const SGP_VERSION = "v2.34.3";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -485,7 +485,11 @@ const SEPARACAO_INFO = {
   indisponivel: {label:"STATUS INDISPONÍVEL",  cor:"#525252", bg:"#f5f5f5", borda:"#d4d4d4"},
 };
 function BadgeSeparacao({status, qtdSep, qtdTot, qtdItensSep, totalItens, size="md"}){
-  const info = SEPARACAO_INFO[status] || SEPARACAO_INFO.indisponivel;
+  // Status desconhecido/indisponível: não mostra badge (evita o "STATUS
+  // INDISPONÍVEL" cinza, que parece erro — ex.: em Conferência e Direcionamento,
+  // onde a separação já acabou e essa info nem é relevante).
+  if(!status || status==="indisponivel" || !SEPARACAO_INFO[status]) return null;
+  const info = SEPARACAO_INFO[status];
   const fontSize = size==="lg" ? 13 : size==="sm" ? 9.5 : 11;
   const padding = size==="lg" ? "6px 12px" : size==="sm" ? "2px 6px" : "4px 9px";
   const detalhe = (status==="parcial" && totalItens>0)
@@ -503,6 +507,41 @@ function BadgeSeparacao({status, qtdSep, qtdTot, qtdItensSep, totalItens, size="
     </span>
   );
 }
+// ─── RESPONSÁVEL PÓS-VENDA (quem atende quem) — cruza pelo nome do vendedor ───
+// Mapa carregado do worker (KV), editável na aba Configurações.
+const normNomePessoa=(s)=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim().replace(/\s+/g," ");
+let _respPVMap={};      // { "Responsável CS": ["vendedor1", ...] }
+let _respPVIndex={};    // nomeVendedorNormalizado → "Responsável CS"
+const _respPVListeners=new Set();
+function _rebuildRespPVIndex(){
+  _respPVIndex={};
+  for(const resp of Object.keys(_respPVMap||{})){
+    for(const nome of (_respPVMap[resp]||[])){
+      const n=normNomePessoa(nome);
+      if(n) _respPVIndex[n]=resp;
+    }
+  }
+}
+function responsavelPosVendaDe(vendedor){
+  const v=normNomePessoa(vendedor); if(!v) return "";
+  if(_respPVIndex[v]) return _respPVIndex[v];
+  // match por prefixo (mapeado = 1º nome e vendedor = nome completo, ou vice-versa)
+  for(const n of Object.keys(_respPVIndex)){
+    if(v.startsWith(n+" ")||n.startsWith(v+" ")) return _respPVIndex[n];
+  }
+  return "";
+}
+async function carregarRespPV(){
+  try{
+    const r=await apiFetch("/config-responsavel-posvenda");
+    if(r&&r.success){ _respPVMap=r.mapa||{}; _rebuildRespPVIndex(); _respPVListeners.forEach(fn=>{try{fn();}catch(e){}}); }
+  }catch(e){}
+}
+function useRespPV(){
+  const [,tick]=useState(0);
+  useEffect(()=>{ const fn=()=>tick(n=>n+1); _respPVListeners.add(fn); if(!Object.keys(_respPVMap).length) carregarRespPV(); return ()=>_respPVListeners.delete(fn); },[]);
+  return { mapa:_respPVMap, responsaveis:Object.keys(_respPVMap), de:responsavelPosVendaDe };
+}
 const normalizarCard=(o,etapa)=>({
   id:o.id,posvendaId:o.posvendaId,vendasId:o.vendasId,bordadoId:o.bordadoId,
   pedidoLinx:o.pedidoLinx||"",
@@ -517,9 +556,14 @@ const normalizarCard=(o,etapa)=>({
   houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
   temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
   prazoFinal:o.prazoFinal||null,
+  dataFechamento:o.dataFechamento||o.prazoFinal||null,
   qtdTotal:Number(o.qtdTotal||0),qtdSeparada:Number(o.qtdSeparada||0),
   totalItensSeparacao:Number(o.totalItensSeparacao||0),qtdItensSeparados:Number(o.qtdItensSeparados||0),
   statusSeparacao:o.statusSeparacao||"pendente",
+  bordadoresExternos: Array.isArray(o.bordadoresExternos)?o.bordadoresExternos:[],
+  colocadoParaBordar: o.colocadoParaBordar===true,
+  colocadoBordarPor: o.colocadoBordarPor||"", colocadoBordarEm: o.colocadoBordarEm||"",
+  aguardadoPor: Array.isArray(o.aguardadoPor)?o.aguardadoPor:[],
   subEtapa: o.subEtapa || "",
   stageIdAtual: o.stageIdAtual || o.stageId || null,
   stageIdPV: o.stageIdPV || null,
@@ -749,10 +793,49 @@ const F = {
   body:  { fontFamily:"'Montserrat',sans-serif" },
 };
 
+// ─── PRÉ-VISUALIZAÇÃO DE ARQUIVOS (lightbox reutilizável) ─────────────────────
+function tipoPreviewArquivo(nome){
+  const ext=String(nome||"").split(".").pop().toLowerCase();
+  if(["png","jpg","jpeg","gif","webp","bmp","svg","avif"].includes(ext))return "img";
+  if(ext==="pdf")return "pdf";
+  return "outro";
+}
+function FileLightbox({file,onClose}){
+  if(!file)return null;
+  const url=file.url||file.fileUrl||"";
+  const nome=file.nome||file.fileName||"arquivo";
+  const t=tipoPreviewArquivo(nome);
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.82)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 20px"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.white,borderRadius:10,overflow:"hidden",maxWidth:"92vw",maxHeight:"90vh",display:"flex",flexDirection:"column",boxShadow:"0 12px 48px rgba(0,0,0,0.4)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",borderBottom:`1px solid ${C.gray200}`}}>
+          <div style={{flex:1,minWidth:0,...F.body,fontSize:13,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{nome}</div>
+          {url&&<a href={url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}><span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"6px 12px",...F.body,fontSize:12,fontWeight:700}}><Ic n="download" s={13} c={C.white}/> Baixar</span></a>}
+          <button onClick={onClose} style={{background:C.gray100,border:"none",borderRadius:6,width:32,height:32,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center"}}><Ic n="close" s={16} c={C.gray600}/></button>
+        </div>
+        <div style={{background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",overflow:"auto"}}>
+          {t==="img"?<img src={url} alt={nome} style={{maxWidth:"90vw",maxHeight:"78vh",display:"block",objectFit:"contain"}}/>
+            :t==="pdf"?<iframe src={url} title={nome} style={{width:"90vw",height:"78vh",border:"none"}}/>
+            :<div style={{padding:48,...F.body,fontSize:13,color:C.gray500,textAlign:"center"}}>Não é possível pré-visualizar este tipo de arquivo. Use o botão Baixar.</div>}
+        </div>
+      </div>
+      <div style={{...F.body,fontSize:12,color:"rgba(255,255,255,0.75)",marginTop:12}}>Clique fora para fechar</div>
+    </div>
+  );
+}
+
 // ─── EXIBIÇÃO DE ARQUIVOS (resolve fileIds do HubSpot) ────────────────────────
 function ArquivosBox({fileIds,titulo,emptyText}){
   const [arquivos,setArquivos]=useState(null);
   const [loading,setLoading]=useState(false);
+  const [preview,setPreview]=useState(null); // arquivo em pré-visualização (lightbox)
+  // Tipo de pré-visualização pela extensão do nome
+  const tipoPreview=(nome)=>{
+    const ext=String(nome||"").split(".").pop().toLowerCase();
+    if(["png","jpg","jpeg","gif","webp","bmp","svg","avif"].includes(ext))return "img";
+    if(ext==="pdf")return "pdf";
+    return "outro";
+  };
 
   useEffect(()=>{
     if(!fileIds||!fileIds.length){setArquivos([]);return;}
@@ -783,6 +866,7 @@ function ArquivosBox({fileIds,titulo,emptyText}){
   if(!arquivos||arquivos.length===0)return <div style={{...F.body,fontSize:13,color:C.gray400}}>{emptyText||"Nenhum arquivo anexado."}</div>;
 
   return(
+    <>
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
       {arquivos.map((a,i)=>(
         <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:C.gray50,borderRadius:7,padding:"10px 14px",border:`1px solid ${C.gray200}`}}>
@@ -794,16 +878,44 @@ function ArquivosBox({fileIds,titulo,emptyText}){
             {a.tamanho>0&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:1}}>{(a.tamanho/1024).toFixed(0)} KB</div>}
           </div>
           {a.url
-            ?<a href={a.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
-              <span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"7px 14px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer"}}>
-                <Ic n="download" s={13} c={C.white}/> Baixar
-              </span>
-            </a>
+            ?<div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+              {tipoPreview(a.nome)!=="outro"&&<button onClick={()=>setPreview(a)}
+                style={{display:"inline-flex",alignItems:"center",gap:5,background:C.white,color:C.red,border:`1.5px solid ${C.red}`,borderRadius:6,padding:"6px 12px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                <Ic n="search" s={13} c={C.red}/> Ver
+              </button>}
+              <a href={a.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
+                <span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"7px 14px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                  <Ic n="download" s={13} c={C.white}/> Baixar
+                </span>
+              </a>
+            </div>
             :<span style={{...F.body,fontSize:11,color:C.gray400}}>indisponível</span>
           }
         </div>
       ))}
     </div>
+    {/* Lightbox de pré-visualização */}
+    {preview&&<div onClick={()=>setPreview(null)}
+      style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.82)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 20px"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.white,borderRadius:10,overflow:"hidden",maxWidth:"92vw",maxHeight:"90vh",display:"flex",flexDirection:"column",boxShadow:"0 12px 48px rgba(0,0,0,0.4)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",borderBottom:`1px solid ${C.gray200}`}}>
+          <div style={{flex:1,minWidth:0,...F.body,fontSize:13,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{preview.nome}</div>
+          <a href={preview.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
+            <span style={{display:"inline-flex",alignItems:"center",gap:5,background:C.red,color:C.white,borderRadius:6,padding:"6px 12px",...F.body,fontSize:12,fontWeight:700}}><Ic n="download" s={13} c={C.white}/> Baixar</span>
+          </a>
+          <button onClick={()=>setPreview(null)} style={{background:C.gray100,border:"none",borderRadius:6,width:32,height:32,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center"}}><Ic n="close" s={16} c={C.gray600}/></button>
+        </div>
+        <div style={{background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",overflow:"auto"}}>
+          {tipoPreview(preview.nome)==="img"
+            ?<img src={preview.url} alt={preview.nome} style={{maxWidth:"90vw",maxHeight:"78vh",display:"block",objectFit:"contain"}}/>
+            :tipoPreview(preview.nome)==="pdf"
+              ?<iframe src={preview.url} title={preview.nome} style={{width:"90vw",height:"78vh",border:"none"}}/>
+              :<div style={{padding:48,...F.body,fontSize:13,color:C.gray500,textAlign:"center"}}>Não é possível pré-visualizar este tipo de arquivo. Use o botão Baixar.</div>}
+        </div>
+      </div>
+      <div style={{...F.body,fontSize:12,color:"rgba(255,255,255,0.75)",marginTop:12}}>Clique fora para fechar</div>
+    </div>}
+    </>
   );
 }
 
@@ -1089,7 +1201,18 @@ function Chat({order,me,usuarios}){
   const [mq,setMq]=useState("");
   const [enviando,setEnviando]=useState(false);
   const [users,setUsers]=useState(usuarios||[]);
+  const [files,setFiles]=useState([]);   // File[] selecionados p/ anexar
+  const [preview,setPreview]=useState(null);
   const eRef=useRef(null);
+  const fileRef=useRef(null);
+  // Separa texto e anexos embutidos (marcador §§ANEXOS§§) de uma mensagem.
+  const parseMsg=(raw)=>{
+    const s=String(raw||""); const i=s.indexOf("\n§§ANEXOS§§");
+    if(i===-1) return {texto:s, anexos:[]};
+    let anexos=[]; try{ anexos=JSON.parse(s.slice(i+"\n§§ANEXOS§§".length))||[]; }catch{ anexos=[]; }
+    return {texto:s.slice(0,i), anexos};
+  };
+  const ehImg=(n="")=>/\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(n);
 
   const carregar=()=>apiFetch("/conversa/"+encodeURIComponent(pedidoId))
     .then(r=>setMsgs(r.data||[])).catch(()=>setMsgs([]));
@@ -1112,7 +1235,7 @@ function Chat({order,me,usuarios}){
   const ins=u=>{const at=msg.lastIndexOf("@");setMsg(msg.slice(0,at)+"@"+primeiroNome(u)+" ");setShowM(false);};
 
   const send=async()=>{
-    if(!msg.trim()||enviando)return;
+    if((!msg.trim()&&files.length===0)||enviando)return;
     // Mencionados: usuários cujo primeiro nome aparece como @nome no texto.
     // Boundary unicode-aware: o nome não pode ser seguido de outra letra/número
     // (evita @Ana casar com "@Anabela") e funciona com acentos.
@@ -1124,11 +1247,18 @@ function Chat({order,me,usuarios}){
     }).map(u=>u.email);
     setEnviando(true);
     try{
+      // Converte os arquivos selecionados em base64 pra subir junto.
+      const anexos=[];
+      for(const f of files){
+        const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
+        anexos.push({base64,nome:f.name});
+      }
       await apiFetch("/conversa/"+encodeURIComponent(pedidoId),"POST",{
         autor:me.nome||me.name||me.email, autorEmail:me.email,
         mensagem:msg.trim(), mencionados, cliente:order.client||"",
+        anexos,
       });
-      setMsg("");setShowM(false);
+      setMsg("");setShowM(false);setFiles([]);
       await carregar();
     }catch(e){alert("Erro ao enviar: "+e.message);}
     finally{setEnviando(false);}
@@ -1152,9 +1282,22 @@ function Chat({order,me,usuarios}){
                   <span style={{...F.body,fontSize:12,fontWeight:700,color:C.black}}>{m.autor||"—"}</span>
                   <span style={{...F.body,fontSize:10,color:C.gray400}}>{fmtMsgData(m.criado_em)}</span>
                 </div>
-                <div style={{...F.body,fontSize:13,color:C.gray700,marginTop:4,lineHeight:1.6,background:C.gray50,borderRadius:6,padding:"8px 12px",border:`1px solid ${C.gray200}`,wordBreak:"break-word"}}>
-                  {String(m.mensagem||"").split(/(@[\wÀ-ÿ]+)/).map((p,j)=>p.startsWith("@")?<span key={j} style={{color:C.red,fontWeight:700}}>{p}</span>:p)}
-                </div>
+                {(()=>{ const {texto,anexos}=parseMsg(m.mensagem); return <>
+                  {texto.trim()&&<div style={{...F.body,fontSize:13,color:C.gray700,marginTop:4,lineHeight:1.6,background:C.gray50,borderRadius:6,padding:"8px 12px",border:`1px solid ${C.gray200}`,wordBreak:"break-word"}}>
+                    {texto.split(/(@[\wÀ-ÿ]+)/).map((p,j)=>p.startsWith("@")?<span key={j} style={{color:C.red,fontWeight:700}}>{p}</span>:p)}
+                  </div>}
+                  {anexos.length>0&&<div style={{marginTop:6,display:"flex",flexWrap:"wrap",gap:8}}>
+                    {anexos.map((a,j)=>{const im=ehImg(a.nome); return (
+                      <div key={j} onClick={()=>setPreview(a)} title="Ver / baixar"
+                        style={{display:"flex",alignItems:"center",gap:8,border:`1px solid ${C.gray200}`,borderRadius:8,padding:im?4:"8px 10px",background:C.white,cursor:"pointer",maxWidth:220}}>
+                        {im&&a.url
+                          ?<img src={a.url} alt={a.nome} style={{width:44,height:44,objectFit:"cover",borderRadius:6,flexShrink:0}}/>
+                          :<div style={{width:32,height:32,borderRadius:6,background:C.red+"12",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="download" s={15} c={C.red}/></div>}
+                        <span style={{...F.body,fontSize:11,color:C.gray700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.nome}</span>
+                      </div>
+                    );})}
+                  </div>}
+                </>; })()}
               </div>
             </div>
           );
@@ -1173,7 +1316,21 @@ function Chat({order,me,usuarios}){
             </div>
           ))}
         </div>}
+        {files.length>0&&<div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:8}}>
+          {files.map((f,idx)=>(
+            <div key={idx} style={{display:"flex",alignItems:"center",gap:6,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"5px 8px",...F.body,fontSize:11,color:C.gray700}}>
+              <Ic n="box" s={12} c={C.gray500}/> <span style={{maxWidth:140,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{f.name}</span>
+              <button onClick={()=>setFiles(fs=>fs.filter((_,i)=>i!==idx))} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,fontSize:14,lineHeight:1}}>✕</button>
+            </div>
+          ))}
+        </div>}
         <div style={{display:"flex",gap:8}}>
+          <input type="file" multiple ref={fileRef} style={{display:"none"}}
+            onChange={e=>{const fl=Array.from(e.target.files||[]);if(fl.length)setFiles(fs=>[...fs,...fl]);setTimeout(()=>{if(e.target)e.target.value="";},0);}}/>
+          <button onClick={()=>fileRef.current&&fileRef.current.click()} title="Anexar arquivo"
+            style={{background:C.white,color:C.gray600,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 11px",cursor:"pointer",display:"flex",alignItems:"center"}}>
+            <Ic n="box" s={15} c={C.gray600}/>
+          </button>
           <input value={msg} onChange={e=>hc(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Mensagem... @ para mencionar"
             style={{flex:1,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",fontSize:13,outline:"none",...F.body}}/>
@@ -1181,7 +1338,8 @@ function Chat({order,me,usuarios}){
             <Ic n="send" s={15} c={C.white}/>
           </button>
         </div>
-        <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:5}}>Todos no pedido veem a conversa. Quem for mencionado com @ recebe uma notificação.</div>
+        <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:5}}>Todos no pedido veem a conversa. Quem for mencionado com @ recebe uma notificação. Dá pra anexar prints, planilhas, etc.</div>
+        {preview&&<FileLightbox file={preview} onClose={()=>setPreview(null)}/>}
       </div>
     </div>
   );
@@ -1343,6 +1501,7 @@ function Timeline({order}){
 // ─── EXECUÇÃO POR BORDADO (Programação: c/ dificuldade · Amostra: s/ dificuldade) ─
 function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setActionDone,loadingDet,me,setTemPendencias}){
   const ehAmostra=etapa!=="Programação";
+  const [previewExec,setPreviewExec]=useState(null); // arquivo em pré-visualização
   const todos=(order.bordadosJson||[]).filter(b=>b&&(b.fileName||b.fileId));
   const filtro=ehAmostra?/~(prog|amostra)/i:/~prog/i;
   let bordados=todos.filter(b=>filtro.test(b.fileName||""));
@@ -1712,6 +1871,14 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     setSelKeys(todasMarcadas?new Set():new Set(todas));
   };
   const bordadosSelecionados = ()=>bordados.filter((b,i)=>selKeys.has(keyOf(b,i)));
+  // ── AMOSTRA: anexar UM arquivo a VÁRIOS bordados selecionados de uma vez ──────
+  const bulkAmostraRef = useRef(null);
+  const aplicarArquivoAmostra = (files)=>{
+    const alvos = bordadosSelecionados().filter(b=>!(ehProgAssumivel&&findExecutado(b.fileName||"")));
+    if(!alvos.length){ alert("Marque ao menos um bordado para anexar."); return; }
+    if(!files||!files.length) return;
+    alvos.forEach(b=>{ const i=bordados.indexOf(b); addFiles(keyOf(b,i), files); });
+  };
   const bulkAssumir = async ()=>{
     const alvos = bordadosSelecionados().filter(b=>{
       if(findExecutado(b.fileName||"")) return false;
@@ -1789,6 +1956,7 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
   }
   return(
     <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+      {previewExec&&<FileLightbox file={previewExec} onClose={()=>setPreviewExec(null)}/>}
       {/* Arquivos de referência das etapas anteriores — a bordadeira/operadora
           precisa ter todos os anexos aprovados pra executar corretamente. */}
       {etapa!=="Programação"&&(() => {
@@ -1929,14 +2097,18 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
               return (
                 <div key={k} style={{display:"grid",gridTemplateColumns:gcols,gap:10,alignItems:"center",padding:"10px 14px",borderLeft:`1px solid ${C.gray200}`,borderRight:`1px solid ${C.gray200}`,borderBottom:`1px solid ${C.gray100}`,background:isSel?"#fdf3f3":disp?"#fffbeb":jaExecutado?"#f0fdf4":bloqueado?C.gray50:"#fff",opacity:bloqueado?0.65:1}}>
                   <div>{!bloqueado&&<input type="checkbox" checked={isSel} onChange={()=>toggleSel(k)} style={{width:16,height:16,accentColor:C.red,cursor:"pointer"}}/>}</div>
-                  <div style={{width:52,height:52,borderRadius:8,border:`1px solid ${C.gray200}`,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+                  <div onClick={b.fileUrl?()=>setPreviewExec({url:b.fileUrl,nome:b.fileName}):undefined}
+                    title={b.fileUrl?"Pré-visualizar":undefined}
+                    style={{position:"relative",width:52,height:52,borderRadius:8,border:`1px solid ${C.gray200}`,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",cursor:b.fileUrl?"pointer":"default"}}>
                     {img&&b.fileUrl?<img src={b.fileUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<Ic n="box" s={20} c={C.gray400}/>}
+                    {b.fileUrl&&<span style={{position:"absolute",bottom:2,right:2,background:"rgba(0,0,0,0.6)",borderRadius:4,padding:"1px 3px",display:"inline-flex"}}><Ic n="search" s={10} c={C.white}/></span>}
                   </div>
                   <div style={{minWidth:0}}>
                     <div style={{...F.body,fontSize:12.5,fontWeight:700,color:C.gray800,wordBreak:"break-word"}}>{nomeLimpo(b.fileName)}</div>
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2,lineHeight:1.5}}>
                       <RenderCombos b={b}/>
                     </div>
+                    {b.fileUrl&&<button onClick={()=>setPreviewExec({url:b.fileUrl,nome:b.fileName})} style={{...F.body,fontSize:11,color:C.blue,fontWeight:600,background:"none",border:"none",padding:0,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:4,marginTop:3}}><Ic n="search" s={12} c={C.blue}/> Pré-visualizar referência</button>}
                     {disp&&executado.motivo&&<div style={{...F.body,fontSize:11,color:"#92400e",fontStyle:"italic",marginTop:2}}>💬 {executado.motivo}</div>}
                   </div>
                   <div>
@@ -1976,6 +2148,28 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
           </div>
         );
       })()}
+      {/* AMOSTRA: barra de seleção múltipla + anexar 1 arquivo a todos selecionados */}
+      {!comDificuldade && bordados.length>0 && (()=>{
+        const selavel = chavesSelecionaveis();
+        const todasMarcadas = selavel.length>0 && selavel.every(x=>selKeys.has(x.k));
+        const nSel = selKeys.size;
+        return (
+          <div style={{position:"sticky",top:0,zIndex:3,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+            <label style={{display:"flex",alignItems:"center",gap:7,...F.body,fontSize:13,fontWeight:600,color:C.gray700,cursor:"pointer"}}>
+              <input type="checkbox" checked={todasMarcadas} onChange={selAllToggle} style={{width:16,height:16,accentColor:C.red,cursor:"pointer"}}/> Selecionar todos
+            </label>
+            <span style={{...F.body,fontSize:12,color:C.gray500}}>{nSel} selecionado{nSel!==1?"s":""}</span>
+            <div style={{flex:1,minWidth:8}}/>
+            <input type="file" multiple accept={ACCEPT} ref={bulkAmostraRef} style={{display:"none"}}
+              onChange={e=>{ const fl=e.target.files; if(fl&&fl.length) aplicarArquivoAmostra(fl); setTimeout(()=>{if(e.target)e.target.value="";},0); }}/>
+            <button type="button" disabled={nSel===0}
+              onClick={()=>{ if(nSel===0){alert("Marque ao menos um bordado.");return;} bulkAmostraRef.current&&bulkAmostraRef.current.click(); }}
+              style={{padding:"9px 14px",borderRadius:7,border:"none",background:nSel===0?C.gray300:C.red,color:C.white,cursor:nSel===0?"not-allowed":"pointer",...F.body,fontSize:13,fontWeight:700,display:"inline-flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
+              <Ic n="box" s={14} c={C.white}/> Anexar 1 arquivo aos selecionados
+            </button>
+          </div>
+        );
+      })()}
       {!ehProgAssumivel && bordados.map((b,i)=>{
         const k=keyOf(b,i);const st=data[k]||{dificuldade:"",files:[]};const img=ehImagem(b.fileName||"");
         // Arquivos gerais de programação (todos os fileIds gravados). Usado como
@@ -2002,6 +2196,10 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
             background:jaExecutado?C.green+"08":bloqueado?C.gray50:C.white,
             opacity:bloqueado?0.75:1,
           }}>
+            {/* Amostra: checkbox de seleção (pra anexar 1 arquivo a vários) */}
+            {!comDificuldade && !jaExecutado && <label style={{display:"flex",alignItems:"center",gap:8,...F.body,fontSize:12,fontWeight:600,color:selKeys.has(k)?C.red:C.gray600,cursor:"pointer"}}>
+              <input type="checkbox" checked={selKeys.has(k)} onChange={()=>toggleSel(k)} style={{width:16,height:16,accentColor:C.red,cursor:"pointer"}}/> Selecionar este bordado
+            </label>}
             {/* Badge de já executado */}
             {jaExecutado&&<div style={{background:executado.dispensado?"#fef3c7":C.green+"14",border:`1.5px solid ${executado.dispensado?C.amber+"66":C.green+"55"}`,borderRadius:8,padding:"8px 12px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
               <div style={{...F.body,fontSize:12,fontWeight:700,color:executado.dispensado?"#92400e":"#065f46",display:"flex",alignItems:"center",gap:6}}>
@@ -2423,6 +2621,20 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   // Fornecedor externo por item (quando o destino é Externo). Igual à tela.
   const[bordadorSel,setBordadorSel]=useState({});
   const BORDADORES=[["bordadel","Bordadel"],["mg_bordados","MG Bordados"],["outros","Outros"]];
+  // Seleção de bordados p/ anexar a amostra física aprovada (default: todos).
+  // Guarda só os DESmarcados; selecionado = valor !== false.
+  const[selBordFis,setSelBordFis]=useState({});
+  // Controle do executor: "colocado na máquina pra bordar" (por pedido).
+  const[colocadoLocal,setColocadoLocal]=useState(order.colocadoParaBordar===true);
+  const[colocandoBusy,setColocandoBusy]=useState(false);
+  const toggleColocado=async()=>{
+    setColocandoBusy(true);
+    try{
+      await apiFetch(`/colocar-para-bordar/${order.vendasId}`,"POST",{remover:colocadoLocal,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+      setColocadoLocal(v=>!v);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setColocandoBusy(false);}
+  };
 
   // Pedido já concluído — apenas consulta, sem ação
   if(etapa==="Finalizado"){
@@ -2451,9 +2663,53 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
     );
   }
 
-  // ── EXECUÇÃO POR BORDADO: Programação (c/ dificuldade) e Amostras (s/ dificuldade) ─
-  if(etapa==="Programação"||etapa==="Amostra Digital"||etapa==="Amostra Física"){
+  // ── EXECUÇÃO POR BORDADO: Programação (c/ dificuldade) e Amostra Digital ─
+  if(etapa==="Programação"||etapa==="Amostra Digital"){
     return <ExecPorBordado order={order} etapa={etapa} comDificuldade={etapa==="Programação"} onAction={onAction} setActionMsg={setActionMsg} setActionDone={setActionDone} loadingDet={loadingDet} me={me} setTemPendencias={setTemPendencias}/>;
+  }
+
+  // ── AMOSTRA FÍSICA (executor) — só CONFIRMA que está pronta; NÃO anexa. ─────
+  // Quem anexa a amostra aprovada é o VENDEDOR, na etapa de Aprovação.
+  if(etapa==="Amostra Física"){
+    const refIds=arquivosBordadoPorEtapa(order,"Amostra Física");
+    const bords=order.bordadosJson||[];
+    return(
+      <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+        {order.reprogramacao&&order.motivoRejAmFisica&&<div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px"}}>
+          <div style={{...F.title,fontSize:12,fontWeight:700,color:"#c2410c",letterSpacing:"0.06em"}}>↻ REPROGRAMAÇÃO</div>
+          <div style={{...F.body,fontSize:12,color:"#9a3412",marginTop:4}}>{order.motivoRejAmFisica}</div>
+        </div>}
+        <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+          <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>CONFIRMAR AMOSTRA FÍSICA</div>
+          <div style={{...F.body,fontSize:13,color:C.gray600}}>Confirme que a amostra física foi executada e está pronta. O vendedor vai anexar a amostra aprovada e aprovar.</div>
+        </div>
+        {bords.length>0&&<div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Bordados do pedido</label>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {bords.map((b,i)=>(<div key={b.id||b.fileId||i} style={{...F.body,fontSize:12,color:C.gray700,padding:"7px 10px",background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6}}>{(b.sku?b.sku+" · ":"")}{b.positionLabel||b.productName||b.fileName||"Bordado"}</div>))}
+          </div>
+        </div>}
+        {refIds.length>0&&<div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivos do vendedor (referência)</label>
+          <ArquivosBox fileIds={refIds}/>
+        </div>}
+        {/* Controle do executor: colocado na máquina (opcional, não muda etapa) */}
+        <div style={{background:colocadoLocal?C.green+"0c":"#7c3aed08",border:`1px solid ${colocadoLocal?C.green+"55":"#7c3aed40"}`,borderRadius:8,padding:"12px 14px",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+          <div style={{flex:1,minWidth:180}}>
+            <div style={{...F.body,fontSize:13,fontWeight:700,color:colocadoLocal?"#065f46":"#5b21b6"}}>{colocadoLocal?"🧵 Já está na máquina":"Colocar para bordar"}</div>
+            <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>{colocadoLocal?"Marcado como em processo — não coloque de novo.":"Marque quando colocar na máquina, só pro seu controle."}</div>
+          </div>
+          <button onClick={toggleColocado} disabled={colocandoBusy}
+            style={{border:colocadoLocal?`1.5px solid ${C.green}`:"none",background:colocadoLocal?C.white:"#7c3aed",color:colocadoLocal?"#065f46":C.white,borderRadius:7,padding:"9px 14px",...F.body,fontSize:12,fontWeight:700,cursor:colocandoBusy?"wait":"pointer",whiteSpace:"nowrap",display:"inline-flex",alignItems:"center",gap:6}}>
+            {colocadoLocal?<><Ic n="check" s={13} c="#065f46"/> Na máquina · desfazer</>:"🧵 Colocar para Bordar"}
+          </button>
+        </div>
+        <button onClick={async()=>{try{const m=await onAction(order.id,"confirmar_amostra_fisica",{});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
+          style={{background:"#be185d",color:C.white,border:"none",borderRadius:8,padding:"13px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,alignSelf:"flex-start",paddingLeft:24,paddingRight:24}}>
+          <Ic n="check" s={16} c={C.white}/> Confirmar amostra física pronta
+        </button>
+      </div>
+    );
   }
 
   // ── RETIRAR E CONFERIR ─────────────────────────────────────────────────────
@@ -2692,7 +2948,97 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
   }
 
   // ── PÓS-VENDA / CS — Aprovação de amostra ─────────────────────────────────
-  if(etapa==="Aprovação de Amostra Digital"||etapa==="Aprovação de Amostra Física"){
+  // ── APROVAÇÃO DE AMOSTRA FÍSICA (vendedor) — anexa (opcional) a amostra
+  //    aprovada; pode marcar VÁRIOS bordados e mandar UM arquivo pra todos, e
+  //    aprovar junto. Anexo NÃO é obrigatório pra aprovar. ─────────────────────
+  if(etapa==="Aprovação de Amostra Física"){
+    const bords=order.bordadosJson||[];
+    const keyDe=(b,i)=>String(b.id||b.fileId||("idx"+i));
+    const isSel=(k)=>selBordFis[k]!==false;
+    const selKeys=bords.map((b,i)=>keyDe(b,i)).filter(k=>isSel(k));
+    const todosSel=bords.length>0&&selKeys.length===bords.length;
+    const fisIds=order.arqAmostraFisica?String(order.arqAmostraFisica).split(";").filter(Boolean):[];
+    return(
+      <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{background:C.amber+"0e",border:`1px solid ${C.amber}40`,borderRadius:8,padding:"14px 16px"}}>
+          <div style={{...F.title,fontSize:12,fontWeight:700,color:C.amber,letterSpacing:"0.1em",marginBottom:4}}>APROVAÇÃO DE AMOSTRA FÍSICA</div>
+          <div style={{...F.body,fontSize:13,color:C.gray700}}>Após aprovação do cliente, anexe a amostra aprovada (opcional). Você pode marcar vários bordados e enviar o mesmo arquivo para todos.</div>
+        </div>
+        {fisIds.length>0&&<div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Amostra física já anexada</label>
+          <ArquivosBox fileIds={fisIds} emptyText="Nenhuma amostra física anexada ainda."/>
+        </div>}
+        {/* Seleção de bordados */}
+        {bords.length>0&&<div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em"}}>Bordados que recebem esta amostra</label>
+            <button onClick={()=>{ if(todosSel){const m={};bords.forEach((b,i)=>m[keyDe(b,i)]=false);setSelBordFis(m);} else setSelBordFis({}); }}
+              style={{...F.body,fontSize:11,fontWeight:700,color:C.blue,background:"none",border:"none",cursor:"pointer"}}>{todosSel?"Desmarcar todos":"Marcar todos"}</button>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {bords.map((b,i)=>{const k=keyDe(b,i);const on=isSel(k);return(
+              <label key={k} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",background:on?C.blue+"08":C.gray50,border:`1px solid ${on?C.blue+"55":C.gray200}`,borderRadius:6,cursor:"pointer"}}>
+                <input type="checkbox" checked={on} onChange={()=>setSelBordFis(p=>({...p,[k]:!on}))} style={{width:16,height:16,cursor:"pointer"}}/>
+                <span style={{...F.body,fontSize:12,color:C.gray700}}>{(b.sku?b.sku+" · ":"")}{b.positionLabel||b.productName||b.fileName||"Bordado"}</span>
+              </label>
+            );})}
+          </div>
+        </div>}
+        {/* Upload opcional */}
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Amostra aprovada (opcional)</label>
+          <div style={{border:`2px dashed ${uploadFile?C.green:C.gray200}`,borderRadius:8,padding:"22px 20px",textAlign:"center",background:uploadFile?C.green+"06":C.gray50,cursor:"pointer"}}
+            onClick={()=>document.getElementById("upload-af-input").click()}
+            onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor=C.red;}}
+            onDragLeave={e=>e.currentTarget.style.borderColor=uploadFile?C.green:C.gray200}
+            onDrop={e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f){setUploadFile(f);setUploadName(f.name);}e.currentTarget.style.borderColor=C.green;}}>
+            <input id="upload-af-input" type="file" accept="image/*" style={{display:"none"}}
+              onChange={e=>{const f=e.target.files[0];if(f){setUploadFile(f);setUploadName(f.name);}}}/>
+            {uploadFile
+              ?<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><Ic n="check" s={18} c={C.green}/><div style={{...F.body,fontWeight:700,fontSize:13,color:C.green}}>{uploadName}</div></div>
+              :<div style={{...F.body,fontSize:13,color:C.gray500}}>Clique ou arraste a foto da amostra aprovada</div>}
+          </div>
+        </div>
+        {/* Motivo reprovação */}
+        <div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Motivo da reprovação <span style={{color:C.gray400,fontWeight:500}}>(obrigatório apenas se REPROVAR)</span></label>
+          <textarea value={obsText} onChange={e=>setObsText(e.target.value)} rows={3} placeholder="Preencha só se o cliente rejeitou. Descreva o que ajustar..."
+            style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
+        </div>
+        {/* Botões */}
+        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+          <button disabled={uploading} onClick={async()=>{
+              setUploading(true);
+              try{
+                let fileBase64=null,fileName=null;
+                if(uploadFile){
+                  fileBase64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(uploadFile);});
+                  fileName=uploadName;
+                }
+                const m=await onAction(order.id,"aprovar_amostra_fisica",{fileBase64,fileName,bordadoKeys:selKeys,obs:""});
+                setActionMsg(m||"");setActionDone(true);
+              }catch(e){alert("Erro: "+e.message);}
+              finally{setUploading(false);}
+            }}
+            style={{flex:1,minWidth:160,background:uploading?"#ccc":C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:uploading?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+            <Ic n="check" s={16} c={C.white}/> {uploading?"Enviando...":(uploadFile?"Anexar e aprovar":"Amostra Aprovada")}
+          </button>
+          <button onClick={async()=>{
+              if(!obsText.trim()){alert("Pra reprovar, preencha o motivo. A programadora vai usar essa informação para refazer.");return;}
+              try{const m=await onAction(order.id,"reprovar_amostra",{obs:obsText});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}
+            }}
+            style={{flex:1,minWidth:140,background:C.white,color:C.red,border:`2px solid ${C.red}`,borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+            <Ic n="close" s={16} c={C.red}/> Reprovar — Refazer
+          </button>
+        </div>
+        <div style={{...F.body,fontSize:11,color:C.gray400,display:"flex",alignItems:"center",gap:4}}>
+          <Ic n="warn" s={11} c={C.gray300}/> Reprovar retorna o pedido para a etapa de Amostra Digital (reprogramação).
+        </div>
+      </div>
+    );
+  }
+
+  if(etapa==="Aprovação de Amostra Digital"){
     const ehDigital=etapa==="Aprovação de Amostra Digital";
     const tituloEtapa=ehDigital?"APROVAÇÃO DE AMOSTRA DIGITAL":"APROVAÇÃO DE AMOSTRA FÍSICA";
     const voltaPara=ehDigital?"Amostra Digital":"Amostra Física";
@@ -2930,7 +3276,7 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
 // Lista os bordados que a pessoa já programou/avançou (fonte: relatório de
 // programação no Supabase). Por padrão mostra só as dela; dá pra ver de todos.
 // Renderizada dentro da Fila da Programação (sem header próprio).
-function ExecutadosLista({user}){
+function ExecutadosLista({user,onOpen}){
   const [rows,setRows]=useState(null);
   const [loading,setLoading]=useState(true);
   const [erro,setErro]=useState("");
@@ -2965,17 +3311,26 @@ function ExecutadosLista({user}){
       {!loading&&!erro&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} programaç{lista.length!==1?"ões":"ão"}</div>}
       {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhuma programação encontrada.</div>}
       <div style={{display:"flex",flexDirection:"column",gap:8}}>
-        {lista.map((r,i)=>(
-          <div key={i} style={{background:C.white,border:`1px solid ${C.gray200}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+        {lista.map((r,i)=>{
+          const abrir=onOpen&&r.pedido_id?()=>onOpen(normalizarCard({id:"PED-"+r.pedido_id,vendasId:String(r.pedido_id)})):undefined;
+          return (
+          <div key={i} onClick={abrir} title={abrir?"Abrir pedido":undefined}
+            style={{background:C.white,border:`1px solid ${C.gray200}`,borderLeft:`4px solid ${C.green}`,borderRadius:8,padding:"11px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",cursor:abrir?"pointer":"default",transition:"box-shadow 0.15s"}}
+            onMouseEnter={e=>{if(abrir)e.currentTarget.style.boxShadow="0 3px 12px rgba(0,0,0,0.08)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow="";}}>
             <div style={{flex:1,minWidth:200}}>
               <div style={{...F.body,fontSize:13,fontWeight:700,color:C.gray700,wordBreak:"break-word"}}>{limpo(r.nome_arquivo)}</div>
               <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:3}}>
                 Pedido <strong>{r.pedido_id||"—"}</strong>{!soMeus&&r.programador?` · ${r.programador}`:""}{r.data_execucao?` · ${new Date(r.data_execucao).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}`:""}
               </div>
             </div>
-            {r.dificuldade&&<Tag label={r.dificuldade} color={r.dificuldade==="Fácil"?C.green:r.dificuldade==="Médio"?C.amber:C.red}/>}
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              {r.dificuldade&&<Tag label={r.dificuldade} color={r.dificuldade==="Fácil"?C.green:r.dificuldade==="Médio"?C.amber:C.red}/>}
+              {abrir&&<Ic n="chevR" s={16} c={C.gray400}/>}
+            </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -3006,13 +3361,14 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     _setEnriched(null);
     setSepEdits({}); setSepMsg("");
     const params=_orderLeve.posvendaId?"?posvenda="+_orderLeve.posvendaId
-                :_orderLeve.bordadoId?"?bordado="+_orderLeve.bordadoId:null;
+                :_orderLeve.bordadoId?"?bordado="+_orderLeve.bordadoId
+                :_orderLeve.vendasId?"?vendas="+_orderLeve.vendasId:null;
     if(!params){_setLoadingDet(false);return;}
     _setLoadingDet(true);
     apiFetch("/pedido-completo"+params).then(r=>{
       if(r&&r.success&&r.card)_setEnriched(normalizarCard(r.card,r.card.etapa));
     }).catch(()=>{}).finally(()=>_setLoadingDet(false));
-  },[_orderLeve?.posvendaId,_orderLeve?.bordadoId]);
+  },[_orderLeve?.posvendaId,_orderLeve?.bordadoId,_orderLeve?.vendasId]);
   // Mescla: dados leves sempre existem (vindo do snapshot); enriched preenche
   // items, historico, timeline, contato, etc, quando termina de carregar.
   // IMPORTANTE: preservamos os campos que o snapshot calculou (etapa, stageId,
@@ -3020,10 +3376,11 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   // bordado e sabe a etapa granular ("Programação", não "Em Processo de Bordado").
   const order=_enriched?{
     ..._enriched,
-    etapa: _orderLeve.etapa,
-    stageId: _orderLeve.stageId,
-    stageIdAtual: _orderLeve.stageIdAtual,
-    pedidoLinx: _orderLeve.pedidoLinx,
+    etapa: _orderLeve.etapa || _enriched.etapa,
+    stageId: _orderLeve.stageId || _enriched.stageId,
+    stageIdAtual: _orderLeve.stageIdAtual || _enriched.stageIdAtual,
+    pedidoLinx: _orderLeve.pedidoLinx || _enriched.pedidoLinx,
+    aguardadoPor: (_orderLeve.aguardadoPor&&_orderLeve.aguardadoPor.length)?_orderLeve.aguardadoPor:(_enriched.aguardadoPor||[]),
     bordadoId: _orderLeve.bordadoId||_enriched.bordadoId,
     posvendaId: _orderLeve.posvendaId||_enriched.posvendaId,
     vendasId: _orderLeve.vendasId||_enriched.vendasId,
@@ -3049,7 +3406,10 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const[motivoPend,setMotivoPend]=useState("");
   const[modalAguard,setModalAguard]=useState(false);
   const[motivoAguard,setMotivoAguard]=useState("");
-  const[pedidoDep,setPedidoDep]=useState("");
+  const[pedidoDep,setPedidoDep]=useState("");           // vendasId do pedido escolhido
+  const[pedidoDepBusca,setPedidoDepBusca]=useState(""); // texto de busca
+  const[pedidoDepSel,setPedidoDepSel]=useState(null);   // {vendasId, pedidoLinx, client}
+  const _snapDep=useSnapshotAberto();
   const[uploadFile,setUploadFile]=useState(null);
   const[uploadName,setUploadName]=useState("");
   const[obsText,setObsText]=useState("");
@@ -3145,6 +3505,11 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
             </div>
             <div style={{...F.body,fontSize:13,color:C.gray600,marginTop:6,fontWeight:600}}>{order.client}</div>
             <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:2}}>{order.vendedor}{order.etapa!=="Programação"?` · ${pecasDoCard(order)} peças · ${fmtR(order.valor)}`:""}</div>
+            {(()=>{const rp=responsavelPosVendaDe(order.vendedor);return rp?<div style={{...F.body,fontSize:12,color:"#7c3aed",fontWeight:700,marginTop:4,display:"inline-flex",alignItems:"center",gap:5,background:"#7c3aed12",border:"1px solid #7c3aed40",borderRadius:6,padding:"3px 9px"}}><Ic n="phone" s={12} c="#7c3aed"/> Responsável Pós-Venda: {rp}</div>:null;})()}
+            {(order.aguardadoPor||[]).length>0&&<div style={{marginTop:6,background:"#1d4ed80e",border:"1px solid #1d4ed83a",borderLeft:"4px solid #1d4ed8",borderRadius:8,padding:"8px 12px"}}>
+              <div style={{...F.title,fontSize:11,fontWeight:800,color:"#1d4ed8",letterSpacing:"0.04em",marginBottom:2}}>🔗 AGUARDANDO FATURAR JUNTO</div>
+              {order.aguardadoPor.map((a,i)=><div key={i} style={{...F.body,fontSize:12.5,color:"#1e3a8a"}}><strong>PED-{a.pedido}</strong> está aguardando para ser faturado junto com este pedido{a.motivo?` — ${a.motivo}`:""}.</div>)}
+            </div>}
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0}}>
             <button
@@ -3286,11 +3651,19 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           </div>}
           {/* BORDADO */}
           {tab==="bordado"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
-            {/* Arquivos de bordado anexados pelo vendedor */}
-            <div>
-              <SecH>Arquivos de Bordado</SecH>
-              <ArquivosBox fileIds={order.arquivoBordado} emptyText="Nenhum arquivo de bordado anexado ao negócio."/>
-            </div>
+            {/* Arquivos de bordado anexados pelo vendedor.
+                Fonte: bordados_json (tem TODOS os fileIds, inclusive planilhas) +
+                arquivo_do_negocio. Antes lia só arquivo_do_negocio, que às vezes
+                não tinha todos os fileIds (ex.: XLSX) — e o arquivo sumia. */}
+            {(()=>{
+              const idsBordadoJson=(order.bordadosJson||[]).map(b=>String(b.fileId)).filter(Boolean);
+              const idsNegocio=(order.arquivoBordado||[]).map(String);
+              const todosIds=[...new Set([...idsBordadoJson,...idsNegocio])];
+              return <div>
+                <SecH>Arquivos de Bordado</SecH>
+                <ArquivosBox fileIds={todosIds} emptyText="Nenhum arquivo de bordado anexado ao negócio."/>
+              </div>;
+            })()}
             {(order.arquivoDtfsilk&&order.arquivoDtfsilk.length>0)?<div>
               <SecH>Arquivos DTF / Silk</SecH>
               <ArquivosBox fileIds={order.arquivoDtfsilk} emptyText="Nenhum arquivo DTF/Silk."/>
@@ -3456,17 +3829,39 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           <div style={{...F.body,fontSize:13,color:C.gray600,marginBottom:16,lineHeight:1.5}}>
             O pedido sai da etapa <strong>{order.etapa}</strong> e vai pra aba "Aguardando Outro Pedido". Use quando o vendedor pediu pra faturar junto com outro pedido ou aguardar material atrelado.
           </div>
-          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",display:"block",marginBottom:6}}>Nº do pedido dependência (obrigatório)</label>
-          <input value={pedidoDep} onChange={e=>setPedidoDep(e.target.value)} placeholder="Nº Linx ou ID HubSpot"
-            style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",outline:"none",boxSizing:"border-box",marginBottom:12}}/>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",display:"block",marginBottom:6}}>Pedido que vai ser aguardado (obrigatório)</label>
+          {pedidoDepSel
+            ? <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,border:`1.5px solid ${C.blue}`,background:C.blue+"0c",borderRadius:6,padding:"9px 12px",marginBottom:12}}>
+                <span style={{...F.body,fontSize:13,color:C.gray800,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}><strong>{idPedido(pedidoDepSel)}</strong>{pedidoDepSel.client?` · ${pedidoDepSel.client}`:""}</span>
+                <button onClick={()=>{setPedidoDepSel(null);setPedidoDep("");setPedidoDepBusca("");}} style={{background:"none",border:"none",color:C.gray500,cursor:"pointer",fontSize:14,flexShrink:0}}>✕ trocar</button>
+              </div>
+            : <div style={{position:"relative",marginBottom:12}}>
+                <input value={pedidoDepBusca} onChange={e=>setPedidoDepBusca(e.target.value)} placeholder="Buscar por cliente, nº Linx ou ID..."
+                  style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",outline:"none",boxSizing:"border-box"}}/>
+                {pedidoDepBusca.trim().length>=2&&(()=>{
+                  const q=pedidoDepBusca.trim().toLowerCase();
+                  const todos=snapTodosPedidos(_snapDep.data).filter(p=>String(p.vendasId||"")!==String(order.vendasId||""));
+                  const matches=todos.filter(p=>((p.client||"")+" "+(p.pedidoLinx||"")+" "+(p.vendasId||"")).toLowerCase().includes(q)).slice(0,8);
+                  return <div style={{position:"absolute",top:"100%",left:0,right:0,marginTop:2,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:6,boxShadow:"0 8px 24px rgba(0,0,0,0.12)",zIndex:5,maxHeight:220,overflowY:"auto"}}>
+                    {matches.length?matches.map((p,i)=>(
+                      <div key={p.vendasId||i} onClick={()=>{setPedidoDepSel(p);setPedidoDep(String(p.vendasId||""));setPedidoDepBusca("");}}
+                        style={{padding:"8px 12px",cursor:"pointer",borderBottom:`1px solid ${C.gray50}`}}
+                        onMouseEnter={e=>e.currentTarget.style.background=C.gray50} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                        <div style={{...F.body,fontSize:12.5,fontWeight:700,color:C.gray800}}>{idPedido(p)}</div>
+                        <div style={{...F.body,fontSize:11,color:C.gray500}}>{p.client} · {p.etapa}</div>
+                      </div>
+                    )):<div style={{padding:"10px 12px",...F.body,fontSize:12,color:C.gray400}}>Nenhum pedido ativo encontrado.</div>}
+                  </div>;
+                })()}
+              </div>}
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",display:"block",marginBottom:6}}>Motivo (obrigatório)</label>
           <textarea value={motivoAguard} onChange={e=>setMotivoAguard(e.target.value)} rows={4}
             placeholder="Ex: aguardar faturamento junto com o pedido X; aguardar chegada de material do pedido Y..."
             style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",boxSizing:"border-box",resize:"vertical",marginBottom:14}}/>
           <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
-            <button onClick={()=>{setModalAguard(false);setMotivoAguard("");setPedidoDep("");}} style={{background:C.white,color:C.gray600,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 14px",...F.body,fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancelar</button>
+            <button onClick={()=>{setModalAguard(false);setMotivoAguard("");setPedidoDep("");setPedidoDepSel(null);setPedidoDepBusca("");}} style={{background:C.white,color:C.gray600,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"9px 14px",...F.body,fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancelar</button>
             <button onClick={async()=>{
-              if(!pedidoDep.trim()){alert("Nº do pedido dependência obrigatório."); return;}
+              if(!pedidoDep.trim()){alert("Selecione o pedido que vai ser aguardado."); return;}
               if(!motivoAguard.trim()){alert("Motivo obrigatório."); return;}
               try{
                 const r=await apiFetch("/aguardando-outro-pedido/entrar","POST",{
@@ -3475,7 +3870,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                   motivo: motivoAguard.trim(),
                   ctx: { executor: me?.nome || "Usuário SGP" },
                 });
-                if(r.success){ setModalAguard(false); setMotivoAguard(""); setPedidoDep(""); onClose(); }
+                if(r.success){ setModalAguard(false); setMotivoAguard(""); setPedidoDep(""); setPedidoDepSel(null); setPedidoDepBusca(""); onClose(); }
                 else alert("Erro: "+(r.error||"desconhecido"));
               }catch(e){alert("Erro: "+e.message);}
             }} style={{background:C.blue,color:C.white,border:"none",borderRadius:6,padding:"9px 16px",...F.body,fontSize:13,fontWeight:700,cursor:"pointer"}}>
@@ -4014,14 +4409,16 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const [loadError,setLoadError]=useState(null);
   const [hsOrders,setHsOrders]=useState(null); // null = não carregado ainda
   const [capLot,setCapLot]=useState({capacidade:{},lotacao:{}}); // capacidade + lotação por destino
+  const [lotLoading,setLotLoading]=useState(true);
 
   const carregarDir=()=>{
     setLoading(true);
+    setLotLoading(true);
     setLoadError(null);
     setConfirmed({});
     setDestMap({});
     setSel({});
-    apiFetch("/capacidade-lotacao").then(r=>{ if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}}); }).catch(()=>{});
+    apiFetch("/capacidade-lotacao").then(r=>{ if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}}); }).catch(()=>{}).finally(()=>setLotLoading(false));
     apiFetch("/conferencia-direcionamento")
       .then(res=>{
         if(res.success){
@@ -4039,6 +4436,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
             historico:o.historico||[],
             houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
+            veioDoAguardandoAmostra:o.veioDoAguardandoAmostra===true,
             temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
             items:(o.items||[]).map(it=>({
               id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
@@ -4068,7 +4466,13 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   // Sem bordado NÃO espera amostra — entra direto em "prontos" (card com só o
   // botão Conferido). "pendentes" (aguardando amostra) é só pra quem tem bordado.
   const pendentes=activeOrders.filter(o=>!o.amOk&&o.temBordado!==false&&!o.concluido);
-  const prontos=activeOrders.filter(o=>(o.amOk||o.temBordado===false)&&!o.concluido);
+  const prontosAll=activeOrders.filter(o=>(o.amOk||o.temBordado===false)&&!o.concluido);
+  // "Saíram do aguardando amostra": estavam separados esperando a amostra e ela
+  // acabou de sair. Ficam numa aba própria (tratativa mais rápida) e saem da
+  // lista principal pra chamar atenção.
+  const saira=prontosAll.filter(o=>o.veioDoAguardandoAmostra===true);
+  const prontosMain=prontosAll.filter(o=>o.veioDoAguardandoAmostra!==true);
+  // `prontos` (depende de `aba`) é definido mais abaixo, DEPOIS do useState de `aba`.
   // Estado local de seleção por pedido: {orderId: {sku: true/false}}
   const[sel,setSel]=useState({});
   const[destMap,setDestMap]=useState({});// {orderId: {sku: "interno"|"externo"}}
@@ -4088,6 +4492,9 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   const setBordador=(oid,sku,b)=>setBordadorMap(prev=>({...prev,[oid]:{...(prev[oid]||{}),[sku]:b}}));
   const[confirmed,setConfirmed]=useState({});// orderId: bool
   const[pendentesAberto,setPendentesAberto]=useState(false);// caixa recolhível
+  const[aba,setAba]=useState("direcionamento");// "direcionamento" | "saira" (saíram do aguardando amostra)
+  // Lista exibida na área principal, conforme a aba (usa `aba` já inicializado).
+  const prontos=aba==="saira"?saira:prontosMain;
   const[itensAbertos,setItensAbertos]=useState({});// {orderId: bool} — itens recolhidos por padrão
   const toggleItens=(oid)=>setItensAbertos(p=>({...p,[oid]:!p[oid]}));
 
@@ -4164,7 +4571,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
   return(
     <div style={{padding:24,display:"flex",flexDirection:"column",gap:20}}>
       <PageH title="Conferência e Direcionamento" sub="Confira o pedido separado. Se tiver bordado, defina destinos." onRefresh={carregarDir} refreshing={loading}/>
-      <PainelLotacao capLot={capLot} destinos={["interno","bordadel","mg_bordados","outros"]} titulo="Capacidade x lotação — usada para a sugestão"/>
+      <PainelLotacao capLot={capLot} carregando={lotLoading} destinos={["interno","bordadel","mg_bordados","outros"]} titulo="Capacidade x lotação — usada para a sugestão"/>
       {loading&&<div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue}}>
         <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={C.blue} strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         Carregando pedidos do HubSpot...
@@ -4176,8 +4583,23 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
       {hsOrders!==null&&!loading&&<div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px",background:C.green+"0e",border:`1px solid ${C.green}28`,borderRadius:7,...F.body,fontSize:12,color:C.green}}>
         <Ic n="check" s={13} c={C.green}/> {hsOrders.length} pedido{hsOrders.length!==1?"s":""} carregado{hsOrders.length!==1?"s":""} do HubSpot
       </div>}
+      {/* Abas: Direcionamento | Saíram do aguardando amostra (com badge) */}
+      <div style={{display:"flex",gap:2,marginBottom:2,borderBottom:`1.5px solid ${C.gray200}`}}>
+        <div onClick={()=>setAba("direcionamento")}
+          style={{padding:"10px 18px 11px",cursor:"pointer",...F.body,fontSize:13,fontWeight:aba==="direcionamento"?700:500,color:aba==="direcionamento"?C.black:C.gray500,borderBottom:aba==="direcionamento"?`2px solid ${C.red}`:"2px solid transparent"}}>
+          Direcionamento
+        </div>
+        <div onClick={()=>setAba("saira")}
+          style={{position:"relative",padding:"10px 22px 11px 18px",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:8,...F.body,fontSize:13,fontWeight:aba==="saira"?700:500,color:aba==="saira"?"#b45309":C.gray500,borderBottom:aba==="saira"?`2px solid #f59e0b`:"2px solid transparent"}}>
+          <Ic n="warn" s={13} c={aba==="saira"?"#b45309":C.gray400}/> Saíram do aguardando amostra
+          {saira.length>0&&<span style={{position:"absolute",top:2,right:2,background:C.red,color:C.white,borderRadius:10,padding:"1px 7px",fontSize:10,fontWeight:800,minWidth:16,textAlign:"center",boxShadow:"0 0 0 2px "+C.white}}>{saira.length}</span>}
+        </div>
+      </div>
+      {aba==="saira"&&<div style={{background:"#fffbeb",border:`1px solid #f59e0b40`,borderRadius:8,padding:"10px 14px",...F.body,fontSize:12,color:"#92400e",display:"flex",alignItems:"center",gap:8}}>
+        <Ic n="warn" s={14} c="#f59e0b"/> Estes pedidos já estavam separados e só agora tiveram a amostra aprovada. Priorize o direcionamento.
+      </div>}
       {/* Pedidos aguardando amostra — caixa recolhível */}
-      {pendentes.length>0&&(
+      {aba==="direcionamento"&&pendentes.length>0&&(
         <div>
           <div onClick={()=>setPendentesAberto(v=>!v)}
             style={{background:C.amber+"10",border:`1px solid ${C.amber}38`,borderRadius:8,padding:"10px 16px",marginBottom:pendentesAberto?10:0,display:"flex",alignItems:"center",gap:8,cursor:"pointer"}}>
@@ -4199,8 +4621,12 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
         </div>
       )}
       {/* Pedidos prontos */}
-      <SecH>Prontos para direcionar — {prontos.length} pedido{prontos.length!==1?"s":""}</SecH>
-      {prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>Nenhum pedido aguardando direcionamento.</div>}
+      <SecH>{aba==="saira"?"Saíram do aguardando amostra":"Prontos para direcionar"} — {prontos.length} pedido{prontos.length!==1?"s":""}</SecH>
+      {loading&&hsOrders===null&&<div style={{...F.body,color:C.gray500,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`,display:"flex",flexDirection:"column",alignItems:"center",gap:10}}>
+        <span style={{display:"inline-block",width:22,height:22,border:`3px solid ${C.gray200}`,borderTopColor:C.red,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+        Carregando pedidos...
+      </div>}
+      {!loading&&prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{aba==="saira"?"Nenhum pedido saiu do aguardando amostra no momento.":"Nenhum pedido aguardando direcionamento."}</div>}
       {prontos.map(o=>{
         // Pedidos SEM bordado: card simplificado com botão "Conferido" só
         if (o.temBordado === false) {
@@ -4582,14 +5008,18 @@ const ABERTO_ETAPAS=[
 ];
 
 // Painel de capacidade x lotação (peças com bordado em aberto) por destino
-function PainelLotacao({capLot,destinos,titulo}){
+function PainelLotacao({capLot,destinos,titulo,carregando}){
   const cap=capLot.capacidade||{}, lot=capLot.lotacao||{};
   const LBL={interno:"Interno",bordadel:"Bordadel",mg_bordados:"MG Bordados",outros:"Outros"};
   const COR={interno:C.green,bordadel:C.red,mg_bordados:"#7c3aed",outros:C.amber};
   return(
     <Card>
       <SecH>{titulo||"Capacidade x lotação (peças com bordado em aberto)"}</SecH>
-      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      {carregando&&<div style={{display:"flex",alignItems:"center",gap:8,...F.body,fontSize:12,color:C.gray500,marginBottom:10}}>
+        <span style={{display:"inline-block",width:14,height:14,border:`2px solid ${C.gray200}`,borderTopColor:C.red,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+        Calculando lotação...
+      </div>}
+      <div style={{display:"flex",flexDirection:"column",gap:14,opacity:carregando?0.5:1}}>
         {destinos.map(d=>{
           const c=Number(cap[d]||0), v=Number(lot[d]||0);
           const pct=c>0?Math.min(100,(v/c)*100):(v>0?100:0);
@@ -5562,6 +5992,9 @@ function SLAConfig({slaCfg,onSave}){
         </div>
       </Card>
 
+      {/* Responsável Pós-Venda (quem atende quem) — salva separado */}
+      <ConfigRespPosVenda/>
+
       {/* Manutenção — ações administrativas */}
       <Card>
         <SecH>Manutenção</SecH>
@@ -5575,6 +6008,61 @@ function SLAConfig({slaCfg,onSave}){
         {loading&&<span style={{...F.body,fontSize:12,color:C.gray400}}>Carregando config...</span>}
       </div>
     </div>
+  );
+}
+
+// Gestão "quem atende quem" — responsável de pós-venda por vendedor(a). Salva no
+// KV via /config-responsavel-posvenda. O SGP cruza pelo nome do representante.
+function ConfigRespPosVenda(){
+  const [mapa,setMapa]=useState({});
+  const [carregando,setCarregando]=useState(true);
+  const [salvando,setSalvando]=useState(false);
+  const [ok,setOk]=useState(false);
+  const [novoResp,setNovoResp]=useState("");
+  const [novoVend,setNovoVend]=useState({}); // {resp: texto}
+  useEffect(()=>{ apiFetch("/config-responsavel-posvenda").then(r=>{ if(r&&r.success) setMapa(r.mapa||{}); }).catch(()=>{}).finally(()=>setCarregando(false)); },[]);
+  const addResp=()=>{ const n=novoResp.trim(); if(!n) return; setMapa(m=>m[n]?m:{...m,[n]:[]}); setNovoResp(""); };
+  const rmResp=(r)=>setMapa(m=>{const c={...m};delete c[r];return c;});
+  const addVend=(r)=>{ const v=(novoVend[r]||"").trim(); if(!v) return; setMapa(m=>({...m,[r]:[...(m[r]||[]).filter(x=>x.toLowerCase()!==v.toLowerCase()),v]})); setNovoVend(p=>({...p,[r]:""})); };
+  const rmVend=(r,v)=>setMapa(m=>({...m,[r]:(m[r]||[]).filter(x=>x!==v)}));
+  const salvar=async()=>{ setSalvando(true); try{ await apiFetch("/config-responsavel-posvenda","POST",{mapa}); _respPVMap=mapa; _rebuildRespPVIndex(); _respPVListeners.forEach(fn=>{try{fn();}catch(e){}}); setOk(true); setTimeout(()=>setOk(false),2500);}catch(e){alert("Erro ao salvar: "+e.message);} finally{setSalvando(false);} };
+  const resps=Object.keys(mapa);
+  return (
+    <Card>
+      <SecH>Responsável Pós-Venda (quem atende quem)</SecH>
+      <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:14}}>Vincule cada responsável de pós-venda aos vendedores(as) que ela atende. O SGP cruza pelo <strong>nome do representante</strong> e exibe o responsável em todos os pedidos.</div>
+      {carregando?<div style={{...F.body,fontSize:13,color:C.gray400}}>Carregando...</div>:<>
+        <div style={{display:"flex",gap:8,marginBottom:16}}>
+          <input value={novoResp} onChange={e=>setNovoResp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addResp()} placeholder="Nome do responsável (ex.: Karolyne Marques)" style={{flex:1,border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"9px 12px",...F.body,fontSize:13,outline:"none"}}/>
+          <button onClick={addResp} style={{background:C.red,color:C.white,border:"none",borderRadius:8,padding:"9px 16px",cursor:"pointer",...F.body,fontWeight:700,fontSize:13}}>+ Responsável</button>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          {resps.length===0&&<div style={{...F.body,fontSize:13,color:C.gray400}}>Nenhum responsável cadastrado ainda.</div>}
+          {resps.map(r=>(
+            <div key={r} style={{border:`1px solid ${C.gray200}`,borderRadius:10,padding:14}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <span style={{...F.body,fontSize:14,fontWeight:800,color:"#7c3aed"}}>{r}</span>
+                <button onClick={()=>rmResp(r)} style={{background:"none",border:"none",color:C.gray400,cursor:"pointer",...F.body,fontSize:12,textDecoration:"underline"}}>Remover</button>
+              </div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
+                {(mapa[r]||[]).map(v=>(
+                  <span key={v} style={{display:"inline-flex",alignItems:"center",gap:6,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"5px 9px",...F.body,fontSize:12,color:C.gray700}}>{v}<button onClick={()=>rmVend(r,v)} style={{background:"none",border:"none",color:C.gray400,cursor:"pointer",fontSize:14,lineHeight:1}}>✕</button></span>
+                ))}
+                {(mapa[r]||[]).length===0&&<span style={{...F.body,fontSize:12,color:C.gray400}}>Nenhum vendedor vinculado.</span>}
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <input value={novoVend[r]||""} onChange={e=>setNovoVend(p=>({...p,[r]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&addVend(r)} placeholder="Nome do vendedor(a)" style={{flex:1,border:`1.5px solid ${C.gray200}`,borderRadius:7,padding:"8px 11px",...F.body,fontSize:12,outline:"none"}}/>
+                <button onClick={()=>addVend(r)} style={{background:C.white,color:C.red,border:`1.5px solid ${C.red}`,borderRadius:7,padding:"8px 13px",cursor:"pointer",...F.body,fontWeight:700,fontSize:12}}>+ Vendedor</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:10,alignItems:"center",marginTop:16}}>
+          <button onClick={salvar} disabled={salvando} style={{background:salvando?C.gray300:C.red,color:C.white,border:"none",borderRadius:8,padding:"11px 22px",cursor:salvando?"wait":"pointer",...F.body,fontWeight:700,fontSize:13,display:"inline-flex",alignItems:"center",gap:8}}><Ic n="check" s={14} c={C.white}/> {salvando?"Salvando...":"Salvar responsáveis"}</button>
+          {ok&&<span style={{...F.body,fontSize:13,color:C.green,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}><Ic n="check" s={14} c={C.green}/>Salvo!</span>}
+        </div>
+      </>}
+    </Card>
   );
 }
 
@@ -5635,6 +6123,17 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
   const [busca,setBusca]=useState("");
   const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
   const [subTab,setSubTab]=useState("normal"); // normal | reprogramacao
+  useRespPV(); // re-renderiza quando o mapa "responsável pós-venda" carregar
+  // Override otimista do "colocado para bordar" (por vendasId) — atualiza o card
+  // na hora, sem esperar o recarregamento do snapshot inteiro.
+  const [colocadoOverride,setColocadoOverride]=useState({});
+  const estaColocado=(o)=> colocadoOverride[o.vendasId]!==undefined ? colocadoOverride[o.vendasId] : (o.colocadoParaBordar===true);
+  const toggleColocadoCard=async(o)=>{
+    const novo=!estaColocado(o);
+    setColocadoOverride(p=>({...p,[o.vendasId]:novo}));   // otimista, instantâneo
+    try{ await apiFetch(`/colocar-para-bordar/${o.vendasId}`,"POST",{remover:!novo,ctx:{executor:user?.nome||user?.email||"Usuário SGP"}}); }
+    catch(err){ setColocadoOverride(p=>({...p,[o.vendasId]:!novo})); alert("Erro: "+err.message); }
+  };
 
   // Consome o snapshot único (1 chamada compartilhada com todas as outras telas).
   // Filtra apenas a etapa que essa tela é responsável. Não chama endpoint específico.
@@ -5674,9 +6173,14 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     });
   }
 
-  // Filtro por bordador externo (só usado na aba Externo)
+  // Filtro por bordador externo (só usado na aba Externo). Usa o campo do card
+  // (bordadoresExternos, vindo do snapshot) — o leve não carrega items. Mantém
+  // fallback por items quando o card já foi enriquecido no modal.
   if(filtroBordador&&filtroBordador!=="todos"){
-    mine=mine.filter(o=>(o.items||[]).some(it=>(it.bordador||"")===filtroBordador));
+    mine=mine.filter(o=>
+      (o.bordadoresExternos||[]).includes(filtroBordador) ||
+      (o.items||[]).some(it=>(it.bordador||"")===filtroBordador)
+    );
   }
 
   // Filtro por sub-tab (só ativa quando subTabsReprog=true)
@@ -5685,11 +6189,35 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     else mine=mine.filter(o=>!o.reprogramacao);
   }
 
-  // Ordena por PRIORIDADE (data de vencimento mais próxima primeiro)
-  mine=ordenarPorPrioridade(mine);
+  if(etapa==="Programação"){
+    // Programação: ORDEM DE CHEGADA — o mais recente em cima (decisão do time).
+    // "Chegada" = entrada na etapa (etapaAt); fallback pra emissão/entrada.
+    const chegada=(o)=>o.etapaAt||o.entradaAt||o.dataFechamento||null;
+    mine=[...mine].sort((a,b)=>{
+      const ca=chegada(a),cb=chegada(b);
+      if(!ca&&!cb)return 0;
+      if(!ca)return 1;
+      if(!cb)return -1;
+      return new Date(cb)-new Date(ca);  // mais recente primeiro
+    });
+  } else {
+    // Demais etapas: URGÊNCIA DE SLA — o mais "estourado" primeiro (casa com o
+    // badge ATRASADO/EM RISCO/NO PRAZO e a barra Xh/Yh do card). htd = horas
+    // úteis restantes até o prazo (negativo = já venceu; quanto menor, mais atrasado).
+    mine=[...mine].sort((a,b)=>{
+      const ha=getSLA(a,slaCfg,etapa).htd, hb=getSLA(b,slaCfg,etapa).htd;
+      if(ha==null&&hb==null)return 0;
+      if(ha==null)return 1;   // sem prazo definido vai pro fim
+      if(hb==null)return -1;
+      return ha-hb;           // menor htd (mais vencido) primeiro
+    });
+  }
 
-  // Contadores para os chips de filtro
-  const all=source.filter(o=>o.etapa===etapa&&!o.concluido);
+  // Contadores para os chips de filtro. Usa o MESMO critério da lista (mine):
+  // etapasAtivas, não a etapa principal. Assim o cabeçalho/contador bate com a
+  // lista exibida e com a aba Minhas Demandas — um card ativo em "Em Separação"
+  // mas com etapa principal em outra (ex.: Programação) conta aqui também.
+  const all=source.filter(o=>((o.etapasAtivas||[o.etapa]).includes(etapa))&&!o.concluido);
   const nLate=all.filter(o=>getSLA(o,slaCfg,etapa).st==="late").length;
   const nRisk=all.filter(o=>getSLA(o,slaCfg,etapa).st==="risk").length;
   const nReprog=all.filter(o=>o.reprogramacao===true).length;
@@ -5761,7 +6289,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
         </div>}
       </div>}
 
-      {subTab==="executados" ? <ExecutadosLista user={user}/> : <>
+      {subTab==="executados" ? <ExecutadosLista user={user} onOpen={onOpen}/> : <>
       {/* Barra de busca + filtros */}
       <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{position:"relative",flex:1,minWidth:220}}>
@@ -5811,6 +6339,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ (ALTERAÇÃO)</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
                     {o.temBordado===false&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:C.gray600,color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>SEM BORDADO</span>}
+                    {etapa==="Amostra Física"&&estaColocado(o)&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#7c3aed",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>🧵 NA MÁQUINA</span>}
                     {/* Badge de status */}
                     {finalizado
                       ?(()=>{
@@ -5839,12 +6368,18 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                       </span>}
                   </div>
                   <div style={{...F.body,fontSize:13,color:C.black,fontWeight:600,marginBottom:3}}>{o.client||"—"}</div>
+                  {(()=>{const rp=responsavelPosVendaDe(o.vendedor);return rp?<div style={{...F.body,fontSize:11,color:"#7c3aed",fontWeight:600,marginBottom:4,display:"flex",alignItems:"center",gap:4}}><Ic n="phone" s={11} c="#7c3aed"/> Pós-venda: {rp}</div>:null;})()}
+                  {(o.aguardadoPor||[]).length>0&&<div style={{...F.body,fontSize:11,color:"#1d4ed8",fontWeight:600,marginBottom:4,display:"flex",alignItems:"center",gap:4,background:"#1d4ed812",border:"1px solid #1d4ed833",borderRadius:6,padding:"3px 8px"}}>🔗 {o.aguardadoPor.length===1?`PED-${o.aguardadoPor[0].pedido} aguarda faturar junto`:`${o.aguardadoPor.length} pedidos aguardam faturar junto`}</div>}
                   <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:6}}>{etapa==="Programação"
                     ? (()=>{const n=(o.bordadosJson||[]).filter(b=>/~prog/i.test(b.fileName||"")).length||(o.bordadosJson||[]).length; return `${n} programaç${n===1?"ão":"ões"}`;})()
                     : `${fmtR(o.valor)} · ${totalSKUs} SKU${totalSKUs!==1?"s":""} · ${totalPecas} peça${totalPecas!==1?"s":""}`}</div>
-                  {!finalizado&&<div style={{...F.body,fontSize:11,color:o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray600):C.gray400,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
-                    <Ic n="clock" s={11} c={o.dataVencimento?(new Date(o.dataVencimento)<new Date()?C.red:C.gray500):C.gray300}/>
-                    {o.dataVencimento?<>Vence em {fmtDS(o.dataVencimento)}</>:"Vencimento ainda não definido"}
+                  {etapa==="Programação"&&<div style={{...F.body,fontSize:11,color:C.gray600,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
+                    <Ic n="check" s={11} c={C.gray400}/>
+                    {o.dataFechamento?<>Emissão: <strong style={{color:C.gray700}}>{fmtDS(o.dataFechamento)}</strong></>:"Emissão não informada"}
+                  </div>}
+                  {!finalizado&&o.dataVencimento&&<div style={{...F.body,fontSize:11,color:new Date(o.dataVencimento)<new Date()?C.red:C.gray600,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
+                    <Ic n="clock" s={11} c={new Date(o.dataVencimento)<new Date()?C.red:C.gray500}/>
+                    Vence em {fmtDS(o.dataVencimento)}
                   </div>}
                   {!finalizado&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
                     <SLABar pct={sla.pct} st={sla.st}/>
@@ -5852,9 +6387,17 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                   </div>}
                   {o.alertas.length>0&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{o.alertas.map((a,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:4,...F.body,fontSize:11,color:"#92400e",fontWeight:600}}><Ic n="warn" s={11} c={C.amber}/>{a}</div>)}</div>}
                 </div>
-                <div style={{display:"flex",alignItems:"center",gap:6,color:C.gray400}}>
-                  <span style={{...F.body,fontSize:12,color:C.gray400}}>Abrir</span>
-                  <Ic n="chevR" s={16} c={C.gray400}/>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+                  {etapa==="Amostra Física"&&(()=>{const col=estaColocado(o);return <button
+                    onClick={(e)=>{e.stopPropagation();toggleColocadoCard(o);}}
+                    title={col?"Clique para desmarcar":"Marcar que já foi colocado na máquina"}
+                    style={{display:"inline-flex",alignItems:"center",gap:6,border:col?`1.5px solid ${C.green}`:`1.5px solid #7c3aed`,background:col?C.green+"12":"#7c3aed",color:col?"#065f46":C.white,borderRadius:7,padding:"7px 12px",...F.body,fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>
+                    {col?<><Ic n="check" s={13} c="#065f46"/> Na máquina</>:<>🧵 Colocar para Bordar</>}
+                  </button>;})()}
+                  <div style={{display:"flex",alignItems:"center",gap:6,color:C.gray400}}>
+                    <span style={{...F.body,fontSize:12,color:C.gray400}}>Abrir</span>
+                    <Ic n="chevR" s={16} c={C.gray400}/>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -6244,11 +6787,60 @@ let _refreshListeners=[];
 function triggerRefresh(){ _refreshListeners.forEach(fn=>fn()); }
 
 // Página de Bordado Externo: gráfico de lotação por bordador + filtro + fila
+// Página FINALIZADOS (menu) — busca do endpoint /finalizados (pedidos faturados),
+// NÃO do snapshot (que só tem os em aberto). Era por isso que a aba do menu vinha
+// vazia enquanto a do Dashboard mostrava.
+function FinalizadosPage({onOpen}){
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [busca,setBusca]=useState("");
+  const carregar=()=>{ setLoading(true); setErro("");
+    apiFetch("/finalizados").then(r=>{ setData(r.success?(r.data||[]):[]); if(!r.success)setErro(r.error||"Erro ao carregar."); })
+      .catch(e=>setErro(e.message)).finally(()=>setLoading(false)); };
+  useEffect(()=>{carregar();},[]);
+  const q=busca.trim().toLowerCase();
+  const lista=(data||[]).filter(o=> !q || (((o.client||"")+" "+(o.pedidoLinx||"")+" "+(o.vendasId||"")+" "+(o.cnpj||"")).toLowerCase().includes(q)));
+  return (
+    <div style={{padding:24}}>
+      <PageH title="Finalizados" sub={`${(data||[]).length} pedido${(data||[]).length!==1?"s":""} faturado${(data||[]).length!==1?"s":""}`} onRefresh={carregar} refreshing={loading}/>
+      <div style={{position:"relative",marginBottom:16,maxWidth:420}}>
+        <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}><Ic n="search" s={15} c={C.gray400}/></div>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido Linx, ID ou CNPJ..."
+          style={{width:"100%",border:`1.5px solid ${C.gray200}`,borderRadius:8,padding:"10px 12px 10px 36px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+      {loading&&<div style={{padding:"10px 14px",background:C.blue+"0e",border:`1px solid ${C.blue}28`,borderRadius:8,...F.body,fontSize:13,color:C.blue,marginBottom:12}}>Carregando finalizados...</div>}
+      {erro&&<div style={{padding:"10px 14px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red,marginBottom:12}}>Erro: {erro}</div>}
+      {!loading&&!erro&&lista.length===0&&<div style={{...F.body,color:C.gray400,fontSize:13,textAlign:"center",padding:60,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado.":"Nenhum pedido finalizado."}</div>}
+      {lista.map(o=>{
+        const st=(o.statusFaturamento||"").toLowerCase();
+        const fat=st.includes("parcial")?{lbl:"FATURADO PARCIAL",cor:"#92400e",bg:C.amber+"20"}:st.includes("faturado")?{lbl:"FATURADO",cor:"#065f46",bg:C.green+"18"}:{lbl:"FINALIZADO",cor:C.gray600,bg:C.gray100};
+        return (
+          <Card key={o.id} onClick={()=>onOpen(normalizarCard(o,"Finalizado"))}
+            style={{marginBottom:10,borderLeft:`4px solid ${C.green}`,cursor:"pointer",transition:"box-shadow 0.15s"}}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 3px 12px rgba(0,0,0,0.08)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow="";}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:10}}>
+              <div style={{minWidth:0,flex:1}}>
+                <div style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</div>
+                <div style={{...F.body,fontSize:13,color:C.gray700,marginTop:2}}>{o.client||"—"}</div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:3}}>{fmtR(o.valor)}{o.centroCusto?` · ${o.centroCusto}`:""}</div>
+              </div>
+              <span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"4px 10px",borderRadius:6,background:fat.bg,color:fat.cor,border:`1px solid ${fat.cor}33`,whiteSpace:"nowrap"}}>{fat.lbl}</span>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function BordadoExternoPage({orders,onOpen,slaCfg}){
   const [capLot,setCapLot]=useState({capacidade:{},lotacao:{}});
+  const [lotLoading,setLotLoading]=useState(true);
   const [filtro,setFiltro]=useState("todos");
   useEffect(()=>{
-    const load=()=>apiFetch("/capacidade-lotacao").then(r=>{if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}});}).catch(()=>{});
+    const load=()=>{setLotLoading(true);return apiFetch("/capacidade-lotacao").then(r=>{if(r.success)setCapLot({capacidade:r.capacidade||{},lotacao:r.lotacao||{}});}).catch(()=>{}).finally(()=>setLotLoading(false));};
     load();
     _refreshListeners.push(load);
     return ()=>{_refreshListeners=_refreshListeners.filter(f=>f!==load);};
@@ -6256,7 +6848,7 @@ function BordadoExternoPage({orders,onOpen,slaCfg}){
   const FILT=[["todos","Todos",C.gray600],["bordadel","Bordadel",C.red],["mg_bordados","MG Bordados","#7c3aed"],["outros","Outros",C.amber]];
   const topoExtra=(
     <div style={{marginBottom:16,display:"flex",flexDirection:"column",gap:12}}>
-      <PainelLotacao capLot={capLot} destinos={["bordadel","mg_bordados","outros"]} titulo="Lotação dos bordadores externos (peças em aberto)"/>
+      <PainelLotacao capLot={capLot} carregando={lotLoading} destinos={["bordadel","mg_bordados","outros"]} titulo="Lotação dos bordadores externos (peças em aberto)"/>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
         <span style={{...F.body,fontSize:12,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.05em",marginRight:2}}>Bordador:</span>
         {FILT.map(([id,lbl,cor])=>(
@@ -7378,7 +7970,7 @@ function PedidosRisco(){
       <EstadoCarga loading={loading} erro={erro} onRetry={carregar}/>
       {d&&!loading&&!erro&&<>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
-          <KpiR lab="Em risco" val={d.total} oq="Pedidos no prazo, mas ameaçados por etapas atrasadas." como="Folga = dias até o vencimento − tempo previsto do que falta. Folga baixa entra na lista."/>
+          <KpiR lab="Em risco" val={d.total} oq="Pedidos no prazo, mas ameaçados." como="Entra quem está parado além do tempo previsto (SLA) na etapa atual, vencendo em breve, aguardando o cliente ou em reprogramação. O motivo aparece em cada card."/>
           <KpiR lab="Risco alto" val={d.alto} cor={C.red}/>
           <KpiR lab="Risco médio" val={d.medio} cor={C.amber}/>
           <KpiR lab="Risco baixo" val={d.baixo} cor={C.gray600}/>
@@ -7399,17 +7991,21 @@ function PedidosRisco(){
               </div>
               <div style={{textAlign:"right"}}>
                 <span style={{...F.title,fontWeight:600,fontSize:11.5,textTransform:"uppercase",letterSpacing:"0.05em",padding:"4px 11px",borderRadius:20,background:bgNivel[o.nivel],color:corNivel[o.nivel]}}>{RB[o.nivel]}</span>
-                <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:4,fontWeight:600}}>vence em {o.buffer} {o.buffer===1?"dia":"dias"}</div>
+                {o.buffer!=null&&<div style={{...F.body,fontSize:11,color:C.gray500,marginTop:4,fontWeight:600}}>{o.buffer===0?"vence hoje":o.buffer===1?"vence amanhã":`vence em ${o.buffer} dias`}</div>}
               </div>
             </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:6,margin:"11px 0 9px"}}>
-              {o.slips.length? o.slips.map((s,i)=><span key={i} style={{...F.body,fontSize:11.5,fontWeight:600,background:"#9E0B0F14",color:C.red,borderRadius:6,padding:"3px 8px"}}>{s.nm} +{_f1(s.d)}d</span>)
-                : <span style={{...F.body,fontSize:11.5,fontWeight:600,background:C.gray100,color:C.gray500,borderRadius:6,padding:"3px 8px"}}>buffer apertado</span>}
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:8,paddingTop:10,borderTop:`1px solid ${C.gray100}`,...F.body,fontSize:12.5,color:C.gray700}}>
-              <span style={{width:18,height:18,borderRadius:"50%",background:o.atrasoAcum>=o.buffer?C.red:C.amber,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",...F.title,fontSize:12,fontWeight:700,flex:"0 0 auto"}}>{o.atrasoAcum>=o.buffer?"!":"~"}</span>
-              <span>{o.atrasoAcum>0?<>Já acumulou <b>{_f1(o.atrasoAcum)}d</b> de atraso nas etapas, com <b>{o.buffer}d</b> de prazo.</>:<>Folga apertada: vence em <b>{o.buffer}d</b>.</>}</span>
-              <span style={{marginLeft:"auto",...F.body,fontSize:11,color:C.gray500,fontWeight:600,whiteSpace:"nowrap"}}>↳ {(o.etapa||"").indexOf("Bordado")>=0?"priorizar no bordado":"acompanhar"}</span>
+            {/* MOTIVO(S) DO RISCO */}
+            <div style={{marginTop:11,paddingTop:10,borderTop:`1px solid ${C.gray100}`}}>
+              <div style={{...F.title,fontSize:10.5,fontWeight:700,color:C.gray500,letterSpacing:"0.06em",textTransform:"uppercase",marginBottom:6}}>Motivo do risco</div>
+              <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                {(o.motivos||[]).map((m,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"flex-start",gap:7,...F.body,fontSize:12.5,color:C.gray700}}>
+                    <Ic n="warn" s={13} c={corNivel[o.nivel]} style={{marginTop:1,flexShrink:0}}/>
+                    <span>{m}</span>
+                  </div>
+                ))}
+              </div>
+              {o.vendedor&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:7}}>Vendedor(a): {o.vendedor}{(()=>{const rp=responsavelPosVendaDe(o.vendedor);return rp?` · Pós-venda: ${rp}`:"";})()}</div>}
             </div>
           </div>)):<EstadoCarga vazio vazioTxt="Nenhum pedido em risco agora. Tudo sob controle. 🎉"/>}
       </>}
@@ -7672,6 +8268,32 @@ function AppInner(){
         }
       }
 
+      // ── APROVAR AMOSTRA FÍSICA c/ anexo do vendedor (opcional, multi-bordado) ───
+      else if(tipo==="aprovar_amostra_fisica"){
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        const res=await apiFetch(`/aprovar-amostra-fisica/${bordadoId}`,"POST",{
+          fileBase64:payload.fileBase64||null,
+          fileName:payload.fileName||null,
+          bordadoKeys:payload.bordadoKeys||[],
+          obs:payload.obs||"",
+          ctx,
+        });
+        if(res.error) throw new Error(res.error);
+        resultMsg=payload.fileName
+          ?"Amostra física aprovada e anexada. Pedido liberado para bordar."
+          :"Amostra física aprovada. Pedido liberado para bordar.";
+      }
+
+      // ── CONFIRMAR AMOSTRA FÍSICA PRONTA (executor — sem anexar) ─────────────────
+      else if(tipo==="confirmar_amostra_fisica"){
+        if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        await apiFetch(`/mover-etapa/${bordadoId}`,"PATCH",{
+          novaEtapa:ETAPA_STAGE_ID["Aprovação de Amostra Física"],
+          nota:"Amostra física pronta → Aprovação de Amostra Física",ctx,
+        });
+        resultMsg="Amostra física confirmada. Enviada para aprovação do vendedor.";
+      }
+
       // ── REPROVAR AMOSTRA (limpa arquivo + volta etapa) ─────────────────────────
       else if(tipo==="reprovar_amostra"){
         // Regra do processo:
@@ -7794,9 +8416,11 @@ function AppInner(){
             ]} onOpen={setSel} slaCfg={slaCfg} user={user} faltantesExtraEndpoints={["/buscar-loja","/analise-producao"]}/>}
             {page==="buscar_loja"&&<CaixaPCP title="Buscar Produto em Loja" sub="Ao concluir a busca, o pedido vai pra Retirar e Conferir." endpoint="/buscar-loja" etapaLabel="Buscar em Loja" acoes={[
               {label:"Concluído", cor:C.green, icon:"check", apiPath:"/pcp-concluir", confirmMsg:"Concluir a busca em loja e mandar o pedido pra Retirar e Conferir?"},
+              {label:"Enviar p/ Conf. Separação", cor:C.gray600, icon:"arrow", apiPath:"/pcp-rotear", body:{destino:"separacao"}, confirmMsg:"Devolver este pedido para a Conferência de Separação?"},
             ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="analise_producao"&&<CaixaPCP title="Análise da Produção" sub="Ao concluir a análise, o pedido vai pra Retirar e Conferir." endpoint="/analise-producao" etapaLabel="Análise Produção" acoes={[
               {label:"Concluído", cor:C.green, icon:"check", apiPath:"/pcp-concluir", confirmMsg:"Concluir a análise da produção e mandar o pedido pra Retirar e Conferir?"},
+              {label:"Enviar p/ Conf. Separação", cor:C.gray600, icon:"arrow", apiPath:"/pcp-rotear", body:{destino:"separacao"}, confirmMsg:"Devolver este pedido para a Conferência de Separação?"},
             ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="conferencia_direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg} subTabExecutados user={user}/>}
@@ -7808,7 +8432,7 @@ function AppInner(){
             {page==="bordado_externo"&&<BordadoExternoPage orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ análise de frete" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="analise_frete"&&<Fila title="Análise de Frete" etapa="Análise de Frete" endpoint="/analise-frete" orders={orders} onOpen={setSel} actionLabel="Finalizar pedido" actionColor="#0891b2" slaCfg={slaCfg}/>}
-            {page==="finalizados"&&<Fila title="Finalizados" etapa="Finalizado" endpoint="/finalizados" orders={orders} onOpen={setSel} slaCfg={slaCfg} finalizado/>}
+            {page==="finalizados"&&<FinalizadosPage onOpen={setSel}/>}
             {page==="alteracoes_form"&&<AlteracoesFormList/>}
             {page==="codigos_barra"&&<CodigosBarra user={user}/>}
             {page==="impressao_pedido"&&<ImpressaoPedido user={user}/>}
@@ -7839,6 +8463,8 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
   const [filtroChip, setFiltroChip] = useState("todos"); // todos, atrasados, risco, pendencia, aguardando, sem_contato, vencem_hoje
   const [filtroEtapa, setFiltroEtapa] = useState("");
   const [filtroVendedores, setFiltroVendedores] = useState([]); // array de nomes
+  const [filtroRespPV, setFiltroRespPV] = useState(""); // responsável pós-venda
+  const rpv = useRespPV();
   const [vendedorDropdownAberto, setVendedorDropdownAberto] = useState(false);
   const [busca, setBusca] = useState("");
   const [selecionado, setSelecionado] = useState(null);
@@ -7876,8 +8502,9 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
     if (filtroChip === "pendencia" && !p.emPendencia) return false;
     if (filtroChip === "aguardando" && !p.aguardandoCliente) return false;
     if (filtroChip === "vencem_hoje" && !p.vencemHoje) return false;
-    if (filtroEtapa && p.etapa !== filtroEtapa) return false;
+    if (filtroEtapa && !((p.etapasAtivas && p.etapasAtivas.length ? p.etapasAtivas : [p.etapa]).includes(filtroEtapa))) return false;
     if (filtroVendedores.length > 0 && !filtroVendedores.includes(p.vendedor)) return false;
+    if (filtroRespPV && responsavelPosVendaDe(p.vendedor) !== filtroRespPV) return false;
     if (busca) {
       const q = busca.toLowerCase();
       const bate = (p.client || "").toLowerCase().includes(q)
@@ -8016,6 +8643,10 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
         <select value={filtroEtapa} onChange={e=>setFiltroEtapa(e.target.value)} style={{padding:"8px 12px",fontSize:12,border:`1.5px solid ${C.gray200}`,background:C.white,borderRadius:6,color:C.gray700,cursor:"pointer",...F.body}}>
           <option value="">Todas as etapas</option>
           {Object.keys(dist).sort().map(e=><option key={e} value={e}>{e} ({dist[e]})</option>)}
+        </select>
+        <select value={filtroRespPV} onChange={e=>setFiltroRespPV(e.target.value)} style={{padding:"8px 12px",fontSize:12,border:`1.5px solid ${filtroRespPV?"#7c3aed":C.gray200}`,background:C.white,borderRadius:6,color:filtroRespPV?"#7c3aed":C.gray700,cursor:"pointer",...F.body,fontWeight:filtroRespPV?600:400}}>
+          <option value="">Todos resp. pós-venda</option>
+          {(rpv.responsaveis||[]).map(r=><option key={r} value={r}>{r}</option>)}
         </select>
         <div style={{position:"relative"}}>
           <button onClick={()=>setVendedorDropdownAberto(v=>!v)}
@@ -8522,6 +9153,7 @@ function BancoImagens({user}) {
 }
 
 export default function App(){
+  useEffect(()=>{ carregarRespPV(); },[]);   // mapa "responsável pós-venda" (KV)
   useEffect(()=>{
     // Define o favicon (ícone da aba) e o título da página
     try{
