@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.45.0";
+const SGP_VERSION = "v2.46.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAAba0lEQVR42u2deZRcVZ3HP+9V9ZZ0N2kSDCKbqHNAFAVFGRdcBkRBEWVAQWVxPW6g6KDiOMcjruioOMooUQFHDKMzoCOIoMZ9EAQRYRRQlC2GGLKn053urvfmj9/vR90UVd21vPtqu/ecOr3U9t693/v97b8bAd8ClgJzQEQYYfgdCTAK3AicWQQOBHYHZgMAw8gJgOPAJoAiMA1sB0oBgLmP1Pk96iMAFoEdBsAIiPWJAMD8R1wFjL08DG+Re/NhtIcJhlX1KfX77gsj3zEHTAC/Bt7jSKK+G8WAhbaAbwlwK3CqeiCKwExgwDDyYr5bgROBB3UNJvVnGgAYhk/w7api9wRgtYrdvwHbgEJgwDB8gm8Z8FPglcBaBVwKbFYQFgMDhpH1SNXCXQZcAZwMrFfwlXT+54C7AwDD8AG+VMXuV4DTVdTGlN0uNv+3dtBapHluhABAP6OkLDcGfBh4B+L3M4e/u9ioXjjVAeuR6nUP5gXCAEA/+t4iBdpbgPN0UaMK8OH8fQvwF2CojWK4pN9fAm7ICxsBgNnrexPA/Yib5TIFX1IFfC7jTAKrHOC2Y9OM63W8V/XRkTyuJQAwm2ELtRT4AfBi4DpdyNICrGbP/SewhXzdMale+1LgDuAFwG7Ac4CteeAjADAb9hjRxyeAk4C/KpDm6gRvrGL4amWiuZyuewDYBVgJHKW63/uBDXlthADA1ljP2ON+4FVqcJQqLN1GxqeAjZ6NgMSxzjcAbwbepOL305RdRMEK7mBdb04V9jHgG8CLgGsd1kiaAEUM3A58VFmwlDEIE/3MMWXrS5X1VurzbwaekbcaEJIRGrcUi2po3Al8BLhcn2uVORL9jAuBx6kFvY5y/lwrOl6EpMHHwC+U6X7sXPd+wFmq9+UaEuwHAKa0nupk2eK7qKj6N11ESyZIMxJbxoTvRfIE34r4B6ccV069oEN1PNMprwdWAN9xwG6uoXN1U20OAMxW5BRUVO7QyU6bBN64ft7Vqqf9JiPWq2URJ8A5wO/056OR0onpBb4vVv1xWH9fC3xfxewqB5ixY4icoirERtoQDuxVAJqusx34PfCYJsRWQRmvpOLqi+piMeAlnpR1Y+wI8SOuAl4NvBR4rG6Gys1kTDYFPKDAXaXXfY/zOnfDlIB9FODbaVM6WLEHWS9Cgv83AV/TxRtAEj6jOnSlIcQhvFUZ76vAD52FjnKwEi0eW0AyZT4NfB6pYHyCAmdCjYltas3ep3rpXfq3y4p2zSXnPgA+hFREbqJN6WDFHmO9EZ3Iz6me9nngEJ3guGJx3UUe0keChMSuBb4J3OwsWOzBMq3nngxAM3o9N9fp3Ygq9MFKFjwFOE5Fb9tyEXsBgDbJZpm+XwF0MXCkWpJu+lNBGXFAf58G7kXin9cgOXubqgCvXYVDSQX7RnUwZzIPMEuqknyAciY2AYDNL05R9aKVwL+oyLoIqbfYhISW7LU7VLTeDfwJ+C1Sof87tQBdlkg96nmtiOVmh4G3CHxc1ZTcrd5eAmAJWKwK9FmqqwG8UBXvD6uVN6mgW6dW4Wr9OVVDbHUS6LIcxn5nIg7oDXRAGUC3AtCKe24HzlDxCRJM/zISFvtpA3rSfGKrF4apIIcBZyvzxZ2yK7pN3ysh8ddr1TVxg07wPoiPbhESZnqOvmdIn7dHJdMl9HYqvCXBLgU+i/gJO6YLRtxl4IuU+S5UllurxkQE/CuwN+Vg/oXAE1XvwzEkeh1wlXqf+fc+ARxAuSyAAMDGwBerzncu8G4kVDWgP89Q8Wvgm9Idf5GCskR/lj1aStgZSCnoxk5Tu7oBgBaVGATepWLW3CmzwKH6f9eii9Xw2E/dMUsdN0ye7BN1APhegLimtnTienc6AFPK/rq3KaMVnOcWIelLwzy8vVxRQXkIEoRflLPuk5JNIkQrRscBiEM+pUO7n3UyABPHcHgbEpkoOi6SBHg78HRqpxEVVewciURHBh128sl8IH625W0AoblbliPloEsRZ3tHrnWnAtAtD3w78F8KpjnHqjsQyZlbSLQUkbSpk1RUp57v28C2XNk5zlEc29yMIe6oA2hDjl+vMOBipHXZNx3wRc51n0M51y2qAxQzwOMdgPseW4BjKdcEF3IC3wjwJeBwVUE62tfbiQBMkPZlH0OiG25xj03y0Yg3v5H08chxyeQ1t5t1oxyj91D0DL5hxP10DG1OMuhWAFpd7VcpF3S7wXjb4Wc1yWJ56mIWZZlT/fPpnkBoczSuRtqx3QK+TgNgCUkAXYWkpNuuTp1rTYFXAE+hAzI56gThjKoTlwBPzRCEkWOU7YUkrx5Nh8R4uw2Axmx3I3UQ0xW6WuQo12/U57ulpa2lfO0KfB14tmNMxS18Jvo5zwa+jcR5N9Bl8f1OAGDqsN2ZSLaKK3pd9nu5GhJTdFcYMUaydpYoCF9Dua64UOe9RM5rrTrvnUga2l6qD3ddckknLGKiovc84Gfs7Otz2W8IyfHr1gN1CmoEFYHzgQsUOCUWzsQxfdJea6z3QX1+ii4NNbZ7x5jedy3isa9WZWY7/kjgSXRYML2JDV9CfHMnq6vkEnU13VvDRWTgGwSeqZvQ2mhsbIBBAwCriN5BxEn8PkcvSqswJIgjuRcaeZtTehMSpfgg8I9qQKxn54o3U02eoqz5WJUEW9W46foEi3buHDu07jzgj1X0Plf3ezzwrC6xfBsRyTPKYqM1yMBUjb2Bg9WY2Uxr3RICAFUMjSNZyxfz8M6hlQtwLOIf7LUTPc2wmFuA2WfViInosbSydgHQDkk8Vye3lu5jXTuPotzdoBdHPaHEnmwk1Y6bsq4FKymn0yfzXNvBwP50cEZHGN0DQMvve0CV6nr6tTwPyeUrheUKAMzC8BhT18O98+h+xpQFNT7Cae4BgJmw3zDSTfSiBdjPrmtfR/wGAAYAtqz7LUJCUWuofmxBpVJ+MBJDDQwYANgy+w0q8P6jATAdQrlNRhgBgC3pfqPAVUgbsfl0P2PLCHFAd2vsN4wOAmABcaReWsdrDWwTSLeDmQDAAMBW2W8x4vO7mYUbPBrYHoXESoP+FwDYsv5XQNKHkjq+08C2pwI3CcvUu6OYA/gGkZODrnEYsZ6xB+UoSZTBdbSjJ4zbibWZ5wMAMxC/i5BO7X+tw/hwx96I39C6W7UySvpZgznObeRcf6nGJrLI0FC/qhl55QP+oEK81guau8imi6clvq7NcW7nkEaZ87VDS3UNNtCnoUafALTdvQ74X+d/9YAF4JNIP7usRHDkGDQ+9Ur77NVIt9aojutK1UtQ7xwFANa56CNq/d7bxMLbCUE+RGMeI0HKB8JoIwCLyLm5ZgmXOgAoeTJM1KHX1RcAtFYYv+4CoNADYO/KEXuc+AHkyIQ/VOhGYYThnQFTdS3c41ieaRObI8sqONNB89wIjVjvwQr2wIC3N6n/0Qaw+Bghi7uNOiAKwGaYKkVSsZ5MNrUg1lnhL5TPD/Gln9n1jyNt0iydrJYfMNZ7vFKt/og+0h2LHhdhBjkOqxm9tAQ8Fzl6IYuGO9b27TLgJ/gtcDcALUPqXkZYOBLyN+Dn+HE79R0ATeROIuG3ZtnmTqRrwtYMGNBOuczTL5cgRefTdQBwU78aab4YsKDMta4JANprVyuLDpBNo+929FApOIZINM9m7cczTB4Sdz4Y0OKbW5t8P0jm9IP07qnuYXgEYKziZ6YJpdpeu55yMD84dAMAG/7cjfOInnpEVwrcpgwYABgA2PDnbm0BgDZuokNP+AmjswGIWsGtiHGQ08wfDCwYANjosNy7VlwYkRoi/4f40tKMriuMPmHAmQyuLQF+RDbF6RHlVnBh9AEAs8hiBvgh4qjNwlc2GZa8fwDY6smUJobvQHIKWy3RtL7MPkSxNZAsVDzCaCMAixVM1ooYvpxs4rfrPYDN7jFBQm6z+nNTgFf9IMl6pMpYrQ5jvKuRxIY9aa5Vh3VjWNsi6GrVFy8BdnMeuyCt5cyJHoyfGipa0ZNIssPzWmVAi5VuRM4MPgcJ7heauNkdSHy5kWHfU6Kc2zeKnMP7ZOCJwGOQIvoJpAZ6wAHrNoL7qNqaPmQQFnVhYg8AXJIBAN0L/hpwii50Ix2zDMSbHQAudE2xAzyQHjXPAY4ADqXcNiTVa5nTxzTl8kqCHjgvIcwYAEsZ71ITdxNIEqh1t09bAHMBSe26FDlJs5EkBUt5WsPC5QEmag14ByMH5LwA6dRlyaM7kGQLe0/k/B5A1yAApxyREWUIwF2RftBZHBJt1/YV4JVIsme9LGj9af7ksH1SQ9yaqH0q8GaksHxMWW0L5USLALTWjd9J+8XH2Wt2EM2yjHRM66r1APCFJlwyMXBLjWtxWW93JAv7u8jxWYky3Yxj+QaDIhuS2mwLsznjSTUGXKy6UlZGjoHwYuBXagyU6gTfNPCbKuI3cj77JUgTpTeoPrfRYcYAuuyNkE22OOvJvkbCxN5+Hi58Gjngb64O5rbruB+JKbsAdO/5Awrs3Sn7CoOI9QvCB20RfHaM2t+DaC8gzY6+qJb23AKsOYykdW1yQGd64CJgBXC26iQ7CBnYeYjfElKIRazskLWz1Pw8+1dYlVm5eGKke9YNqmuWFthtP66wWFMF35fVqFlf4X4Jw68BskP1eWLKxT9ZA3BGXRe7ZagHuiJ0EjmyfgvV0/ZN/K5l51pgMzo+j5zCuS7oebmK3gKSrLzGBeBkxjqPAXA3JGqQNbuYb/BWFZ/DVQwME7HX6T2a+yRRne8EBV8QufmOos77egPFGvxkHZv+9TRPN2L64LeATyGO76RiEyRIc3QzKkrAccAZ6l4Jhka+I1GpdJ+K4dj8gPeRffWZ6YFPd77cxw0VgI8hJzDZsQ52Lt0fgVWUM7T3BD5M2TkexG7+YwBpOoABECTnbiBjkJiy+QTkzI/Ug5Lvdph/J+JAXqrifwS4QvUNY/f3KwjD2cPt1QNvo0Ivu5XsszZMD3wE8PfsHDPNmgUt2+VNSAb17mplXeYw8eHA8Wq0BL2vPcMMEANg4gJwm6eFiYAj8XsehrlmtgKnAb9AcgjvdqzeM/X+QqPM9up/qyk3rUoNcHchjcT3zVg8xUiywzPUIl6Hv/ZjBsItiG9vmLLD+XnKgFuD4dFW0TuMxOQtASaxAPs0co7bsAdDZAewF/B8D+6YWiDcpCLYvu9UwrGvnTAiykd2RLY4ppf9zDP6j/NoDVfTCY39HgE8i/Yc1dWporAd8zCg0umXDiZ2yo37JeIczNofaLlfz0Sc0j6s4WqANyCuQ/x+a5DYcalPgZhSPrV+MGdd2HzCv0dcYw+dGRM7Yuse4Ldkf0KlmyF9oku/OU7695B0q2uQRNkB+qt/szXIXKYG51dz9gRYi+QfUXFialzx82r89GGJlAVfhvjp8m44VFCL+CTgPUiG8xJ6oxF6PeJ2F/37fN2IQ9SfT5ml++V7rvh1gVdyALgOP1GRaSQ/8PicxHAlA9j3/TvSPPy7ugiL9Pmkx4CX6P0tRhJtX4Y44h+BZHtvI98Dy29CcjJ3OrItdhBpqVk/1QvPekEMhKc5nx/lvCi2G28HXgO8VidlQnWUbgZi6ui3i5FalhvUA3AS0mks0t8brSxs9boGkbJaC51CFZeIXcxKT+CIVfQ9QXXBvFnQXSSz/r8DHA28W3XgJUgIL+kiqzl1dLxxBd+vgdepuL2Scj3LuDLhVE5zbwcW3acSh0qxH1dRVH+COAsXe2ADc0y/UfWSdjWfNHAVdFOsQEov/wk5WmxcH1GHsmLqXNegGlaxGlmnKPCuQBIwCs59HAM8jvJ5JHmoPqNIRtJ6qvhi4yrK4gxwiSLXhxieAh6vorgdLFjNOiwgzusVSCnma1VvSih3PMBZ9LRNm8a+f0DZegwJbV2AJNeeBFxVBXgm+l5J7SMjfIwBpLjr4krjgxruEPt7VE3mfcg+c8Q9G+NIncCoA1imsigdVReOUXY8QOdlFonuzDoTGtFcsoV7qPcRSJ2EG6q0HMZjgW843/lXJNH2apVYG+a5B/uMZyJNnmZy3NxLkTS5t1DjuLZilQkxk3kF8GmyP73HwnN7INnMZ9AZqVGuLmX+0dv08RngSUh7DnOoL1PxZx2xZucR17XOCEmpr2ZmVlWDnyCJFtdTDjXiiLakymcZmF+lUm2KfOLh1g7lC7XYr9bE2P8WI6lN+3lSWi04faJObDMHGvoesSPG3LEX0pjoYOBA4NHAcp2zQWeuEmpnAdk8DynzHYbUr1RL1jAVYHuVa5tPJbCNtK+u5UhOInhO2W8F8K751jaaB70lBccKleNZ7xqr2bhdLdFJ/KZstcra0TwLPorkIO6pjz2UISdUTxupMtdT6ovbrBb4l1m4g2uhAtj1sFBJJc0/k08Zgmvc/YNawDVVrKiO3X85ksq02cPF2045HykU6kQWnG9uGgFDFpsgbeL1Y8p++1JuFOWb/ZYp4M9faE0XAmCiYuYqyk7OyMOOGQZO1onqFhDWYshqel5ax3uyvmebxxOACz0RSC23y+/UeNuxkFSLFxCRBSRP8AIVJz6AYRf4SRVdJbqvXsM1ANzHfOxY+R4fbpuCbuw0pzkw0J9DnWcfx3XcRKzWcD1dCJoVZ9tVRHxG3RK+6kf6ZZhVfChSj5NH3Ncynr6ANI+qS5LVQ8lWXHSLGiUFso9gGAgPUgD+mFC/kYW+eLaCcLtnAJaQyNavgLc77E4WADRqXYM4j4/DTyjHwnSH63fdHEDY9DwmwN7Ah5w19CVRLBy4DXi1upLiLAFoN1BEUmoe5ZnW55DIw61I9mwAYeMATIHXAy/GbyFW6rih3oY4yRsyIhsBkBkH70HqR5bQ2nlwtUSHXfwXkbYec4Q63kbmz/IAj8d/AX6CuNHOQ9x1xUZthLgJtE8iBeB/xk9WrXVUGEWSIg4JIGyY/Sx27TPtag7Jwvk68HGadJ/FTSC+gCSunopESEbw48ParrvrUsQXGUBY3/pEObheLIBwLfAO57tT3wA0UVxAgvSn6S4b8gjCZUiS7GEBhHWx31OQRgA+dfQJpL73DSrmm2420OwFuq1yT0eyNYY9gLCoIn8CSUc6ip1z3cJ4+DgZP8nELvh+40jAuJXvasU6Msv4z0g559FIcsFMxjsv1s8cVhfQenXRuLs+GB8yD3sA55LtuS+V4Lu+GXeLDwC6OuGf9cKO0ouc9gBCs7hfrAbKz5Vxg5umHPk4HXipSo04Y/AtRdLmXoM0NC1kMe9Z+IeMCe9FIhiHI77CrL3vtst3AM9FDgu8Hj+pYt3IfiPAR5UA5jJiP4vT74p0on090l4jzmrTxxnukALSeuHlyk7LyD5VybKV1yMp7FciWReWqdOPQDRxewSSJJuV68Wk2y7A59TgmMwSfGS8YO6plN9Wyj5MDRQfseMpnZyXI63fbnRY11cLuE5mwQ8iFW9ZqD/WQyYB3occX4aPec2aMazGYRapKtuo4tJOzfShF84hdRpHITHkO/uIDY39DkJSoGYdoDS7fnbU7j0qcr/t6JiZb2ofi+SexXEjkiFxKFJhN5WxdWZpW5NITcbLgL9TEK7zeI+dBsB3Ii3oWjE+zLW2BElAPh3x9XpNEPa5OMZC9zoi+amUD3nOmg2tMu0QJA66BElm2OLcay+JZov7Lgc+QrmpVDObew5J3Z/VzzqbchKD1+z0vApUJpHOSHcrGy5XXcUHG04h6UHPReppF+v3uuf9xj0APgPcq5C0+2YiH8Z6E0im05uQpIIoa2OjXQCsFMm3IT1CliHxXUs8yDID2iZuu+7qIxSIyykfypNWsGK3gK7g3J+B45M0doC3q+uN6/s+i9Rn30PZv5eLpMhTPzI23KQgvEPdBnsjkY4sa0HcDgEGRDum4SCd9DWUi2ZwFrcTAQc7FziNqiQ5C2nAXq+BZ8X3Qwq+XyBdCy6jfPxtkvdNtkNxNj/TBHJ8wmt1QlwxmTX4rafKYp3sO5EqvO8jsc3pGpszxW+9clQxL9TQux6pOvThavU/RlWNrXWuo0WNxlUv/yzSKTXJm/XaDUB3gW2in6iK74v0720Oi/kAYoREDkaUIe9EEit+jsSZV8+zeaKKz6v2e605rpzv+Rb9kUhO36H6OBApfrdTDaap0m+vyjBGG9d7vRSp111dobK0jebbLWbc3igvVLHyNBWTk56A6IIxRhIdLKVsnaoHv0XqW+9A8h83epqDIcSRvre6kA5Euoc9Wv8/pIw9Tbk5UVzH2hm4x/TnNUh1400OAbS9B2KnKOCxI+YG1Kp7K9KdappyEZQvHS1xjKUBXXQ7O2+bGi73I20m7ke6U61VUG7VjWJ6rHWfsh4xg8q0u+hjmTLZHkjM/FFqIC3R77WjxWb0kdZg34XuZVTfcx0SSrvGAV5KhyRwdJoF6IrlUaSf3euUFaZVhPgEYjWdr6BgHHCMgtQB26wy1A5dVGOpwYr3DjigdD9jjod31mqm3ZsLvCISBLgA8cEm7NzbpqMsrU50N7hiecwB4gG66NurKO7kCEoXJHEFYKIKnTBxGKeaMdNsb0HXuIgUeJEaVF9S4M1SvWdgAGCTQDweKQN4sv5/G+2P+6ZtmGtXfx3T369DOmxdRTkm3PF9drrBCVsJxCGkB/JpyGHYAwrEuQb0pG4dJrYHlfG2I0miFwE/qFAbuqLJejctViUQI8QJeyrSh27MMQZ864l5DwPTMJImtQ5pz3sJ0hHfnZ+uOhOvG9mimk5zEFKM8xJ1Z5jBUq/LolPZLnH0uyJyrO5/I5GLu+aZDwIA87OaXZfC7kiC6gkKykIXiufEcUeNqnV9I1IVeCUSynQNsK6uh+kVfamyl/OgiuWTkKyYCRXP0w5wO5XtFqmoXYsUfq9EIjS1Nh0BgJ11PwV27lmzP/AKJCPmsQrSSXY+MamdbJc4bJcgR4ddro97ulm/60cAVuqJLlMsQUJ9r0BqVRYrEHe0wWgxph5RxtuAnNF3GbDKYeqeELP9CMD5xDNI+4oTkYq6fRSE2yn71nzMi22GooI/QpIgrlDD4k7ntUV6/yjZvgEg84ix3dRyPhFJdTKf4gzZJava9w0p8LYip9NfpjretoqN0nNiNgBwYVaMgGerK+coJGFgO60lQbghsgGkLOC7wDeRdsc9aVQEADbHiq543k/dOCcgdbaWFlZPyM+AVEAc4yUk/Wkl8D9IQX3fsl0A4MKs6Cr84yqeT0ESQiMVn9WSQN0Q2RiS2f1DpHnjKnY+LLtv2S4AsHnxfCRSNvA81eW2Om6cRP83ivjurkBCZLdViNm+Z7swGt+clUz3DAXX35CIxAMqnv+AHDW2TwWQC2Eaw8hiVFbMPQ05hPkWpGn78nleG0YYmYpnl9UmAvBaG/8PqSn74hqrhpwAAAAASUVORK5CYII=";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -221,6 +221,8 @@ const ICONS = {
   barcode:   "M3 5v14M6 5v14M8 5v14M11 5v14M13 5v10M16 5v14M18 5v10M21 5v14",
   print:     "M6 9V3h12v6 M6 18H4a2 2 0 01-2-2v-4a2 2 0 012-2h16a2 2 0 012 2v4a2 2 0 01-2 2h-2 M6 14h12v7H6z",
   lock:      "M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z M8 11V7a4 4 0 118 0v4 M12 15v2",
+  chat:      "M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z",
+  radar:     "M12 2v4 M12 18v4 M2 12h4 M18 12h4 M12 21a9 9 0 100-18 9 9 0 000 18z M12 16a4 4 0 100-8 4 4 0 000 8z",
 };
 
 function Ic({ n, s = 16, c = "currentColor", style = {} }) {
@@ -247,6 +249,8 @@ const SLA_DEF = {
 // Cada módulo é uma permissão individual atribuível a um usuário.
 const NAV_ITEMS = [
   // Principal
+  {id:"raiox",       label:"Raio-X",             icon:"radar",   grupo:"Principal"},
+  {id:"chat",        label:"Chat",               icon:"chat",    grupo:"Principal"},
   {id:"demandas",    label:"Minhas Demandas",    icon:"pin",     grupo:"Principal"},
   {id:"dashboard",   label:"Dashboard",          icon:"grid",    grupo:"Principal"},
   {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
@@ -361,7 +365,8 @@ const ETAPA_STAGE_ID = {
 // Helper: usuário tem acesso a um módulo?
 function temAcesso(user, moduloId) {
   if (!user) return false;
-  if (user.admin) return true; // admin vê tudo
+  if (moduloId === "chat") return true; // chat é de todos
+  if (user.admin) return true; // admin vê tudo (inclui Raio-X)
   return (user.modulos || []).includes(moduloId);
 }
 
@@ -1016,7 +1021,7 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 }
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
-function Sidebar({user,active,onNav,collapsed,onToggle}){
+function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
   const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
@@ -1058,6 +1063,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
             collapsed={collapsed}
             active={active}
             onNav={onNav}
+            chatTotal={chatTotal}
           />
         ))}
       </div>
@@ -1074,7 +1080,7 @@ function Sidebar({user,active,onNav,collapsed,onToggle}){
 
 // Item do menu — extraído pra que os hooks (useState) fiquem no topo do componente,
 // respeitando a regra dos Hooks do React (evita o erro #300).
-function MenuGrupo({grupo, collapsed, active, onNav}) {
+function MenuGrupo({grupo, collapsed, active, onNav, chatTotal}) {
   const gi = grupo.items;
   const podeColapsar = grupo.label === "Outros" || grupo.label === "Cadastros";
   const chaveLS = "sgp_menu_grupo_" + grupo.label;
@@ -1116,13 +1122,18 @@ function MenuGrupo({grupo, collapsed, active, onNav}) {
       )}
       {(collapsed || !podeColapsar || aberto) && gi.map(n => {
         const on = active === n.id;
+        const badge = (n.id === "chat" && chatTotal > 0) ? chatTotal : 0;
         return (
           <div key={n.id} onClick={()=>onNav(n.id)}
-            style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start"}}
+            style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start",position:"relative"}}
             onMouseEnter={e=>{if(!on)e.currentTarget.style.background=C.gray50;}}
             onMouseLeave={e=>{if(!on)e.currentTarget.style.background="transparent";}}>
-            <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
+            <div style={{position:"relative",display:"flex"}}>
+              <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
+              {collapsed&&badge>0&&<span style={{position:"absolute",top:-6,right:-8,background:C.red,color:C.white,borderRadius:9,fontSize:9,fontWeight:800,padding:"1px 5px",...F.body}}>{badge>9?"9+":badge}</span>}
+            </div>
             {!collapsed&&<span style={{...F.body,fontSize:13,fontWeight:on?600:400,whiteSpace:"nowrap"}}>{n.label}</span>}
+            {!collapsed&&badge>0&&<span style={{marginLeft:"auto",background:C.red,color:C.white,borderRadius:10,fontSize:10,fontWeight:800,padding:"1px 7px",...F.body}}>{badge}</span>}
           </div>
         );
       })}
@@ -8369,7 +8380,7 @@ function AppInner(){
     setUser(u);
     // Se o usuário entrou direto numa URL com hash (#funil, etc), respeita
     if (!(typeof window !== "undefined" && window.location.hash && window.location.hash.length > 1)) {
-      setPage("demandas");
+      setPage(u.admin ? "raiox" : "demandas"); // admin cai no Raio-X
     }
   };
   const doLogout=()=>{
@@ -8406,6 +8417,14 @@ function AppInner(){
   const[usuarios,setUsuarios]=useState([]);  // lista para @menção
   const[buscaPedidos,setBuscaPedidos]=useState(""); // busca inicial em Todos os Pedidos
   const naoLidas=notifs.filter(n=>!n.lida).length;
+  const[chatResumo,setChatResumo]=useState({total:0,porPedido:{}}); // badge do chat
+  const[chatPedido,setChatPedido]=useState(null); // pedido a abrir direto no chat
+  const carregarChatResumo=()=>{
+    if(!user?.email)return;
+    apiFetch("/chat/resumo?email="+encodeURIComponent(user.email))
+      .then(r=>{if(r&&r.success)setChatResumo({total:r.total||0,porPedido:r.porPedido||{}});})
+      .catch(()=>{});
+  };
 
   // Carrega notificações do usuário (e atualiza a cada 30s)
   const carregarNotifs=()=>{
@@ -8424,8 +8443,21 @@ function AppInner(){
     if(!user)return;
     carregarNotifs();
     carregarUsuarios();
-    const t=setInterval(()=>{carregarNotifs();carregarUsuarios();},30000);
+    carregarChatResumo();
+    const t=setInterval(()=>{carregarNotifs();carregarUsuarios();carregarChatResumo();},30000);
     return ()=>clearInterval(t);
+  },[user?.email]);
+
+  // Hidrata o SLA salvo (KV) no boot. Sem isso, o slaCfg do app fica preso em
+  // SLA_DEF (ex.: Programação 8h) após qualquer F5, mesmo que o admin tenha
+  // salvo outro valor em Configurações — as filas mostravam o SLA errado.
+  useEffect(()=>{
+    if(!user)return;
+    apiFetch("/config-sla").then(r=>{
+      if(r&&r.success&&r.config&&r.config.etapas){
+        setSlaCfg(prev=>({...prev,...r.config.etapas}));
+      }
+    }).catch(()=>{});
   },[user?.email]);
 
   // Abre o sino: marca todas como lidas
@@ -8711,6 +8743,7 @@ function AppInner(){
   };
 
   const TITLES={
+    raiox:"Raio-X do Sistema",chat:"Chat dos Pedidos",
     demandas:"Minhas Demandas",dashboard:"Dashboard",funil:"Funil em Tempo Real",
     painel_fluxo:"Painel de Fluxo",gestao_vista:"Gestão à Vista",pedidos_risco:"Pedidos em Risco",
     gerencial:"Gerencial",historico:"Histórico",ranking:"Ranking / Premiação",
@@ -8727,11 +8760,13 @@ function AppInner(){
   return(
     <div style={{display:"flex",height:"100dvh",...F.body,background:C.gray100,overflow:"hidden",flexDirection:"column"}}>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
-        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)}/>}
+        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)} chatTotal={chatResumo.total}/>}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
           <Topbar user={user} title={TITLES[page]||""} naoLidas={naoLidas} onBell={toggleBell} onLogout={doLogout} isMobile={isMobile}/>
           {showN&&<NotifPanel notifs={notifs} onClose={()=>setShowN(false)} onAbrir={abrirPedidoNotif}/>}
           <div className="sgp-scroll" style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
+            {page==="raiox"&&(user.admin?<RaioX user={user} onOpen={setSel} slaCfg={slaCfg} onIrChat={(pid)=>{setChatPedido(pid);setPage("chat");}}/>:<div style={{padding:40,textAlign:"center",...F.body,color:C.gray500}}>Acesso restrito a administradores.</div>)}
+            {page==="chat"&&<ChatPage user={user} chatResumo={chatResumo} onResumo={carregarChatResumo} pedidoInicial={chatPedido} onLimparInicial={()=>setChatPedido(null)}/>}
             {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
@@ -9481,6 +9516,270 @@ function BancoImagens({user}) {
           <div style={{...F.body,fontSize:13,marginTop:6,maxWidth:320}}>Digite pelo menos 2 caracteres da razão social ou do CNPJ</div>
         </div>
       </div>}
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CHAT DOS PEDIDOS
+// Cada pedido (nº Linx) é uma conversa. Threads à esquerda com badge de não-lidas,
+// conversa à direita. Notificação = badge global (polling em App). Mensagens no
+// Supabase via worker (/chat/*).
+// ═════════════════════════════════════════════════════════════════════════════
+function fmtChatData(iso){
+  if(!iso) return "";
+  const d=new Date(iso); const hoje=new Date();
+  const mesmodia=d.toDateString()===hoje.toDateString();
+  return mesmodia
+    ? d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
+    : d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
+  const [threads,setThreads]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [sel,setSel]=useState(null);
+  const [selCliente,setSelCliente]=useState("");
+  const [msgs,setMsgs]=useState([]);
+  const [texto,setTexto]=useState("");
+  const [enviando,setEnviando]=useState(false);
+  const [abrirId,setAbrirId]=useState("");
+  const fimRef=useRef(null);
+  const meuEmail=(user?.email||"").toLowerCase();
+
+  const carregarThreads=()=>{
+    apiFetch("/chat/threads?email="+encodeURIComponent(meuEmail))
+      .then(r=>{if(r&&r.success)setThreads(r.data||[]);})
+      .catch(()=>{}).finally(()=>setLoading(false));
+  };
+  useEffect(()=>{carregarThreads();const t=setInterval(carregarThreads,20000);return ()=>clearInterval(t);},[meuEmail]);
+
+  const carregarMsgs=(pid)=>{
+    apiFetch("/chat/"+encodeURIComponent(pid)).then(r=>{if(r&&r.success)setMsgs(r.data||[]);}).catch(()=>{});
+  };
+  const abrirThread=(pid,cliente)=>{
+    if(!pid)return;
+    setSel(String(pid)); setSelCliente(cliente||"");
+    carregarMsgs(String(pid));
+    apiFetch("/chat/marcar-lido","POST",{email:meuEmail,pedidoId:String(pid)})
+      .then(()=>{onResumo&&onResumo();carregarThreads();}).catch(()=>{});
+  };
+
+  useEffect(()=>{ if(pedidoInicial){abrirThread(String(pedidoInicial),"");onLimparInicial&&onLimparInicial();} },[pedidoInicial]);
+  useEffect(()=>{ if(!sel)return; const t=setInterval(()=>carregarMsgs(sel),15000); return ()=>clearInterval(t); },[sel]);
+  useEffect(()=>{ try{fimRef.current&&fimRef.current.scrollIntoView({behavior:"smooth"});}catch(e){} },[msgs]);
+
+  const enviar=async()=>{
+    const t=texto.trim(); if(!t||!sel)return;
+    setEnviando(true);
+    try{
+      await apiFetch("/chat/"+encodeURIComponent(sel),"POST",{texto:t,autorNome:user.nome||user.name||user.email,autorEmail:meuEmail,cliente:selCliente});
+      setTexto(""); carregarMsgs(sel); carregarThreads(); onResumo&&onResumo();
+    }catch(e){alert("Erro ao enviar: "+e.message);}
+    finally{setEnviando(false);}
+  };
+
+  return(
+    <div style={{display:"flex",height:"100%",background:C.gray100}}>
+      {/* Lista de threads */}
+      <div style={{width:320,flexShrink:0,borderRight:`1px solid ${C.gray200}`,background:C.white,display:"flex",flexDirection:"column"}}>
+        <div style={{padding:"14px 16px",borderBottom:`1px solid ${C.gray200}`}}>
+          <div style={{...F.title,fontSize:16,fontWeight:800,color:C.black,marginBottom:10}}>Conversas</div>
+          <div style={{display:"flex",gap:6}}>
+            <input value={abrirId} onChange={e=>setAbrirId(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){abrirThread(abrirId.trim(),"");setAbrirId("");}}}
+              placeholder="Abrir pedido (nº Linx)…"
+              style={{flex:1,padding:"8px 10px",border:`1.5px solid ${C.gray200}`,borderRadius:7,...F.body,fontSize:12,outline:"none"}}/>
+            <button onClick={()=>{abrirThread(abrirId.trim(),"");setAbrirId("");}}
+              style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"0 12px",cursor:"pointer",fontWeight:700,...F.body,fontSize:12}}>Abrir</button>
+          </div>
+        </div>
+        <div className="sgp-scroll" style={{flex:1,overflowY:"auto"}}>
+          {loading&&<div style={{padding:20,...F.body,fontSize:13,color:C.gray400}}>Carregando…</div>}
+          {!loading&&threads.length===0&&<div style={{padding:20,...F.body,fontSize:13,color:C.gray400}}>Nenhuma conversa ainda. Abra um pedido pelo número acima pra começar.</div>}
+          {threads.map(t=>{
+            const on=sel===String(t.pedidoId);
+            return(
+              <div key={t.pedidoId} onClick={()=>abrirThread(t.pedidoId,t.cliente)}
+                style={{padding:"12px 16px",borderBottom:`1px solid ${C.gray100}`,cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`3px solid ${C.red}`:"3px solid transparent"}}
+                onMouseEnter={e=>{if(!on)e.currentTarget.style.background=C.gray50;}}
+                onMouseLeave={e=>{if(!on)e.currentTarget.style.background="transparent";}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+                  <span style={{...F.body,fontSize:13,fontWeight:700,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.cliente||("Pedido "+t.pedidoId)}</span>
+                  {t.naoLidas>0&&<span style={{background:C.red,color:C.white,borderRadius:10,fontSize:10,fontWeight:800,padding:"2px 7px",...F.body}}>{t.naoLidas}</span>}
+                </div>
+                <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>#{t.pedidoId} · {fmtChatData(t.ultimoEm)}</div>
+                <div style={{...F.body,fontSize:12,color:C.gray600,marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.ultimoAutor?(t.ultimoAutor.split(" ")[0]+": "):""}{t.ultimaMsg}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Conversa */}
+      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+        {!sel&&<div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",...F.body,color:C.gray400,fontSize:14}}>Selecione uma conversa ou abra um pedido pelo número.</div>}
+        {sel&&<>
+          <div style={{padding:"14px 20px",borderBottom:`1px solid ${C.gray200}`,background:C.white}}>
+            <div style={{...F.title,fontSize:15,fontWeight:800,color:C.black}}>{selCliente||("Pedido "+sel)}</div>
+            <div style={{...F.body,fontSize:12,color:C.gray500}}>Pedido #{sel}</div>
+          </div>
+          <div className="sgp-scroll" style={{flex:1,overflowY:"auto",padding:"16px 20px",display:"flex",flexDirection:"column",gap:8}}>
+            {msgs.length===0&&<div style={{...F.body,fontSize:13,color:C.gray400,textAlign:"center",marginTop:20}}>Sem mensagens ainda. Seja o primeiro a escrever.</div>}
+            {msgs.map(m=>{
+              const meu=(m.autor_email||"").toLowerCase()===meuEmail;
+              return(
+                <div key={m.id} style={{alignSelf:meu?"flex-end":"flex-start",maxWidth:"72%"}}>
+                  <div style={{background:meu?C.red:C.white,color:meu?C.white:C.black,border:meu?"none":`1px solid ${C.gray200}`,borderRadius:12,padding:"8px 12px",...F.body,fontSize:13,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"pre-wrap"}}>
+                    {!meu&&<div style={{fontSize:11,fontWeight:800,color:C.red,marginBottom:2}}>{m.autor_nome||m.autor_email}</div>}
+                    {m.texto}
+                  </div>
+                  <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:2,textAlign:meu?"right":"left"}}>{fmtChatData(m.criado_em)}</div>
+                </div>
+              );
+            })}
+            <div ref={fimRef}/>
+          </div>
+          <div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,background:C.white,display:"flex",gap:8,alignItems:"flex-end"}}>
+            <textarea value={texto} onChange={e=>setTexto(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();}}}
+              placeholder="Escreva uma mensagem…  (Enter envia, Shift+Enter quebra linha)" rows={1}
+              style={{flex:1,resize:"none",padding:"10px 12px",border:`1.5px solid ${C.gray200}`,borderRadius:10,...F.body,fontSize:13,outline:"none",maxHeight:120}}/>
+            <button onClick={enviar} disabled={enviando||!texto.trim()}
+              style={{background:texto.trim()?C.red:C.gray300,color:C.white,border:"none",borderRadius:10,padding:"10px 16px",cursor:texto.trim()?"pointer":"default",fontWeight:700,...F.body,fontSize:13,display:"inline-flex",alignItems:"center",gap:6}}>
+              <Ic n="send" s={14} c={C.white}/> Enviar
+            </button>
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RAIO-X DO SISTEMA (só admin)
+// Painel de saúde: pedidos fora do SGP (deveriam estar), parados (SLA estourado +
+// tempo fixo), mais atrasados, e atividade do chat. Reaproveita endpoints prontos.
+// ═════════════════════════════════════════════════════════════════════════════
+function RaioX({user,onOpen,slaCfg,onIrChat}){
+  const [peds,setPeds]=useState(null);
+  const [leaks,setLeaks]=useState(null);
+  const [threads,setThreads]=useState([]);
+  const [corte,setCorte]=useState(3);
+  const [loading,setLoading]=useState(true);
+
+  const carregar=async()=>{
+    setLoading(true);
+    try{ await apiFetch("/snapshot-aberto").catch(()=>null);
+      const r=await apiFetch("/painel-posvenda"); setPeds(r&&r.success?(r.pedidos||[]):[]);
+    }catch(e){ setPeds([]); }
+    apiFetch("/admin/monitor-sem-posvenda?dias=30").then(r=>{setLeaks(r&&r.success?(r.leaks||[]):[]);}).catch(()=>setLeaks([]));
+    apiFetch("/chat/threads?email="+encodeURIComponent(user?.email||"")).then(r=>{if(r&&r.success)setThreads(r.data||[]);}).catch(()=>{});
+    setLoading(false);
+  };
+  useEffect(()=>{carregar();},[]);
+
+  const diasParado=(p)=>p.etapaAt?Math.floor((Date.now()-new Date(p.etapaAt).getTime())/86400000):null;
+  const lista=peds||[];
+  const atrasados=lista.filter(p=>p.atrasado).sort((a,b)=>new Date(a.dataVencimento||0)-new Date(b.dataVencimento||0));
+  const paradosTempo=lista.filter(p=>{const d=diasParado(p);return d!=null&&d>=corte;}).sort((a,b)=>(diasParado(b)||0)-(diasParado(a)||0));
+  const totalChatNaoLidas=threads.reduce((s,t)=>s+(t.naoLidas||0),0);
+
+  const Sec=({icon,cor,titulo,sub,count,children})=>(
+    <div style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:12,overflow:"hidden",marginBottom:16}}>
+      <div style={{padding:"14px 18px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:34,height:34,borderRadius:8,background:cor+"18",display:"flex",alignItems:"center",justifyContent:"center"}}><Ic n={icon} s={18} c={cor}/></div>
+        <div style={{flex:1}}>
+          <div style={{...F.title,fontSize:14,fontWeight:800,color:C.black}}>{titulo}</div>
+          {sub&&<div style={{...F.body,fontSize:11.5,color:C.gray500}}>{sub}</div>}
+        </div>
+        <div style={{...F.title,fontSize:20,fontWeight:800,color:count>0?cor:C.gray300}}>{count}</div>
+      </div>
+      <div style={{padding:count>0?"6px 0":"16px 18px"}}>{children}</div>
+    </div>
+  );
+  const Linha=({children,onClick})=>(
+    <div onClick={onClick} style={{padding:"9px 18px",borderBottom:`1px solid ${C.gray50}`,display:"flex",alignItems:"center",gap:10,cursor:onClick?"pointer":"default",...F.body,fontSize:12.5,color:C.gray700}}
+      onMouseEnter={e=>{if(onClick)e.currentTarget.style.background=C.gray50;}}
+      onMouseLeave={e=>{if(onClick)e.currentTarget.style.background="transparent";}}>{children}</div>
+  );
+  const btnChat=(pid)=>(
+    <button onClick={(e)=>{e.stopPropagation();onIrChat&&onIrChat(String(pid));}}
+      style={{background:C.white,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"4px 9px",cursor:"pointer",...F.body,fontSize:11,fontWeight:700,color:C.gray600,display:"inline-flex",alignItems:"center",gap:5,flexShrink:0}}>
+      <Ic n="chat" s={12} c={C.gray500}/> Chat
+    </button>
+  );
+
+  return(
+    <div style={{padding:"20px 28px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:18,flexWrap:"wrap",gap:12}}>
+        <div>
+          <h2 style={{...F.title,fontSize:22,fontWeight:800,color:C.black,letterSpacing:"-0.01em",margin:0}}>Raio-X do Sistema</h2>
+          <div style={{...F.body,fontSize:13,color:C.gray500,marginTop:2}}>Visão de saúde da operação — o que precisa de atenção agora</div>
+        </div>
+        <button onClick={carregar} disabled={loading}
+          style={{background:C.white,border:`1.5px solid ${C.gray300}`,borderRadius:7,padding:"8px 14px",cursor:loading?"wait":"pointer",...F.body,fontWeight:700,fontSize:12,color:C.gray700,display:"inline-flex",alignItems:"center",gap:6}}>
+          <Ic n="refresh" s={13} c={C.gray700}/> {loading?"Carregando…":"Atualizar"}
+        </button>
+      </div>
+
+      <Sec icon="warn" cor="#d97706" titulo="Pedidos fora do SGP (deveriam estar)"
+        sub="Vendas fechadas (últimos 30 dias) sem pós-venda gerado, ignorando naturezas de remessa" count={(leaks||[]).length}>
+        {leaks===null&&<div style={{...F.body,fontSize:12,color:C.gray400,padding:"6px 18px"}}>Verificando…</div>}
+        {(leaks||[]).map(l=>(
+          <Linha key={l.id}>
+            <span style={{fontWeight:700,color:C.black,minWidth:70}}>#{l.linx||l.id}</span>
+            <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{l.razao}</span>
+            <span style={{fontSize:11,color:C.gray500}}>{l.natureza}</span>
+            <span style={{fontSize:11,color:C.gray400}}>{l.closedate}</span>
+            {l.comBordado&&<span style={{fontSize:10,fontWeight:800,color:C.purple,background:C.purple+"14",borderRadius:5,padding:"2px 6px"}}>BORDADO</span>}
+          </Linha>
+        ))}
+        {leaks&&leaks.length===0&&<div style={{...F.body,fontSize:12.5,color:C.green,padding:"2px 0"}}>✓ Nenhum pedido passando em branco.</div>}
+      </Sec>
+
+      <Sec icon="clock" cor={C.red} titulo="Mais atrasados (SLA estourado)"
+        sub="Pedidos que já passaram do prazo de vencimento" count={atrasados.length}>
+        {atrasados.slice(0,20).map(p=>(
+          <Linha key={p.id||p.vendasId} onClick={()=>onOpen&&onOpen(p)}>
+            <span style={{fontWeight:700,color:C.black,minWidth:70}}>#{p.pedidoLinx||p.vendasId}</span>
+            <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.client}</span>
+            <span style={{fontSize:11,color:C.gray500}}>{p.etapa}</span>
+            <span style={{fontSize:11,fontWeight:700,color:C.red}}>{p.dataVencimento?("venc "+new Date(p.dataVencimento).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})):""}</span>
+            {btnChat(p.pedidoLinx||p.vendasId)}
+          </Linha>
+        ))}
+        {atrasados.length===0&&<div style={{...F.body,fontSize:12.5,color:C.green}}>✓ Nenhum pedido atrasado.</div>}
+      </Sec>
+
+      <Sec icon="activity" cor="#0891b2" titulo={"Parados há "+corte+"+ dias na mesma etapa"}
+        sub="Tempo fixo na etapa atual, independente do SLA" count={paradosTempo.length}>
+        <div style={{padding:"0 18px 8px",display:"flex",alignItems:"center",gap:8}}>
+          <span style={{...F.body,fontSize:11.5,color:C.gray500}}>Corte:</span>
+          {[2,3,5,7].map(n=>(
+            <button key={n} onClick={()=>setCorte(n)} style={{background:corte===n?"#0891b2":C.white,color:corte===n?C.white:C.gray600,border:`1.5px solid ${corte===n?"#0891b2":C.gray200}`,borderRadius:6,padding:"3px 10px",cursor:"pointer",...F.body,fontSize:11,fontWeight:700}}>{n}d</button>
+          ))}
+        </div>
+        {paradosTempo.slice(0,20).map(p=>(
+          <Linha key={p.id||p.vendasId} onClick={()=>onOpen&&onOpen(p)}>
+            <span style={{fontWeight:700,color:C.black,minWidth:70}}>#{p.pedidoLinx||p.vendasId}</span>
+            <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.client}</span>
+            <span style={{fontSize:11,color:C.gray500}}>{p.etapa}</span>
+            <span style={{fontSize:11,fontWeight:700,color:"#0891b2"}}>{diasParado(p)}d parado</span>
+            {btnChat(p.pedidoLinx||p.vendasId)}
+          </Linha>
+        ))}
+        {paradosTempo.length===0&&<div style={{...F.body,fontSize:12.5,color:C.gray500}}>Nenhum pedido parado há {corte}+ dias.</div>}
+      </Sec>
+
+      <Sec icon="chat" cor={C.purple} titulo="Conversas dos pedidos"
+        sub={totalChatNaoLidas>0?(totalChatNaoLidas+" mensagem(ns) não lida(s)"):"Atividade recente do chat"} count={threads.length}>
+        {threads.slice(0,12).map(t=>(
+          <Linha key={t.pedidoId} onClick={()=>onIrChat&&onIrChat(String(t.pedidoId))}>
+            <span style={{fontWeight:700,color:C.black,minWidth:70}}>#{t.pedidoId}</span>
+            <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.cliente||"—"}</span>
+            <span style={{fontSize:11,color:C.gray500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:200}}>{t.ultimaMsg}</span>
+            {t.naoLidas>0&&<span style={{background:C.red,color:C.white,borderRadius:10,fontSize:10,fontWeight:800,padding:"2px 7px"}}>{t.naoLidas}</span>}
+          </Linha>
+        ))}
+        {threads.length===0&&<div style={{...F.body,fontSize:12.5,color:C.gray400}}>Nenhuma conversa ainda.</div>}
+      </Sec>
     </div>
   );
 }
