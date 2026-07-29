@@ -8417,12 +8417,12 @@ function AppInner(){
   const[usuarios,setUsuarios]=useState([]);  // lista para @menção
   const[buscaPedidos,setBuscaPedidos]=useState(""); // busca inicial em Todos os Pedidos
   const naoLidas=notifs.filter(n=>!n.lida).length;
-  const[chatResumo,setChatResumo]=useState({total:0,porPedido:{}}); // badge do chat
+  const[chatResumo,setChatResumo]=useState({total:0,porPedido:{},mencoes:0}); // badge do chat
   const[chatPedido,setChatPedido]=useState(null); // pedido a abrir direto no chat
   const carregarChatResumo=()=>{
     if(!user?.email)return;
     apiFetch("/chat/resumo?email="+encodeURIComponent(user.email))
-      .then(r=>{if(r&&r.success)setChatResumo({total:r.total||0,porPedido:r.porPedido||{}});})
+      .then(r=>{if(r&&r.success)setChatResumo({total:r.total||0,porPedido:r.porPedido||{},mencoes:r.mencoes||0});})
       .catch(()=>{});
   };
 
@@ -8760,13 +8760,13 @@ function AppInner(){
   return(
     <div style={{display:"flex",height:"100dvh",...F.body,background:C.gray100,overflow:"hidden",flexDirection:"column"}}>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
-        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)} chatTotal={chatResumo.total}/>}
+        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)} chatTotal={chatResumo.mencoes}/>}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
           <Topbar user={user} title={TITLES[page]||""} naoLidas={naoLidas} onBell={toggleBell} onLogout={doLogout} isMobile={isMobile}/>
           {showN&&<NotifPanel notifs={notifs} onClose={()=>setShowN(false)} onAbrir={abrirPedidoNotif}/>}
           <div className="sgp-scroll" style={{flex:1,overflowY:"auto",paddingBottom:isMobile?70:0}}>
             {page==="raiox"&&(user.admin?<RaioX user={user} onOpen={setSel} slaCfg={slaCfg} onIrChat={(pid)=>{setChatPedido(pid);setPage("chat");}}/>:<div style={{padding:40,textAlign:"center",...F.body,color:C.gray500}}>Acesso restrito a administradores.</div>)}
-            {page==="chat"&&<ChatPage user={user} chatResumo={chatResumo} onResumo={carregarChatResumo} pedidoInicial={chatPedido} onLimparInicial={()=>setChatPedido(null)}/>}
+            {page==="chat"&&<ChatPage user={user} usuarios={usuarios} chatResumo={chatResumo} onResumo={carregarChatResumo} pedidoInicial={chatPedido} onLimparInicial={()=>setChatPedido(null)}/>}
             {page==="demandas"&&<MinhasDemandas user={user} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="dashboard"&&<Dashboard orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="funil"&&<Funil onOpen={setSel} slaCfg={slaCfg}/>}
@@ -9534,7 +9534,7 @@ function fmtChatData(iso){
     ? d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
     : d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 }
-function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
+function ChatPage({user,usuarios,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
   const [threads,setThreads]=useState([]);
   const [loading,setLoading]=useState(true);
   const [sel,setSel]=useState(null);
@@ -9543,8 +9543,52 @@ function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
   const [texto,setTexto]=useState("");
   const [enviando,setEnviando]=useState(false);
   const [abrirId,setAbrirId]=useState("");
+  const [aba,setAba]=useState("mencao");           // "mencao" | "sem"
+  const [mm,setMm]=useState({open:false,opts:[]});  // dropdown de @menção
+  const [mencSel,setMencSel]=useState({});          // firstNameLower -> email (escolhidos)
   const fimRef=useRef(null);
+  const taRef=useRef(null);
   const meuEmail=(user?.email||"").toLowerCase();
+  const firstName=(u)=>String(u?.nome||u?.name||"").trim().split(/\s+/)[0]||"";
+
+  // Detecta @token no cursor e abre dropdown de usuários
+  const onChangeTexto=(e)=>{
+    const val=e.target.value; setTexto(val);
+    const caret=e.target.selectionStart||val.length;
+    const m=val.slice(0,caret).match(/@([\p{L}0-9._-]*)$/u);
+    if(m){
+      const q=m[1].toLowerCase();
+      const opts=(usuarios||[]).filter(u=>{const n=String(u.nome||u.name||"").toLowerCase(); return n&&(q===""||n.includes(q));}).slice(0,6);
+      setMm({open:opts.length>0,opts});
+    } else setMm({open:false,opts:[]});
+  };
+  const escolherMenc=(u)=>{
+    const first=firstName(u);
+    const ta=taRef.current;
+    const caret=ta?ta.selectionStart:texto.length;
+    const antes=texto.slice(0,caret).replace(/@([\p{L}0-9._-]*)$/u,"@"+first+" ");
+    setTexto(antes+texto.slice(caret));
+    setMencSel(prev=>({...prev,[first.toLowerCase()]:String(u.email||"").toLowerCase()}));
+    setMm({open:false,opts:[]});
+    setTimeout(()=>{try{ta&&ta.focus();}catch(e){}},0);
+  };
+  // Resolve os e-mails mencionados a partir do texto (@Nome)
+  const resolverMencoes=(txt)=>{
+    const emails=new Set();
+    for(const mt of String(txt).matchAll(/@([\p{L}0-9._-]+)/gu)){
+      const tok=mt[1].toLowerCase();
+      if(mencSel[tok]) emails.add(mencSel[tok]);
+      else{ const u=(usuarios||[]).find(u=>firstName(u).toLowerCase()===tok); if(u&&u.email) emails.add(String(u.email).toLowerCase()); }
+    }
+    return Array.from(emails);
+  };
+  // Renderiza o texto destacando @menções
+  const renderMsg=(txt)=>{
+    const partes=String(txt||"").split(/(@[\p{L}0-9._-]+)/gu);
+    return partes.map((p,i)=> p.startsWith("@")
+      ? <strong key={i} style={{color:"inherit",fontWeight:800}}>{p}</strong>
+      : <span key={i}>{p}</span>);
+  };
 
   const carregarThreads=()=>{
     apiFetch("/chat/threads?email="+encodeURIComponent(meuEmail))
@@ -9572,11 +9616,14 @@ function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
     const t=texto.trim(); if(!t||!sel)return;
     setEnviando(true);
     try{
-      await apiFetch("/chat/"+encodeURIComponent(sel),"POST",{texto:t,autorNome:user.nome||user.name||user.email,autorEmail:meuEmail,cliente:selCliente});
-      setTexto(""); carregarMsgs(sel); carregarThreads(); onResumo&&onResumo();
+      await apiFetch("/chat/"+encodeURIComponent(sel),"POST",{texto:t,autorNome:user.nome||user.name||user.email,autorEmail:meuEmail,cliente:selCliente,mencionados:resolverMencoes(t)});
+      setTexto(""); setMencSel({}); setMm({open:false,opts:[]}); carregarMsgs(sel); carregarThreads(); onResumo&&onResumo();
     }catch(e){alert("Erro ao enviar: "+e.message);}
     finally{setEnviando(false);}
   };
+  const threadsFiltradas=threads.filter(t=>aba==="mencao"?t.mencionouMe:!t.mencionouMe);
+  const nMenc=threads.filter(t=>t.mencionouMe).length;
+  const nSem=threads.length-nMenc;
 
   return(
     <div style={{display:"flex",height:"100%",background:C.gray100}}>
@@ -9592,10 +9639,25 @@ function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
               style={{background:C.red,color:C.white,border:"none",borderRadius:7,padding:"0 12px",cursor:"pointer",fontWeight:700,...F.body,fontSize:12}}>Abrir</button>
           </div>
         </div>
+        {/* Mini-abas */}
+        <div style={{display:"flex",borderBottom:`1px solid ${C.gray200}`}}>
+          {[{k:"mencao",label:"Me mencionaram",n:nMenc},{k:"sem",label:"Sem menção",n:nSem}].map(tb=>{
+            const on=aba===tb.k;
+            return(
+              <button key={tb.k} onClick={()=>setAba(tb.k)}
+                style={{flex:1,padding:"10px 6px",background:"none",border:"none",borderBottom:on?`2px solid ${C.red}`:"2px solid transparent",cursor:"pointer",...F.body,fontSize:12,fontWeight:on?700:500,color:on?C.red:C.gray500,display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>
+                {tb.label}
+                {tb.k==="mencao"&&chatResumo&&chatResumo.mencoes>0
+                  ? <span style={{background:C.red,color:C.white,borderRadius:9,fontSize:9,fontWeight:800,padding:"1px 5px"}}>{chatResumo.mencoes}</span>
+                  : <span style={{color:C.gray400,fontWeight:700}}>{tb.n}</span>}
+              </button>
+            );
+          })}
+        </div>
         <div className="sgp-scroll" style={{flex:1,overflowY:"auto"}}>
           {loading&&<div style={{padding:20,...F.body,fontSize:13,color:C.gray400}}>Carregando…</div>}
-          {!loading&&threads.length===0&&<div style={{padding:20,...F.body,fontSize:13,color:C.gray400}}>Nenhuma conversa ainda. Abra um pedido pelo número acima pra começar.</div>}
-          {threads.map(t=>{
+          {!loading&&threadsFiltradas.length===0&&<div style={{padding:20,...F.body,fontSize:13,color:C.gray400}}>{aba==="mencao"?"Nenhuma conversa em que te mencionaram.":"Nenhuma conversa sem menção. Abra um pedido pelo número acima pra começar."}</div>}
+          {threadsFiltradas.map(t=>{
             const on=sel===String(t.pedidoId);
             return(
               <div key={t.pedidoId} onClick={()=>abrirThread(t.pedidoId,t.cliente)}
@@ -9625,11 +9687,12 @@ function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
             {msgs.length===0&&<div style={{...F.body,fontSize:13,color:C.gray400,textAlign:"center",marginTop:20}}>Sem mensagens ainda. Seja o primeiro a escrever.</div>}
             {msgs.map(m=>{
               const meu=(m.autor_email||"").toLowerCase()===meuEmail;
+              const mencMe=!meu&&(m.mencionados||"").toLowerCase().split(",").map(s=>s.trim()).includes(meuEmail);
               return(
                 <div key={m.id} style={{alignSelf:meu?"flex-end":"flex-start",maxWidth:"72%"}}>
-                  <div style={{background:meu?C.red:C.white,color:meu?C.white:C.black,border:meu?"none":`1px solid ${C.gray200}`,borderRadius:12,padding:"8px 12px",...F.body,fontSize:13,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"pre-wrap"}}>
-                    {!meu&&<div style={{fontSize:11,fontWeight:800,color:C.red,marginBottom:2}}>{m.autor_nome||m.autor_email}</div>}
-                    {m.texto}
+                  <div style={{background:meu?C.red:(mencMe?"#fffbeb":C.white),color:meu?C.white:C.black,border:meu?"none":`1px solid ${mencMe?"#f59e0b":C.gray200}`,borderLeft:mencMe?`3px solid #f59e0b`:undefined,borderRadius:12,padding:"8px 12px",...F.body,fontSize:13,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"pre-wrap"}}>
+                    {!meu&&<div style={{fontSize:11,fontWeight:800,color:C.red,marginBottom:2,display:"flex",alignItems:"center",gap:6}}>{m.autor_nome||m.autor_email}{mencMe&&<span style={{fontSize:9,fontWeight:800,color:"#b45309",background:"#fef3c7",borderRadius:5,padding:"1px 5px",letterSpacing:"0.03em"}}>MENCIONOU VOCÊ</span>}</div>}
+                    {renderMsg(m.texto)}
                   </div>
                   <div style={{...F.body,fontSize:10,color:C.gray400,marginTop:2,textAlign:meu?"right":"left"}}>{fmtChatData(m.criado_em)}</div>
                 </div>
@@ -9637,9 +9700,23 @@ function ChatPage({user,chatResumo,onResumo,pedidoInicial,onLimparInicial}){
             })}
             <div ref={fimRef}/>
           </div>
-          <div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,background:C.white,display:"flex",gap:8,alignItems:"flex-end"}}>
-            <textarea value={texto} onChange={e=>setTexto(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar();}}}
-              placeholder="Escreva uma mensagem…  (Enter envia, Shift+Enter quebra linha)" rows={1}
+          <div style={{padding:"12px 16px",borderTop:`1px solid ${C.gray200}`,background:C.white,display:"flex",gap:8,alignItems:"flex-end",position:"relative"}}>
+            {/* Dropdown de @menção */}
+            {mm.open&&mm.opts.length>0&&(
+              <div style={{position:"absolute",bottom:"100%",left:16,marginBottom:6,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:10,boxShadow:"0 6px 20px rgba(0,0,0,0.12)",overflow:"hidden",zIndex:30,minWidth:200}}>
+                <div style={{padding:"6px 12px",...F.body,fontSize:10,fontWeight:800,color:C.gray400,textTransform:"uppercase",letterSpacing:"0.05em",borderBottom:`1px solid ${C.gray100}`}}>Mencionar</div>
+                {mm.opts.map(u=>(
+                  <div key={u.email||u.nome} onClick={()=>escolherMenc(u)}
+                    style={{padding:"8px 12px",cursor:"pointer",...F.body,fontSize:13,color:C.gray700,display:"flex",alignItems:"center",gap:8}}
+                    onMouseEnter={e=>e.currentTarget.style.background=C.gray50}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <span style={{fontWeight:700,color:C.red}}>@</span>{u.nome||u.name}
+                  </div>
+                ))}
+              </div>
+            )}
+            <textarea ref={taRef} value={texto} onChange={onChangeTexto} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey&&!mm.open){e.preventDefault();enviar();}if(e.key==="Escape")setMm({open:false,opts:[]});}}
+              placeholder="Escreva uma mensagem…  Use @ para mencionar. (Enter envia)" rows={1}
               style={{flex:1,resize:"none",padding:"10px 12px",border:`1.5px solid ${C.gray200}`,borderRadius:10,...F.body,fontSize:13,outline:"none",maxHeight:120}}/>
             <button onClick={enviar} disabled={enviando||!texto.trim()}
               style={{background:texto.trim()?C.red:C.gray300,color:C.white,border:"none",borderRadius:10,padding:"10px 16px",cursor:texto.trim()?"pointer":"default",fontWeight:700,...F.body,fontSize:13,display:"inline-flex",alignItems:"center",gap:6}}>
