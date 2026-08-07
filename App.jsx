@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.48.1";
+const SGP_VERSION = "v2.65.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -13,15 +13,31 @@ const FAVICON_SGP = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAA
 const WORKER_URL = "https://citerol-sgp.israel-caetano-lima.workers.dev";
 const SGP_TOKEN  = "sgp_citerol_2024_xK9mP";
 
+// TEMPO LIMITE: sem isso, uma requisição pendurada deixava a tela "carregando"
+// pra sempre — sem erro, sem botão de tentar de novo. Com o limite, a falha
+// aparece na tela e o usuário consegue reagir (Atualizar).
+const API_TIMEOUT_MS = 45000;
 async function apiFetch(path, method = "GET", body = null) {
-  const doFetch = () => fetch(`${WORKER_URL}${path}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      "X-SGP-Token": SGP_TOKEN,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const doFetch = async () => {
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), API_TIMEOUT_MS) : null;
+    try {
+      return await fetch(`${WORKER_URL}${path}`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "X-SGP-Token": SGP_TOKEN,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: ctrl ? ctrl.signal : undefined,
+      });
+    } catch (e) {
+      if (e && e.name === "AbortError") throw new Error("O servidor demorou demais para responder. Clique em Atualizar para tentar de novo.");
+      throw e;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  };
   // Retry APENAS em GET (idempotente) e só em falhas transitórias (rede, 5xx, 429).
   // POST/PATCH nunca são repetidos para não duplicar ação.
   const maxTentativas = method === "GET" ? 3 : 1;
@@ -271,8 +287,10 @@ const NAV_ITEMS = [
   // ── Amostra ───────────────────────────────────────────────────────────────
   {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Amostra"},
   {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Amostra"},
+  {id:"alteracao_amostra_digital",label:"Alteração de Amostra Digital",icon:"refresh",grupo:"Amostra"},
   {id:"aprovacao_amostra_digital",label:"Aprovação Amostra Digital",icon:"check", grupo:"Amostra"},
   {id:"amostra_fisica",          label:"Amostra Física",           icon:"scissors",grupo:"Amostra"},
+  {id:"alteracao_amostra_fisica",label:"Alteração de Amostra Física",icon:"refresh",grupo:"Amostra"},
   {id:"aprovacao_amostra_fisica",label:"Aprovação Amostra Física", icon:"check",   grupo:"Amostra"},
   // ── Operação ──────────────────────────────────────────────────────────────
   {id:"conferencia_direcionamento",label:"Conferência e Direcionamento",icon:"arrow",grupo:"Operação"},
@@ -304,8 +322,10 @@ const MODULO_ETAPA = {
   conferencia_direcionamento: "Conferência e Direcionamento",
   programacao:                "Programação",
   amostra_digital:            "Amostra Digital",
+  alteracao_amostra_digital:  "Amostra Digital",   // mesma etapa, só reprogramações
   aprovacao_amostra_digital:  "Aprovação de Amostra Digital",
   amostra_fisica:             "Amostra Física",
+  alteracao_amostra_fisica:   "Amostra Física",    // mesma etapa, só reprogramações
   aprovacao_amostra_fisica:   "Aprovação de Amostra Física",
   bordado_interno:            "Bordado Interno",
   bordado_externo:            "Bordado Externo",
@@ -324,8 +344,10 @@ const MODULO_ENDPOINT = {
   conferencia_direcionamento: "/conferencia-direcionamento",
   programacao:                "/programacao",
   amostra_digital:            "/amostra-digital",
+  alteracao_amostra_digital:  "/amostra-digital",
   aprovacao_amostra_digital:  "/aprovacao-amostra-digital",
   amostra_fisica:             "/amostra-fisica",
+  alteracao_amostra_fisica:   "/amostra-fisica",
   aprovacao_amostra_fisica:   "/aprovacao-amostra-fisica",
   bordado_interno:            "/bordado-interno",
   bordado_externo:            "/bordado-externo",
@@ -573,6 +595,11 @@ const normalizarCard=(o,etapa)=>({
   obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
   condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
   transportadora:o.transportadora||"",valorFrete:o.valorFrete||0,pagadorFrete:o.pagadorFrete||"",
+  tipo:o.tipo||"",
+  pagamentoLiberado:o.pagamentoLiberado===true,
+  pagamentos:o.pagamentos||[],totalRecebido:o.totalRecebido||0,
+  infoImportante:o.infoImportante||"",dadosAdicionais:o.dadosAdicionais||"",
+  obsProdutos:o.obsProdutos||"",
   arqProgramacao:o.arqProgramacao||"",arqAmostraDigital:o.arqAmostraDigital||"",arqAmostraFisica:o.arqAmostraFisica||"",
   motivoRejAmDigital:o.motivoRejAmDigital||"",motivoRejAmFisica:o.motivoRejAmFisica||"",
   reprogramacao:o.reprogramacao||false,
@@ -754,6 +781,13 @@ function addHorasUteis(dataInicio, horas) {
 }
 // hrsIn: horas ÚTEIS decorridas desde a data (usado pra medir SLA consumido)
 const hrsIn = (at) => at ? minutosUteis(at, new Date()) / 60 : 0;
+// Dias ÚTEIS decorridos desde uma data (1 dia = 10,8h de expediente). Fim de
+// semana não conta — um pedido que entrou na sexta mostra "1d parado" na
+// segunda, não "3d". Usado no Painel Pós-Venda e no Raio-X.
+const diasUteisDesde = (at) => {
+  if (!at) return null;
+  return Math.floor((minutosUteis(at, new Date()) / SLA_MINUTOS_POR_DIA));
+};
 function baixarExcelProgramacao(lista,de,ate){
   const esc=(v)=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const cols=["Arquivo","Programador","Dificuldade","Data da execução"];
@@ -1500,7 +1534,7 @@ function Timeline({order}){
                 <span style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{t.stage}</span>
                 {act&&<Tag label="Em andamento" color={C.red}/>}
               </div>
-              <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>Por: {t.who||"Sistema"}</div>
+              <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>Por: {t.who||(t.exitedAt?"Sistema":"—")}</div>
               <div style={{...F.body,fontSize:11,color:C.gray600,marginTop:3}}>
                 Entrada: {fmtD(t.enteredAt)}{t.exitedAt&&<> · Saída: {fmtD(t.exitedAt)}</>}
               </div>
@@ -3148,6 +3182,26 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           </div>
         ))}
       </div>
+      {/* INFORMAÇÕES GERAIS DO PEDIDO (todas as etapas, quando preenchidas) */}
+      {(order.infoImportante||order.obs)&&<div style={{background:"#fffbeb",border:"1px solid #f59e0b55",borderLeft:"5px solid #f59e0b",borderRadius:8,padding:"12px 14px"}}>
+        <div style={{...F.title,fontSize:10,color:"#b45309",fontWeight:800,letterSpacing:"0.08em",marginBottom:4,textTransform:"uppercase"}}>Informação importante do pedido</div>
+        <div style={{...F.body,fontSize:12.5,color:C.black,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word",fontWeight:600}}>{order.infoImportante||order.obs}</div>
+      </div>}
+      {order.dadosAdicionais&&<div style={{background:"#f5f3ff",border:"1px solid #7c3aed44",borderLeft:"5px solid #7c3aed",borderRadius:8,padding:"12px 14px"}}>
+        <div style={{...F.title,fontSize:10,color:"#6d28d9",fontWeight:800,letterSpacing:"0.08em",marginBottom:4,textTransform:"uppercase"}}>Dados adicionais</div>
+        <div style={{...F.body,fontSize:12.5,color:C.black,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word",fontWeight:600}}>{order.dadosAdicionais}</div>
+      </div>}
+      {/* TRANSPORTADORA + FRETE em destaque (Análise de Frete) — do deal de Vendas */}
+      {etapa==="Análise de Frete"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:10}}>
+        <div style={{background:"#0891b210",border:"1.5px solid #0891b244",borderRadius:8,padding:"12px 14px"}}>
+          <div style={{...F.body,fontSize:10,color:"#0e7490",fontWeight:800,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>🚚 Transportadora</div>
+          <div style={{...F.body,fontSize:15,fontWeight:800,color:order.transportadora?C.black:C.gray400}}>{order.transportadora||"Não informada"}</div>
+        </div>
+        <div style={{background:"#0891b210",border:"1.5px solid #0891b244",borderRadius:8,padding:"12px 14px"}}>
+          <div style={{...F.body,fontSize:10,color:"#0e7490",fontWeight:800,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>Valor do Frete</div>
+          <div style={{...F.body,fontSize:15,fontWeight:800,color:C.black}}>{fmtR(order.valorFrete||0)}{order.pagadorFrete?<span style={{fontSize:12,fontWeight:600,color:C.gray500}}> · Pagador: {order.pagadorFrete}</span>:null}</div>
+        </div>
+      </div>}
       {/* Status de PAGAMENTO (Análise de Frete) — vem do app de Pagamentos via
           propriedade cit_deal_ready_for_invoicing do deal de Vendas. */}
       {etapa==="Análise de Frete"&&(order.pagamentoLiberado
@@ -3165,6 +3219,58 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             <div style={{...F.body,fontSize:12,color:C.gray600,marginTop:2}}>O pagamento ainda não foi liberado no app de Pagamentos. Confirme antes de finalizar.</div>
           </div>
         </div>)}
+      {/* Resumo financeiro (igual ao app de Pagamentos): valores + barra + pagamentos */}
+      {etapa==="Análise de Frete"&&(()=>{
+        // Valor total = produtos + frete (mesma régua do app de Pagamentos)
+        const valorProd=Number(order.valor||0);
+        const valorFre=Number(order.valorFrete||0);
+        const valorPed=valorProd+valorFre;
+        const recebido=Number(order.totalRecebido||0)||(order.pagamentoLiberado?valorPed:0);
+        const pct=valorPed>0?Math.min(100,Math.round(recebido/valorPed*100)):0;
+        const corB=pct>=100?"#16a34a":pct>0?"#f59e0b":C.gray300;
+        const dif=recebido-valorPed;
+        return(
+          <div style={{background:C.white,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 14px"}}>
+            <div style={{...F.body,fontSize:12,color:C.gray600,fontWeight:700,marginBottom:10}}>Resumo financeiro</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:8,marginBottom:12}}>
+              {[["Valor do Pedido",fmtR(valorProd),C.gray50,C.black],["Valor do Frete",fmtR(valorFre),C.gray50,C.black],["Valor Total",fmtR(valorPed),"#0891b210","#0e7490"],["Total Recebido",fmtR(recebido),dif>=0?"#16a34a12":"#f59e0b15",dif>=0?"#166534":"#92400e"]].map(([k,v,bg,cor])=>(
+                <div key={k} style={{background:bg,borderRadius:6,padding:"8px 10px",border:`1px solid ${C.gray200}`}}>
+                  <div style={{...F.body,fontSize:9.5,color:C.gray500,fontWeight:800,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3}}>{k}</div>
+                  <div style={{...F.body,fontSize:14.5,fontWeight:800,color:cor}}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",justifyContent:"space-between",...F.body,fontSize:12,color:C.gray600,marginBottom:6}}>
+              <span style={{fontWeight:700}}>Pagamento</span>
+              <span><strong style={{color:C.black}}>{fmtR(recebido)}</strong> de {fmtR(valorPed)}</span>
+            </div>
+            <div style={{height:14,background:C.gray100,borderRadius:8,overflow:"hidden",position:"relative"}}>
+              <div style={{width:pct+"%",height:"100%",background:corB,borderRadius:8,transition:"width 0.3s",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {pct>=15&&<span style={{...F.body,fontSize:9.5,fontWeight:800,color:C.white}}>{pct}%</span>}
+              </div>
+              {pct<15&&<span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",...F.body,fontSize:9.5,fontWeight:800,color:C.gray500}}>{pct}%</span>}
+            </div>
+            {dif>0.009&&<div style={{...F.body,fontSize:11.5,color:"#166534",fontWeight:700,marginTop:6}}>Recebido {fmtR(recebido)} (excedente de {fmtR(dif)})</div>}
+            {dif<-0.009&&recebido>0&&<div style={{...F.body,fontSize:11.5,color:"#92400e",fontWeight:700,marginTop:6}}>Faltam {fmtR(-dif)} para liberar o faturamento</div>}
+            {/* Tabela de pagamentos (lida dos commerce_payments do HubSpot) */}
+            {(order.pagamentos||[]).length>0&&<table style={{width:"100%",borderCollapse:"collapse",marginTop:12,...F.body,fontSize:12}}>
+              <thead><tr>
+                {["Forma","NSU/Comp.","Cartão","Valor"].map(h=>(
+                  <th key={h} style={{textAlign:h==="Valor"?"right":"left",padding:"7px 10px",borderBottom:`2px solid ${C.gray200}`,color:C.gray500,fontSize:10.5,fontWeight:800,textTransform:"uppercase",letterSpacing:"0.05em"}}>{h}</th>
+                ))}
+              </tr></thead>
+              <tbody>{(order.pagamentos||[]).map((pg,i)=>(
+                <tr key={i}>
+                  <td style={{padding:"8px 10px",borderBottom:`1px solid ${C.gray100}`}}><span style={{border:`1px solid ${C.gray300}`,borderRadius:12,padding:"2px 10px",fontWeight:700,fontSize:11}}>{pg.forma||"—"}</span></td>
+                  <td style={{padding:"8px 10px",borderBottom:`1px solid ${C.gray100}`,color:C.gray700}}>{pg.nsu||pg.comprovante||"—"}</td>
+                  <td style={{padding:"8px 10px",borderBottom:`1px solid ${C.gray100}`,color:C.gray700}}>{pg.cartao||"—"}</td>
+                  <td style={{padding:"8px 10px",borderBottom:`1px solid ${C.gray100}`,textAlign:"right",fontWeight:700,color:C.black}}>{fmtR(Number(pg.valor||0))}</td>
+                </tr>
+              ))}</tbody>
+            </table>}
+          </div>
+        );
+      })()}
       {/* Itens a executar nesta etapa */}
       {order.items&&order.items.length>0&&(
         <div>
@@ -3385,6 +3491,43 @@ function ExecutadosLista({user,onOpen}){
   );
 }
 
+// Botão ADMIN de substituir o arquivo de uma etapa (ex.: amostra física anexada
+// errada) SEM mexer no fluxo/etapa do pedido. Usa /upload-etapa sem novaEtapa:
+// sobe o arquivo novo e sobrescreve a propriedade nos 3 deals + nota de auditoria.
+function SubstituirArquivoBtn({bordadoId,propriedade,rotulo,me}){
+  const [rodando,setRodando]=useState(false);
+  const inputRef=useRef(null);
+  if(!(me&&me.admin)||!bordadoId)return null;
+  const onFile=async(e)=>{
+    const f=e.target.files&&e.target.files[0];
+    e.target.value="";
+    if(!f)return;
+    if(!confirm(`Substituir o arquivo de "${rotulo}" por "${f.name}"?\n\nO arquivo anterior deixa de ser exibido (fica no histórico do HubSpot). A etapa do pedido NÃO muda.`))return;
+    setRodando(true);
+    try{
+      const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
+      const r=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
+        propriedade,fileBase64:b64,fileName:f.name,
+        nota:`Arquivo de ${rotulo} SUBSTITUÍDO (correção de anexo errado)`,
+        ctx:{executor:me?.nome||me?.email||"Admin SGP"},
+      });
+      if(r&&r.success)alert("Arquivo substituído com sucesso. Feche e reabra o pedido pra ver o novo anexo.");
+      else throw new Error((r&&r.error)||"Erro desconhecido");
+    }catch(err){alert("Erro ao substituir: "+err.message);}
+    finally{setRodando(false);}
+  };
+  return(
+    <>
+      <input ref={inputRef} type="file" style={{display:"none"}} onChange={onFile}/>
+      <button onClick={()=>inputRef.current&&inputRef.current.click()} disabled={rodando}
+        title="Substituir o arquivo desta etapa sem alterar o fluxo (admin)"
+        style={{background:C.white,border:`1.5px solid ${C.amber}`,borderRadius:6,padding:"4px 10px",cursor:rodando?"wait":"pointer",...F.body,fontSize:11,fontWeight:700,color:"#92400e",display:"inline-flex",alignItems:"center",gap:5,marginLeft:10}}>
+        {rodando?"Enviando...":"↻ Substituir arquivo"}
+      </button>
+    </>
+  );
+}
+
 function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,slaCfg}){
   // Carrega detalhes completos sob demanda (sem essa busca, o snapshot fica leve e
   // a lista carrega rápido — só pagamos o custo de detalhes quando o usuário abre).
@@ -3443,6 +3586,17 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     // Pagamento liberado (cit_deal_ready_for_invoicing do deal de Vendas): prefere
     // o valor do snapshot/leve quando definido; senão cai pro enriched.
     pagamentoLiberado: (_orderLeve.pagamentoLiberado!==undefined?_orderLeve.pagamentoLiberado:_enriched.pagamentoLiberado)||false,
+    // Transportadora + frete (do deal de Vendas): o snapshot já traz certo;
+    // preserva sobre o enriched (que pode vir vazio se a associação falhar).
+    transportadora: _orderLeve.transportadora || _enriched.transportadora || "",
+    valorFrete: _orderLeve.valorFrete || _enriched.valorFrete || 0,
+    pagadorFrete: _orderLeve.pagadorFrete || _enriched.pagadorFrete || "",
+    pagamentos: (_orderLeve.pagamentos&&_orderLeve.pagamentos.length)?_orderLeve.pagamentos:(_enriched.pagamentos||[]),
+    totalRecebido: _orderLeve.totalRecebido || _enriched.totalRecebido || 0,
+    infoImportante: _orderLeve.infoImportante || _enriched.infoImportante || "",
+    dadosAdicionais: _orderLeve.dadosAdicionais || _enriched.dadosAdicionais || "",
+    centroCusto: _orderLeve.centroCusto || _enriched.centroCusto || "",
+    tipo: _orderLeve.tipo || _enriched.tipo || "",
   }:_orderLeve;
   const ETAPAS_COM_ACAO=["Em Separação","Conferência e Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Análise de Frete"];
   // A "etapa efetiva" é a que o USUÁRIO abriu (vinda da tela — ex.: "Separação"
@@ -3554,6 +3708,8 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           <div style={{flex:1,minWidth:0}}>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
               <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black,whiteSpace:"nowrap"}}>{idPedido(order)}</span>
+              <TagCentroCusto cc={order.centroCusto}/>
+              <TagTipo tipo={order.tipo}/>
               <ETag etapa={order.etapa}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
@@ -3633,7 +3789,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Centro de Custo",rotuloCentroCusto(order.centroCusto)||"—"],["Tipo",order.tipo||"—"],["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:_loadingDet&&(k==="Prazo Faturamento do Pedido")?C.gray400:C.black,wordBreak:"break-word",fontStyle:_loadingDet&&(k==="Prazo Faturamento do Pedido")?"italic":"normal"}}>{v}</div>
@@ -3714,7 +3870,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                     const st=durH==null?"andamento":sl&&durH>sl?"atrasado":sl&&durH>sl*.8?"risco":"ok";
                     return(<tr key={i} style={{borderBottom:`1px solid ${C.gray100}`}}>
                       <td style={{padding:"8px 10px",fontWeight:600,...F.body,whiteSpace:"nowrap"}}>{t.stage}</td>
-                      <td style={{padding:"8px 10px",color:C.gray500,...F.body,whiteSpace:"nowrap"}}>{t.who||"Sistema"}</td>
+                      <td style={{padding:"8px 10px",color:C.gray500,...F.body,whiteSpace:"nowrap"}}>{t.who||(t.exitedAt?"Sistema":"—")}</td>
                       <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{fmtD(t.enteredAt)}</td>
                       <td style={{padding:"8px 10px",color:C.gray600,...F.body,fontSize:11,whiteSpace:"nowrap"}}>{t.exitedAt?fmtD(t.exitedAt):"—"}</td>
                       <td style={{padding:"8px 10px",fontWeight:700,color:st==="atrasado"?C.red:st==="risco"?C.amber:C.green,...F.body,whiteSpace:"nowrap"}}>{durH!=null?fmtDur(t.durMin):<em>Em andamento</em>}</td>
@@ -3748,12 +3904,18 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
             </div>:null}
             {/* Amostra digital aprovada */}
             <div>
-              <SecH>Amostra Digital Aprovada</SecH>
+              <div style={{display:"flex",alignItems:"center"}}>
+                <SecH>Amostra Digital Aprovada</SecH>
+                <SubstituirArquivoBtn bordadoId={order.bordadoId} propriedade="amostra_digital" rotulo="Amostra Digital" me={me}/>
+              </div>
               <ArquivosBox fileIds={order.arqAmostraDigital?String(order.arqAmostraDigital).split(";").filter(Boolean):[]} emptyText="Nenhuma amostra digital anexada ainda."/>
             </div>
             {/* Amostra física aprovada */}
             <div>
-              <SecH>Amostra Física Aprovada</SecH>
+              <div style={{display:"flex",alignItems:"center"}}>
+                <SecH>Amostra Física Aprovada</SecH>
+                <SubstituirArquivoBtn bordadoId={order.bordadoId} propriedade="amostra_fisica" rotulo="Amostra Física" me={me}/>
+              </div>
               <ArquivosBox fileIds={order.arqAmostraFisica?String(order.arqAmostraFisica).split(";").filter(Boolean):[]} emptyText="Nenhuma amostra física anexada ainda."/>
             </div>
           </div>}
@@ -4058,6 +4220,65 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
 }
 
 // ─── ORDER CARD ───────────────────────────────────────────────────────────────
+// Centro de custo: no HubSpot a opção "27" é gravada só com o número (as demais
+// já vêm com a descrição). Traduz pro rótulo completo — ex.: "27" → "27 - Corporativo".
+const CENTRO_CUSTO_LABEL = {
+  "27": "27 - Corporativo",
+  "10": "10 - Concessionária",
+  "31": "31 - B2B",
+  "03": "03 - Licitação",
+  "3":  "03 - Licitação",
+  "29": "29 - Comercial Diretoria",
+};
+const rotuloCentroCusto = (cc) => {
+  const v = String(cc||"").trim();
+  if(!v) return "";
+  return CENTRO_CUSTO_LABEL[v] || v;   // já veio com descrição → mantém
+};
+
+// Badge do CENTRO DE CUSTO (Corporativo / Concessionária / B2B / Licitação...).
+// Mostra código + descrição (ex.: "27 - CORPORATIVO"), com cor por tipo.
+function TagCentroCusto({cc,size="md"}){
+  const v=rotuloCentroCusto(cc);
+  if(!v) return null;
+  const s=v.toLowerCase();
+  let cor,bg,bd,label=v.toUpperCase();
+  if(/concession/.test(s))      { cor="#4b2673"; bg="#efe8f7"; bd="#7c4bb8"; }
+  else if(/licita|pregao|pregão|governo|publico|público/.test(s)) { cor="#7a2a06"; bg="#fce8d5"; bd="#c46a2f"; }
+  else if(/b2b|revend|distribu/.test(s)) { cor="#0e4f6e"; bg="#e2f1f8"; bd="#3a86ad"; }
+  else if(/corporat|empresa/.test(s)) { cor="#0d4d24"; bg="#e8f5ec"; bd="#4a8f5f"; }
+  else if(/diretoria|comercial/.test(s)) { cor="#8a4b00"; bg="#fdf0dd"; bd="#c98b2e"; }
+  else if(/varejo|loja|b2c|consumidor/.test(s)) { cor="#8a4b00"; bg="#fdf0dd"; bd="#c98b2e"; }
+  else { cor=C.gray600; bg=C.gray100; bd=C.gray300; }
+  const sm=size==="sm";
+  return (
+    <span title={"Centro de custo: "+v}
+      style={{...F.title,display:"inline-flex",alignItems:"center",flexShrink:0,
+        fontSize:sm?9:10,fontWeight:800,letterSpacing:"0.05em",
+        padding:sm?"2px 7px":"3px 9px",borderRadius:6,
+        background:bg,color:cor,border:`1px solid ${bd}`,whiteSpace:"nowrap"}}>
+      {label}
+    </span>
+  );
+}
+
+// Badge do TIPO do negócio (marca/segmento: JEEP, FIAT, VAREJO, LICITAÇÃO...).
+// Fica ao lado do centro de custo — juntos dizem "de onde vem" o pedido.
+function TagTipo({tipo,size="md"}){
+  const v=String(tipo||"").trim();
+  if(!v) return null;
+  const sm=size==="sm";
+  return (
+    <span title={"Tipo: "+v}
+      style={{...F.title,display:"inline-flex",alignItems:"center",flexShrink:0,
+        fontSize:sm?9:10,fontWeight:800,letterSpacing:"0.05em",
+        padding:sm?"2px 7px":"3px 9px",borderRadius:6,
+        background:C.gray100,color:C.gray700,border:`1px solid ${C.gray300}`,whiteSpace:"nowrap"}}>
+      {v.toUpperCase()}
+    </span>
+  );
+}
+
 function OCard({order,onClick,slaCfg}){
   const total=pecasDoCard(order);
   const falt=order.items.filter(i=>i.status==="faltante").reduce((s,i)=>s+i.qty,0);
@@ -4077,7 +4298,11 @@ function OCard({order,onClick,slaCfg}){
       onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,gap:8}}>
         <div style={{minWidth:0}}>
-          <div style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{idPedido(order)}</div>
+          <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+            <span style={{...F.body,fontWeight:700,fontSize:13,color:C.black}}>{idPedido(order)}</span>
+            <TagCentroCusto cc={order.centroCusto} size="sm"/>
+            <TagTipo tipo={order.tipo} size="sm"/>
+          </div>
           <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{order.client}</div>
         </div>
         <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
@@ -4448,31 +4673,23 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
 }
 
 function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
-  const [pedidos, setPedidos] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null);
   const [confirming, setConfirming] = useState({});
   const [confirmed, setConfirmed] = useState({});
   const [busca, setBusca] = useState("");
 
-  const carregar = () => {
-    setLoading(true);
-    setLoadError(null);
-    // Usa o snapshot-aberto (otimizado com cache 30s + batches) ao invés do
-    // /conferencia-separacao antigo — evita 10+ subrequests por pedido.
-    apiFetch("/snapshot-aberto")
-      .then(res => {
-        if (res.success) {
-          const items = res.porEtapa?.["Conferência Separação"]?.items || [];
-          setPedidos(items.map(o => normalizarCard(o, "Conferência Separação")));
-        } else {
-          setLoadError(res.error || "Erro desconhecido");
-        }
-      })
-      .catch(e => setLoadError(e.message))
-      .finally(() => setLoading(false));
-  };
-  useEffect(() => { carregar(); }, []);
+  // PERF: usa o snapshot COMPARTILHADO (mesmo hook das outras filas). Antes esta
+  // tela disparava um apiFetch("/snapshot-aberto") próprio a cada abertura —
+  // ignorando o cache do app e, muitas vezes, forçando o worker a reconstruir o
+  // quadro inteiro. Era por isso que ela demorava bem mais que as demais.
+  const snap = useSnapshotAberto();
+  const loading = snap.loading && !snap.data;
+  const loadError = snap.error;
+  const carregar = snap.refresh;
+  const pedidos = useMemo(() => {
+    if (!snap.data) return null;
+    const items = snap.data.porEtapa?.["Conferência Separação"]?.items || [];
+    return items.map(o => normalizarCard(o, "Conferência Separação"));
+  }, [snap.data]);
 
   const confirmarConferencia = async (o) => {
     if (!o.posvendaId) { alert("Pedido sem negócio de Pós-venda."); return; }
@@ -5348,7 +5565,7 @@ function Dashboard({onOpen,slaCfg}){
     if(centro&&o.centroCusto!==centro)return false;
     if(bordadoF==="com"&&o.temBordado===false)return false;
     if(bordadoF==="sem"&&o.temBordado!==false)return false;
-    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)||String(o.pedidoLinx||"").toLowerCase().includes(q)||String(o.vendasId||"").includes(q)))return false;
+    if(q&&!((o.client||"").toLowerCase().includes(q)||String(o.id||"").toLowerCase().includes(q)||String(o.pedidoLinx||"").toLowerCase().includes(q)||String(o.vendasId||"").includes(q)||(o.obsProdutos||"").toLowerCase().includes(q)))return false;
     return true;
   });
   const agora=Date.now();
@@ -5990,7 +6207,7 @@ function Ranking({hist}){
 }
 
 // ─── SLA CONFIG ──────────────────────────────────────────────────────────────
-function SLAConfig({slaCfg,onSave}){
+function SLAConfig({slaCfg,onSave,user}){
   const[local,setLocal]=useState({...slaCfg});
   const[prazoCom,setPrazoCom]=useState(15);
   const[prazoSem,setPrazoSem]=useState(7);
@@ -6179,6 +6396,12 @@ function SLAConfig({slaCfg,onSave}){
         <BackfillVencimentoBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <BackfillVencimentoSemBordadoBtn/>
+        <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
+        <FinalizarLoteBtn user={user}/>
+        <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
+        <CorrigirPersonalizacaoBtn user={user}/>
+        <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
+        <MigrarReprogFisicaBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <MonitorSemPosvendaBtn/>
       </Card>
@@ -6402,6 +6625,168 @@ function BackfillVencimentoSemBordadoBtn(){
   );
 }
 
+// Finalização em LOTE: cola uma lista de pedidos (nº Linx e/ou ID de Vendas,
+// misturados) e move todos direto pra Finalizados. Uso administrativo — ex.:
+// quando a integração de nota fiscal está fora do ar.
+function FinalizarLoteBtn({user}){
+  const LISTA_PADRAO=`63211 63829 64276 63502 64955 65140 65145 65146 65147 60840143371 64634 60644335434 60653687203 62622463823 62622483715 62657646100 62639559063 62653113955 62706598823 62706348844 62706350404 62635590573 62704241574 62750599981 62653107325 62605147656 62852979618 62929861004 62448745334 62121906312 62853225244 62985424414 62639561321 63053428852 63083915822 63189253410 63189331474 63222135933 62660997815 62115474243 62939582901 62121717393 62441989214 62121803330 62622451462 63027787630 62622467642 62657817888 62416571541 62489870249 62628777617 62636891465 62706352429 62616665618 62706598224 63027887777 62639565752 62657756032 62742680158 62622462018 62487738184 61293019492 62853162416 62657883191 63027474818 62622485080 62121978225 62750575021 62704634691 62750571322 62950395244 63222403730 60694366779 62660994136 62750600564 64827`;
+  const [txt,setTxt]=useState(LISTA_PADRAO);
+  const [rodando,setRodando]=useState(false);
+  const [res,setRes]=useState(null);
+  const [erro,setErro]=useState("");
+  const qtd=txt.split(/[\s,;]+/).map(s=>s.replace(/\D/g,"")).filter(Boolean).length;
+  const rodar=async()=>{
+    if(!qtd){setErro("Cole ao menos um número de pedido.");return;}
+    if(!confirm(`Mover ${qtd} pedido(s) direto para Finalizados?\n\nIsso altera a etapa no HubSpot e registra uma nota de auditoria em cada um.`))return;
+    setRodando(true);setErro("");setRes(null);
+    try{
+      const r=await apiFetch("/admin/finalizar-lote","POST",{
+        ids:txt,executor:user?.nome||user?.email||"Admin SGP",
+        motivo:"Finalização administrativa em lote (integração de NF indisponível)",
+      });
+      if(r&&r.success)setRes(r); else setErro((r&&r.error)||"Erro desconhecido");
+    }catch(e){setErro(e.message);}
+    finally{setRodando(false);}
+  };
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      <div>
+        <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,marginBottom:4}}>
+          Finalizar pedidos em lote
+        </div>
+        <div style={{...F.body,fontSize:12,color:C.gray500,lineHeight:1.45}}>
+          Cole os números (nº Linx e/ou ID do HubSpot, separados por espaço, vírgula ou linha) e mova todos direto para <strong>Finalizados</strong>.
+          Pedidos já finalizados são ignorados.
+        </div>
+      </div>
+      <textarea value={txt} onChange={e=>setTxt(e.target.value)} rows={4}
+        placeholder="Ex.: 63211 63829 60840143371..."
+        style={{width:"100%",boxSizing:"border-box",resize:"vertical",padding:"10px 12px",border:`1.5px solid ${C.gray200}`,borderRadius:8,...F.body,fontSize:12,outline:"none",fontFamily:"monospace"}}/>
+      <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <button onClick={rodar} disabled={rodando} style={{
+          background:rodando?C.gray400:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:13,...F.body}}>
+          {rodando?"Movendo...":`Finalizar ${qtd} pedido(s)`}
+        </button>
+        {res&&<span style={{...F.body,fontSize:12,color:C.green,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>
+          <Ic n="check" s={13} c={C.green}/>
+          {res.movidos} movido(s){res.jaFinalizados?` · ${res.jaFinalizados} já estavam finalizados`:""}{(res.naoEncontrados||[]).length?` · ${res.naoEncontrados.length} não encontrado(s)`:""}
+        </span>}
+        {erro&&<span style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>Erro: {erro}</span>}
+      </div>
+      {res&&(res.naoEncontrados||[]).length>0&&<div style={{...F.body,fontSize:11,color:C.gray500,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 10px",wordBreak:"break-word"}}>
+        <strong>Não encontrados:</strong> {res.naoEncontrados.join(", ")}
+      </div>}
+    </div>
+  );
+}
+
+// Corrige itens de PERSONALIZAÇÃO (bordado/arte/silk/DTF) marcados como peça a
+// bordar por engano — eles apareciam pra direcionar e como "pendente separação"
+// na folha de impressão.
+function CorrigirPersonalizacaoBtn({user}){
+  const [pedido,setPedido]=useState("");
+  const [rodando,setRodando]=useState(false);
+  const [res,setRes]=useState(null);
+  const [erro,setErro]=useState("");
+  const rodar=async(todos)=>{
+    const vid=pedido.replace(/\D/g,"");
+    if(!todos&&!vid){setErro("Informe o ID do pedido de Vendas (ou use 'Varrer todos').");return;}
+    if(!confirm(todos?"Varrer TODOS os pedidos e desmarcar linhas de personalização marcadas como bordado?":`Corrigir o pedido ${vid}?`))return;
+    setRodando(true);setErro("");setRes(null);
+    try{
+      const r=await apiFetch("/admin/corrigir-personalizacao","POST",todos?{todos:true}:{vendasId:vid});
+      if(r&&r.success)setRes(r); else setErro((r&&r.error)||"Erro desconhecido");
+    }catch(e){setErro(e.message);}
+    finally{setRodando(false);}
+  };
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      <div>
+        <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,marginBottom:4}}>
+          Corrigir itens de personalização
+        </div>
+        <div style={{...F.body,fontSize:12,color:C.gray500,lineHeight:1.45}}>
+          Desmarca como "bordado" as linhas de <strong>personalização</strong> (bordado, arte, silk, DTF) que foram marcadas por engano —
+          elas apareciam para direcionar e como <em>pendente separação</em> na folha. Informe o ID de Vendas ou varra todos.
+        </div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <input value={pedido} onChange={e=>setPedido(e.target.value)} placeholder="ID do pedido (Vendas)"
+          style={{padding:"9px 12px",border:`1.5px solid ${C.gray200}`,borderRadius:7,...F.body,fontSize:12,outline:"none",width:200}}/>
+        <button onClick={()=>rodar(false)} disabled={rodando} style={{
+          background:rodando?C.gray400:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:13,...F.body}}>
+          {rodando?"Corrigindo...":"Corrigir pedido"}
+        </button>
+        <button onClick={()=>rodar(true)} disabled={rodando} style={{
+          background:C.white,color:C.gray700,border:`1.5px solid ${C.gray300}`,borderRadius:7,padding:"9px 14px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:12,...F.body}}>
+          Varrer todos
+        </button>
+        {res&&<span style={{...F.body,fontSize:12,color:C.green,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>
+          <Ic n="check" s={13} c={C.green}/> {res.corrigidos} item(ns) corrigido(s) de {res.verificados} verificado(s)
+        </span>}
+        {erro&&<span style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>Erro: {erro}</span>}
+      </div>
+      {res&&(res.itens||[]).length>0&&<div style={{...F.body,fontSize:11,color:C.gray600,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 10px",maxHeight:120,overflowY:"auto"}}>
+        {res.itens.map((it,i)=><div key={i}>• {it.sku} — {it.nome} (pedido {it.pedido})</div>)}
+      </div>}
+    </div>
+  );
+}
+
+// Move pra Amostra Física as reprogramações que vieram de amostra FÍSICA
+// reprovada mas ficaram na fila de Amostra Digital (regra antiga).
+function MigrarReprogFisicaBtn(){
+  const [rodando,setRodando]=useState(false);
+  const [res,setRes]=useState(null);
+  const [erro,setErro]=useState("");
+  const rodar=async(preview)=>{
+    if(!preview&&!confirm("Mover as reprogramações de amostra física que estão na fila de Amostra Digital para a fila de Amostra Física?"))return;
+    setRodando(true);setErro("");setRes(null);
+    try{
+      const r=await apiFetch("/admin/migrar-reprog-fisica"+(preview?"?preview=1":""),"POST",{});
+      if(r&&r.success)setRes(r); else setErro((r&&r.error)||"Erro desconhecido");
+    }catch(e){setErro(e.message);}
+    finally{setRodando(false);}
+  };
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      <div>
+        <div style={{...F.body,fontSize:13,fontWeight:700,color:C.black,marginBottom:4}}>
+          Migrar reprogramações de amostra física
+        </div>
+        <div style={{...F.body,fontSize:12,color:C.gray500,lineHeight:1.45}}>
+          Pedidos reprovados na <strong>amostra física</strong> voltavam para a fila de Amostra Digital (regra antiga).
+          Esta ação move os que ainda estão lá para a nova aba de reprogramação da <strong>Amostra Física</strong>.
+          Use "Simular" primeiro para ver quais serão afetados.
+        </div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <button onClick={()=>rodar(true)} disabled={rodando} style={{
+          background:C.white,color:C.gray700,border:`1.5px solid ${C.gray300}`,borderRadius:7,padding:"9px 14px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:12,...F.body}}>
+          Simular
+        </button>
+        <button onClick={()=>rodar(false)} disabled={rodando} style={{
+          background:rodando?C.gray400:C.red,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",
+          cursor:rodando?"wait":"pointer",fontWeight:700,fontSize:13,...F.body}}>
+          {rodando?"Movendo...":"Migrar agora"}
+        </button>
+        {res&&<span style={{...F.body,fontSize:12,color:res.preview?C.gray600:C.green,fontWeight:600,display:"inline-flex",alignItems:"center",gap:4}}>
+          {!res.preview&&<Ic n="check" s={13} c={C.green}/>}
+          {res.preview?`${(res.pedidos||[]).length} pedido(s) seriam movidos (de ${res.verificados} na fila digital)`:`${res.movidos} pedido(s) movido(s)`}
+        </span>}
+        {erro&&<span style={{...F.body,fontSize:12,color:C.red,fontWeight:600}}>Erro: {erro}</span>}
+      </div>
+      {res&&(res.pedidos||[]).length>0&&<div style={{...F.body,fontSize:11,color:C.gray600,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 10px",maxHeight:140,overflowY:"auto"}}>
+        {res.pedidos.map((p,i)=><div key={i}>• PED {p.linx||p.vendasId} — {p.motivo}</div>)}
+      </div>}
+    </div>
+  );
+}
+
 // Monitor "Pedidos sem Pós-venda" — rede de segurança contra pedido que passa em
 // branco. Esperto: ignora naturezas de faturamento/entrega futura (produção vai
 // pra remessa). Só mostra vazamento real.
@@ -6468,7 +6853,7 @@ function MonitorSemPosvendaBtn(){
 }
 
 // ─── FILA GENÉRICA ────────────────────────────────────────────────────────────
-function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra,subTabsReprog,subTabExecutados,user}){
+function Fila({title,sub,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,endpoint,finalizado,filtroBordador,setFiltroBordador,topoExtra,subTabsReprog,subTabExecutados,modoReprog,user}){
   const [busca,setBusca]=useState("");
   const [filtroSLA,setFiltroSLA]=useState("todos"); // todos | atrasados | risco | ok
   const [subTab,setSubTab]=useState("normal"); // normal | reprogramacao
@@ -6510,6 +6895,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
       (o.id||"").toLowerCase().includes(q) ||
       String(o.pedidoLinx||"").toLowerCase().includes(q) ||
       String(o.vendasId||"").includes(q) ||
+      (o.obsProdutos||"").toLowerCase().includes(q) ||
       (o.items||[]).some(it=>(it.sku||"").toLowerCase().includes(q)||(it.desc||"").toLowerCase().includes(q))
     );
   }
@@ -6532,10 +6918,19 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
     );
   }
 
-  // Filtro por sub-tab (só ativa quando subTabsReprog=true)
+  // Reprogramação aparece SÓ na fila onde o pedido está agora — e a etapa atual
+  // já reflete a reprovação MAIS RECENTE (digital reprovada volta pra Amostra
+  // Digital; física reprovada volta pra Amostra Física). Como o pedido ocupa uma
+  // única etapa, ele nunca aparece em duas abas de reprogramação ao mesmo tempo,
+  // mesmo tendo sido reprovado nas duas em ciclos diferentes.
+  const ehReprogDaFila=(o)=>o.reprogramacao===true;
+  // Telas separadas (Alteração de Amostra Digital/Física): a fila base esconde
+  // as reprogramações e a tela de alteração mostra SÓ elas.
+  if(modoReprog==="somente") mine=mine.filter(ehReprogDaFila);
+  else if(modoReprog==="sem") mine=mine.filter(o=>!ehReprogDaFila(o));
   if(subTabsReprog){
-    if(subTab==="reprogramacao") mine=mine.filter(o=>o.reprogramacao===true);
-    else mine=mine.filter(o=>!o.reprogramacao);
+    if(subTab==="reprogramacao") mine=mine.filter(ehReprogDaFila);
+    else mine=mine.filter(o=>!ehReprogDaFila(o));
   }
 
   if(etapa==="Programação"){
@@ -6566,11 +6961,12 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
   // etapasAtivas, não a etapa principal. Assim o cabeçalho/contador bate com a
   // lista exibida e com a aba Minhas Demandas — um card ativo em "Em Separação"
   // mas com etapa principal em outra (ex.: Programação) conta aqui também.
-  const all=source.filter(o=>((o.etapasAtivas||[o.etapa]).includes(etapa))&&!o.concluido);
+  const all=source.filter(o=>((o.etapasAtivas||[o.etapa]).includes(etapa))&&!o.concluido)
+    .filter(o=>modoReprog==="somente"?ehReprogDaFila(o):modoReprog==="sem"?!ehReprogDaFila(o):true);
   const nLate=all.filter(o=>getSLA(o,slaCfg,etapa).st==="late").length;
   const nRisk=all.filter(o=>getSLA(o,slaCfg,etapa).st==="risk").length;
-  const nReprog=all.filter(o=>o.reprogramacao===true).length;
-  const nNormal=all.filter(o=>!o.reprogramacao).length;
+  const nReprog=all.filter(ehReprogDaFila).length;
+  const nNormal=all.filter(o=>!ehReprogDaFila(o)).length;
 
   const FilterChip=({id,label,count,color})=>(
     <button onClick={()=>setFiltroSLA(id)}
@@ -6581,7 +6977,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
 
   return(
     <div style={{padding:24}}>
-      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}`} onRefresh={carregar} refreshing={loading}/>
+      <PageH title={title} sub={`${all.length} pedido${all.length!==1?"s":""} ${finalizado?"concluído"+(all.length!==1?"s":""):"nesta etapa"}${sub?" · "+sub:""}`} onRefresh={carregar} refreshing={loading}/>
 
       {topoExtra}
 
@@ -6623,7 +7019,7 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
             color: subTab==="reprogramacao" ? "#c2410c" : C.gray500,
             transition:"all 0.15s",
           }}>
-          <span>↻</span> Reprogramação
+          <span>↻</span> {etapa==="Amostra Física"?"Reprogramação Física":etapa==="Amostra Digital"?"Reprogramação Digital":"Reprogramação"}
           {nReprog>0 && <span style={{
             background:"#f97316",color:C.white,
             padding:"2px 8px",borderRadius:10,
@@ -6684,6 +7080,8 @@ function Fila({title,etapa,orders,onOpen,actionLabel,actionColor=C.green,slaCfg,
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:5}}>
                     <span style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</span>
+                    <TagCentroCusto cc={o.centroCusto} size="sm"/>
+                    <TagTipo tipo={o.tipo} size="sm"/>
                     <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                     {o.reprogramacao&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#f97316",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>↻ (ALTERAÇÃO)</span>}
                     {o.houveAlteracaoForm&&<span style={{display:"inline-flex",alignItems:"center",gap:4,background:"#b45309",color:C.white,borderRadius:6,padding:"2px 9px",...F.body,fontSize:10,fontWeight:700,letterSpacing:"0.04em"}}>⚠ ALTERAÇÃO DE FORMULÁRIO</span>}
@@ -7218,7 +7616,7 @@ function FinalizadosPage({onOpen}){
               <div style={{minWidth:0,flex:1}}>
                 <div style={{...F.body,fontWeight:700,fontSize:14}}>{idPedido(o)}</div>
                 <div style={{...F.body,fontSize:13,color:C.gray700,marginTop:2}}>{o.client||"—"}</div>
-                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:3}}>{fmtR(o.valor)}{o.centroCusto?` · ${o.centroCusto}`:""}</div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:3}}>{fmtR(o.valor)}{o.centroCusto?` · ${rotuloCentroCusto(o.centroCusto)}`:""}</div>
               </div>
               <span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"4px 10px",borderRadius:6,background:fat.bg,color:fat.cor,border:`1px solid ${fat.cor}33`,whiteSpace:"nowrap"}}>{fat.lbl}</span>
             </div>
@@ -7378,8 +7776,13 @@ function CodigosBarra({user}){
 
 // ─── IMPRESSÃO DE PEDIDO (folha de separação) ────────────────────────────────
 function Folha({emit,o,fmtDt}){
-  const totalPecas=(o.produtos||[]).reduce((s,p)=>s+(p.total||0),0);
-  const totalSeparado=(o.produtos||[]).reduce((s,p)=>s+(p.totalSeparado||0),0);
+  // Linhas de PERSONALIZAÇÃO (bordado/arte/silk/DTF) não são peça física — o WMS
+  // nunca as separa. Ficam listadas como informação, mas NÃO entram na contagem
+  // de peças nem no status do pedido (senão o total fica inflado, ex.: 9/18).
+  const ehPers=(p)=>p.naoSeparavel===true||p.statusProduto==="personalizacao";
+  const produtosSep=(o.produtos||[]).filter(p=>!ehPers(p));
+  const totalPecas=produtosSep.reduce((s,p)=>s+(p.total||0),0);
+  const totalSeparado=produtosSep.reduce((s,p)=>s+(p.totalSeparado||0),0);
   const status=o.statusSeparacao||"pendente";
   // Cores escurecidas — impressão B&W fica legível
   const STATUS_CFG={
@@ -7405,6 +7808,9 @@ function Folha({emit,o,fmtDt}){
     }}>{simb}</span>
   );
   const pilProduto=(p)=>{
+    // Linha de personalização (bordado/arte/silk/DTF): não é peça separável,
+    // então nunca aparece como PENDENTE na folha.
+    if(p.statusProduto==="personalizacao"||p.naoSeparavel) return {lbl:"PERSONALIZAÇÃO",cor:"#4b2673",bg:"#efe8f7",bd:"#7c4bb8", simb:"◆"};
     if(p.statusProduto==="completo")return {lbl:"SEPARADO",cor:"#0d4d24",bg:"#e8f5ec",bd:"#4a8f5f", simb:"✓"};
     if(p.statusProduto==="parcial") return {lbl:`PARCIAL ${p.gradesSeparadas||0}/${p.qtdGrades||0}`,cor:"#7a2a06",bg:"#fce8d5",bd:"#c46a2f", simb:"P"};
     return {lbl:"PENDENTE",cor:"#5c0f0f",bg:"#f5d5d5",bd:"#9e3d3d", simb:"✗"};
@@ -7459,13 +7865,29 @@ function Folha({emit,o,fmtDt}){
         <div style={{minWidth:0,flex:1}}>
           <span style={{...F.body,fontSize:10,color:"#333",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Cliente: </span>
           <span style={{...F.body,fontSize:14,fontWeight:700,color:"#000"}}>{o.cliente||"—"}</span>
-          {(o.cnpj||o.endereco||o.clifor)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.clifor?((o.cnpj?" · ":"")+`Clifor: ${o.clifor}`):""}{o.endereco?((o.cnpj||o.clifor)?" · ":"")+o.endereco:""}</div>}
+          {/* Clifor ao lado do nome — é o código que a operação usa pra identificar
+              o cliente rapidamente, então fica em destaque junto do nome. */}
+          {o.clifor&&<span style={{...F.body,fontSize:11.5,fontWeight:700,color:"#333",marginLeft:8,background:"#e4e4e4",border:"1px solid #b8b8b8",borderRadius:5,padding:"1px 7px",whiteSpace:"nowrap"}}>Clifor: {o.clifor}</span>}
+          {(o.cnpj||o.endereco||o.inscricaoEstadual)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.inscricaoEstadual?((o.cnpj?" · ":"")+`IE: ${o.inscricaoEstadual}`):""}{o.endereco?((o.cnpj||o.inscricaoEstadual)?" · ":"")+o.endereco:""}</div>}
+          {(o.representante||o.condicaoPagamento)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.representante?`Representante: ${o.representante}`:""}{o.condicaoPagamento?((o.representante?" · ":"")+`Cond. pagto: ${o.condicaoPagamento}`):""}</div>}
         </div>
         {(() => {
-          const ehConcess=/concession/i.test(o.centroCusto||"");
-          const tipo=ehConcess?"CONCESSIONÁRIA":"CORPORATIVO";
-          const cor=ehConcess?"#3b1173":"#0d4d24"; const bg=ehConcess?"#ece7f5":"#e8f5ec"; const bd=ehConcess?"#4a2b7a":"#4a8f5f";
-          return <span style={{...F.title,flexShrink:0,fontSize:11,fontWeight:800,letterSpacing:"0.05em",padding:"5px 10px",borderRadius:6,background:bg,color:cor,border:`1.5px solid ${bd}`,whiteSpace:"nowrap"}}>{tipo}</span>;
+          // Mostra o centro de custo completo (ex.: "27 - CORPORATIVO"), não só o tipo.
+          const rot=rotuloCentroCusto(o.centroCusto);
+          const s=rot.toLowerCase();
+          const tipo=(rot||"CORPORATIVO").toUpperCase();
+          const ehConcess=/concession/.test(s);
+          const ehLicit=/licita/.test(s);
+          const ehB2B=/b2b/.test(s);
+          const cor=ehConcess?"#3b1173":ehLicit?"#7a2a06":ehB2B?"#0e4f6e":"#0d4d24";
+          const bg =ehConcess?"#ece7f5":ehLicit?"#fce8d5":ehB2B?"#e2f1f8":"#e8f5ec";
+          const bd =ehConcess?"#4a2b7a":ehLicit?"#c46a2f":ehB2B?"#3a86ad":"#4a8f5f";
+          return (
+            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,flexShrink:0}}>
+              <span style={{...F.title,fontSize:11,fontWeight:800,letterSpacing:"0.05em",padding:"5px 10px",borderRadius:6,background:bg,color:cor,border:`1.5px solid ${bd}`,whiteSpace:"nowrap"}}>{tipo}</span>
+              {o.tipo&&<span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"3px 9px",borderRadius:6,background:"#efefef",color:"#333",border:"1.5px solid #b0b0b0",whiteSpace:"nowrap"}}>{String(o.tipo).toUpperCase()}</span>}
+            </div>
+          );
         })()}
       </div>
 
@@ -8713,11 +9135,12 @@ function AppInner(){
       else if(tipo==="reprovar_amostra"){
         // Regra do processo:
         //   Aprovação Digital reprovada → volta pra Amostra Digital (refaz digital)
-        //   Aprovação Física reprovada → volta pra Amostra Digital (refaz do início,
-        //     o problema pode estar no design/programação, não só na física)
+        //   Aprovação Física reprovada → volta pra AMOSTRA FÍSICA (refaz a física;
+        //     antes voltava pra digital, o que misturava as duas reprogramações
+        //     na mesma fila e tirava a demanda de quem faz a peça).
         const voltaMap={
           "Aprovação de Amostra Digital":"Amostra Digital",
-          "Aprovação de Amostra Física":"Amostra Digital",
+          "Aprovação de Amostra Física":"Amostra Física",
         };
         const volta=voltaMap[o.etapa]||"Amostra Digital";
         const propVolta=ETAPA_PROPRIEDADE[volta];
@@ -8807,6 +9230,7 @@ function AppInner(){
     pedidos:"Pedidos em Aberto",direcionamento:"Direcionamento",
     analise_pcp:"Análise PCP",buscar_loja:"Buscar Produto em Loja",analise_producao:"Análise da Produção",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
+    alteracao_amostra_digital:"Alteração de Amostra Digital",alteracao_amostra_fisica:"Alteração de Amostra Física",
     bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
     expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",codigos_barra:"Códigos de Barra",impressao_pedido:"Impressão de Pedido",sla:"Configurações",usuarios:"Usuários",
   };
@@ -8849,8 +9273,10 @@ function AppInner(){
             ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="conferencia_direcionamento"&&<Direcionamento orders={orders} setOrders={setOrders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="programacao"&&<Fila title="Programação de Bordado" etapa="Programação" endpoint="/programacao" orders={orders} onOpen={setSel} actionLabel="Marcar como programado" actionColor={C.amber} slaCfg={slaCfg} subTabExecutados user={user}/>}
-            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg} subTabsReprog/>}
-            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg} subTabsReprog/>}
+            {page==="amostra_digital"&&<Fila title="Amostra Digital" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor={C.purple} slaCfg={slaCfg} modoReprog="sem"/>}
+            {page==="alteracao_amostra_digital"&&<Fila title="Alteração de Amostra Digital" sub="Amostras digitais reprovadas que precisam ser refeitas" etapa="Amostra Digital" endpoint="/amostra-digital" orders={orders} onOpen={setSel} actionLabel="Enviar amostra" actionColor="#c2410c" slaCfg={slaCfg} modoReprog="somente"/>}
+            {page==="amostra_fisica"&&<Fila title="Amostra Física" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#be185d" slaCfg={slaCfg} modoReprog="sem"/>}
+            {page==="alteracao_amostra_fisica"&&<Fila title="Alteração de Amostra Física" sub="Amostras físicas reprovadas que precisam ser refeitas" etapa="Amostra Física" endpoint="/amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Notificar vendedor" actionColor="#c2410c" slaCfg={slaCfg} modoReprog="somente"/>}
             {page==="aprovacao_amostra_digital"&&<Fila title="Aprovação de Amostra Digital" etapa="Aprovação de Amostra Digital" endpoint="/aprovacao-amostra-digital" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="aprovacao_amostra_fisica"&&<Fila title="Aprovação de Amostra Física" etapa="Aprovação de Amostra Física" endpoint="/aprovacao-amostra-fisica" orders={orders} onOpen={setSel} actionLabel="Aprovar/Reprovar" actionColor={C.blue} slaCfg={slaCfg}/>}
             {page==="bordado_interno"&&<Fila title="Bordado Interno" etapa="Bordado Interno" endpoint="/bordado-interno" orders={orders} onOpen={setSel} actionLabel="Bordado concluído" actionColor={C.green} slaCfg={slaCfg}/>}
@@ -8866,7 +9292,7 @@ function AppInner(){
             {page==="rel_pendencias"&&<RelatorioPendencias user={user}/>}
             {page==="posvenda"&&<PainelPosVenda onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="banco_imagens"&&<BancoImagens user={user}/>}
-            {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg}/>}
+            {page==="sla"&&<SLAConfig slaCfg={slaCfg} onSave={setSlaCfg} user={user}/>}
             {page==="usuarios"&&<Usuarios/>}
           </div>
         </div>
@@ -8926,6 +9352,7 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
     if (filtroChip === "risco" && !(p.risco && !p.atrasado)) return false;
     if (filtroChip === "pendencia" && !p.emPendencia) return false;
     if (filtroChip === "aguardando" && !p.aguardandoCliente) return false;
+    if (filtroChip === "aguardando_outro" && !p.aguardandoOutro) return false;
     if (filtroChip === "vencem_hoje" && !p.vencemHoje) return false;
     if (filtroEtapa && !((p.etapasAtivas && p.etapasAtivas.length ? p.etapasAtivas : [p.etapa]).includes(filtroEtapa))) return false;
     if (filtroVendedores.length > 0 && !filtroVendedores.includes(p.vendedor)) return false;
@@ -8934,7 +9361,12 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
       const q = busca.toLowerCase();
       const bate = (p.client || "").toLowerCase().includes(q)
         || (p.pedidoLinx || "").toLowerCase().includes(q)
-        || (p.cnpj || "").includes(q);
+        || (p.cnpj || "").includes(q)
+        // Números do HubSpot: id de Vendas, Pós-venda e Bordado (e o "PED-...")
+        || String(p.vendasId || "").includes(q)
+        || String(p.posvendaId || "").includes(q)
+        || String(p.bordadoId || "").includes(q)
+        || String(p.id || "").toLowerCase().includes(q);
       if (!bate) return false;
     }
     return true;
@@ -8951,10 +9383,11 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
     "Análise de Frete": "#06b6d4",
   };
 
-  // Dias parado na etapa
+  // Dias ÚTEIS parado na etapa (fim de semana não conta). Um pedido que entrou
+  // na sexta não pode aparecer com 3 dias parado na segunda.
   const diasParado = (p) => {
     if (!p.etapaAt) return null;
-    return Math.floor((Date.now() - new Date(p.etapaAt).getTime()) / (24*60*60*1000));
+    return diasUteisDesde(p.etapaAt);
   };
 
   // Formata prazo
@@ -8984,9 +9417,9 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
         <button onClick={()=>{
           const cols = ["Pedido","Vendas ID","Cliente","CNPJ","Vendedor","Valor","Etapa","Dias Parado","Entrada Etapa","Vencimento","Status","Contato Cliente"];
           const linhas = filtrados.map(p=>{
-            const dias = p.etapaAt ? Math.floor((Date.now() - new Date(p.etapaAt).getTime()) / (24*60*60*1000)) : "";
+            const dias = p.etapaAt ? diasUteisDesde(p.etapaAt) : "";   // dias ÚTEIS
             const status = p.atrasado ? "Atrasado" : p.risco ? "Em risco" : "No prazo";
-            const contato = p.aguardandoCliente ? "Aguardando cliente" : p.emPendencia ? "Pendência comercial" : "";
+            const contato = p.aguardandoOutro ? "Aguardando outro pedido" : p.aguardandoCliente ? "Aguardando cliente" : p.emPendencia ? "Pendência comercial" : "";
             return [p.pedidoLinx||"",p.vendasId||"",p.client||"",p.cnpj||"",p.vendedor||"",
               (p.valor||0).toFixed(2).replace(".",","),
               p.etapa||"", dias,
@@ -9020,6 +9453,7 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
           <KpiCard label="Vencem Hoje" value={kpis.vencemHoje||0} sub="Prazo do dia" color="#ea580c" active={filtroChip==="vencem_hoje"} onClick={()=>setFiltroChip("vencem_hoje")}/>
           <KpiCard label="Pendência Comercial" value={kpis.emPendencia||0} sub="Ação interna" color="#7c3aed" active={filtroChip==="pendencia"} onClick={()=>setFiltroChip("pendencia")}/>
           <KpiCard label="Aguardando Cliente" value={kpis.aguardandoCliente||0} sub="Aprovação amostra" color="#0891b2" active={filtroChip==="aguardando"} onClick={()=>setFiltroChip("aguardando")}/>
+          <KpiCard label="Aguardando Outro Pedido" value={kpis.aguardandoOutroPedido||0} sub="Faturar/enviar junto" color="#1d4ed8" active={filtroChip==="aguardando_outro"} onClick={()=>setFiltroChip("aguardando_outro")}/>
           <KpiCard label="Faturados Hoje" value={kpis.faturadosHoje||0} sub={`R$ ${((kpis.valorFaturadosHoje||0)/1000).toFixed(1)}k`} color={C.green}/>
         </div>
       </div>
@@ -9062,7 +9496,7 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
           <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:C.gray400}}>
             <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
           </div>
-          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido, CNPJ..."
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por cliente, pedido Linx, nº HubSpot ou CNPJ..."
             style={{width:"100%",padding:"8px 12px 8px 34px",fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,outline:"none",background:C.white,...F.body,boxSizing:"border-box"}}/>
         </div>
         <select value={filtroEtapa} onChange={e=>setFiltroEtapa(e.target.value)} style={{padding:"8px 12px",fontSize:12,border:`1.5px solid ${C.gray200}`,background:C.white,borderRadius:6,color:C.gray700,cursor:"pointer",...F.body}}>
@@ -9809,7 +10243,7 @@ function RaioX({user,onOpen,slaCfg,onIrChat}){
   };
   useEffect(()=>{carregar();},[]);
 
-  const diasParado=(p)=>p.etapaAt?Math.floor((Date.now()-new Date(p.etapaAt).getTime())/86400000):null;
+  const diasParado=(p)=>p.etapaAt?diasUteisDesde(p.etapaAt):null;   // dias ÚTEIS (sem fim de semana)
   const lista=peds||[];
   const atrasados=lista.filter(p=>p.atrasado).sort((a,b)=>new Date(a.dataVencimento||0)-new Date(b.dataVencimento||0));
   const paradosTempo=lista.filter(p=>{const d=diasParado(p);return d!=null&&d>=corte;}).sort((a,b)=>(diasParado(b)||0)-(diasParado(a)||0));
