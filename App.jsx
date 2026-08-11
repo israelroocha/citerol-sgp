@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.65.0";
+const SGP_VERSION = "v2.76.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -50,7 +50,17 @@ async function apiFetch(path, method = "GET", body = null) {
           await new Promise(r => setTimeout(r, 350 * (i + 1)));
           continue;
         }
-        throw new Error(`Worker ${method} ${path} → ${res.status}`);
+        // Mostra a MENSAGEM que o worker devolveu, não só o código HTTP. Antes
+        // aparecia só "Worker POST /voltar-etapa/... → 400", que não dizia nada
+        // ao usuário nem ajudava a diagnosticar.
+        let detalhe = "";
+        try {
+          const corpo = await res.clone().json();
+          if (corpo && corpo.error) detalhe = String(corpo.error);
+        } catch {
+          try { const t = await res.text(); if (t && t.length < 300) detalhe = t; } catch {}
+        }
+        throw new Error(detalhe || `Worker ${method} ${path} → ${res.status}`);
       }
       return res.json();
     } catch (e) {
@@ -83,9 +93,17 @@ async function _fetchSnap(force){
   _snapState.loading = true; _emitSnap();
   try {
     const r = await apiFetch("/snapshot-aberto" + (force ? "?force=1" : ""));
-    _snapState.data = r;
+    // ESTABILIDADE: se a resposta vier VAZIA (build parcial/timeout no worker)
+    // mas já temos um quadro carregado, MANTÉM o que está na tela. Antes, uma
+    // resposta ruim zerava tudo e depois voltava — a tela "piscava".
+    const temPedidos = !!(r && r.porEtapa && Object.values(r.porEtapa).some(g => g && (g.items||[]).length > 0));
+    if (!temPedidos && _snapState.data) {
+      _snapState.lastFetch = Date.now() - 25000;   // tenta de novo em ~5s
+    } else {
+      _snapState.data = r;
+      _snapState.lastFetch = Date.now();
+    }
     _snapState.error = null;
-    _snapState.lastFetch = Date.now();
   } catch (e) {
     _snapState.error = e.message || "erro ao carregar";
   } finally {
@@ -280,10 +298,19 @@ const NAV_ITEMS = [
   // ── Separação ─────────────────────────────────────────────────────────────
   {id:"em_separacao",            label:"Em Separação",             icon:"inbox",   grupo:"Separação"},
   {id:"conferencia_separacao",   label:"Conferência Separação",    icon:"check",   grupo:"Separação"},
+  {id:"bonificacoes",            label:"Bonificações",             icon:"box",     grupo:"Separação"},
   // ── PCP (pedidos separados parciais) ──────────────────────────────────────
+  {id:"op_sob_medida",           label:"Criação de OP Sob Medida", icon:"needle",  grupo:"PCP"},
+  {id:"aguardando_producao_sm",  label:"Aguardando Produção SM",   icon:"clock",   grupo:"PCP"},
   {id:"analise_pcp",             label:"Análise PCP",              icon:"activity",grupo:"PCP"},
   {id:"buscar_loja",             label:"Buscar Produto em Loja",   icon:"inbox",   grupo:"PCP"},
   {id:"analise_producao",        label:"Análise da Produção",      icon:"box",     grupo:"PCP"},
+  // ── Ocorrência (devolução / reclamação) ───────────────────────────────────
+  {id:"ocorrencias",             label:"Painel de Ocorrências",    icon:"warn",    grupo:"Ocorrência"},
+  {id:"ocor_entrada_devolucao",  label:"Entrada da Devolução",     icon:"inbox",   grupo:"Ocorrência"},
+  {id:"ocor_ajuste_pedido",      label:"Ajuste do Pedido",         icon:"refresh", grupo:"Ocorrência"},
+  {id:"ocor_registro_reclamacao",label:"Registro de Reclamação",   icon:"list",    grupo:"Ocorrência"},
+  {id:"ocor_improcedencia",      label:"Tratativa de Improcedência",icon:"warn",   grupo:"Ocorrência"},
   // ── Amostra ───────────────────────────────────────────────────────────────
   {id:"programacao",             label:"Programação",              icon:"needle",  grupo:"Amostra"},
   {id:"amostra_digital",         label:"Amostra Digital",          icon:"monitor", grupo:"Amostra"},
@@ -296,6 +323,7 @@ const NAV_ITEMS = [
   {id:"conferencia_direcionamento",label:"Conferência e Direcionamento",icon:"arrow",grupo:"Operação"},
   {id:"bordado_interno",         label:"Bordado Interno",          icon:"needle",  grupo:"Operação"},
   {id:"bordado_externo",         label:"Bordado Externo",          icon:"box",     grupo:"Operação"},
+  {id:"silk_dtf",                label:"Silk / DTF",               icon:"image",   grupo:"Operação"},
   {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operação"},
   // ── Outros (fora de grupo, colapsável) ────────────────────────────────────
   {id:"analise_frete",           label:"Análise de Frete",         icon:"send",    grupo:"Outros"},
@@ -312,10 +340,18 @@ const NAV_ITEMS = [
   {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
 ];
 
+// Ordem dos grupos no menu e nas telas de permissão. Centralizada de propósito:
+// ao criar um grupo novo em NAV_ITEMS, basta incluir aqui e ele aparece em todos
+// os lugares (sidebar, menu mobile, cadastro de usuário e acesso em lote).
+const GRUPOS_MENU = ["Principal","Análise","Separação","PCP","Ocorrência","Amostra","Operação","Outros","Cadastros","Sistema"];
+
 // Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
 const MODULO_ETAPA = {
   em_separacao:               "Em Separação",
   conferencia_separacao:      "Conferência Separação",
+  bonificacoes:               "Bonificações",
+  op_sob_medida:              "Criação de OP Sob Medida",
+  aguardando_producao_sm:     "Aguardando Produção Sob Medida",
   analise_pcp:                "Análise PCP",
   buscar_loja:                "Buscar em Loja",
   analise_producao:           "Análise Produção",
@@ -329,15 +365,23 @@ const MODULO_ETAPA = {
   aprovacao_amostra_fisica:   "Aprovação de Amostra Física",
   bordado_interno:            "Bordado Interno",
   bordado_externo:            "Bordado Externo",
+  silk_dtf:                   "Silk/DTF",
   expedicao:                  "Expedição",
   analise_frete:              "Análise de Frete",
   pendencia_comercial:        "Pendência Comercial",
   aguardando_pedido:          "Aguardando Outro Pedido",
+  ocor_entrada_devolucao:     "Entrada da Devolução",
+  ocor_ajuste_pedido:         "Ajuste do Pedido",
+  ocor_registro_reclamacao:   "Registro de Reclamação",
+  ocor_improcedencia:         "Tratativa de Improcedência",
 };
 // Mapa módulo -> endpoint do Worker (para carregar demandas ao vivo)
 const MODULO_ENDPOINT = {
   em_separacao:               "/em-separacao",
   conferencia_separacao:      "/conferencia-separacao",
+  bonificacoes:               "/bonificacoes",
+  op_sob_medida:              "/op-sob-medida",
+  aguardando_producao_sm:     "/aguardando-producao-sm",
   analise_pcp:                "/analise-pcp",
   buscar_loja:                "/buscar-loja",
   analise_producao:           "/analise-producao",
@@ -351,10 +395,16 @@ const MODULO_ENDPOINT = {
   aprovacao_amostra_fisica:   "/aprovacao-amostra-fisica",
   bordado_interno:            "/bordado-interno",
   bordado_externo:            "/bordado-externo",
+  silk_dtf:                   "/silk-dtf",
   expedicao:                  "/expedicao",
   analise_frete:              "/analise-frete",
   pendencia_comercial:        "/pendencia-comercial",
   aguardando_pedido:          "/aguardando-pedido",
+  ocor_entrada_devolucao:     "/ocor-entrada-devolucao",
+  ocor_ajuste_pedido:         "/ocor-ajuste-pedido",
+  ocor_registro_reclamacao:   "/ocor-registro-reclamacao",
+  ocor_improcedencia:         "/ocor-improcedencia",
+  ocorrencias:                "/ocorrencias",
 };
 
 // Mapa de etapa -> propriedade de arquivo no HubSpot
@@ -595,7 +645,14 @@ const normalizarCard=(o,etapa)=>({
   obs:o.infoImportante||o.descricao||"",endereco:o.endereco||"",
   condicaoPagamento:o.condicaoPagamento||"",arquivoDtfsilk:o.arquivoDtfsilk||[],
   transportadora:o.transportadora||"",valorFrete:o.valorFrete||0,pagadorFrete:o.pagadorFrete||"",
-  tipo:o.tipo||"",
+  tipo:o.tipo||"",numeroOP:o.numeroOP||"",tipoPedido:o.tipoPedido||"",
+  // Sob medida: formulário com as medidas, anexado pela vendedora
+  formularioSobMedida:Array.isArray(o.formularioSobMedida)?o.formularioSobMedida:[],
+  // Ocorrência (devolução/reclamação) — definido pelo funil de origem
+  ehOcorrencia:o.ehOcorrencia===true,ocorrenciaId:o.ocorrenciaId||"",
+  ocorrenciaTipo:o.ocorrenciaTipo||"",ocorrenciaParecer:o.ocorrenciaParecer||"",
+  ocorrenciaMotivo:o.ocorrenciaMotivo||"",ocorrenciaRelato:o.ocorrenciaRelato||"",
+  improcPosvendaOk:o.improcPosvendaOk===true,improcSeparacaoOk:o.improcSeparacaoOk===true,
   pagamentoLiberado:o.pagamentoLiberado===true,
   pagamentos:o.pagamentos||[],totalRecebido:o.totalRecebido||0,
   infoImportante:o.infoImportante||"",dadosAdicionais:o.dadosAdicionais||"",
@@ -605,7 +662,8 @@ const normalizarCard=(o,etapa)=>({
   reprogramacao:o.reprogramacao||false,
   historico:o.historico||[],
   houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
-  temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+  temBordado:o.temBordado!==false,temSilkDtf:o.temSilkDtf===true,
+  dataVencimento:o.dataVencimento||null,
   prazoFinal:o.prazoFinal||null,
   dataFechamento:o.dataFechamento||o.prazoFinal||null,
   qtdTotal:Number(o.qtdTotal||0),qtdSeparada:Number(o.qtdSeparada||0),
@@ -1039,17 +1097,17 @@ function ETag({etapa}){
   return <span style={{display:"inline-flex",alignItems:"center",background:c+"14",color:c,borderRadius:3,padding:"4px 9px",fontSize:11,fontWeight:700,...F.body,whiteSpace:"nowrap",flexShrink:0,lineHeight:1}}>{etapa}</span>;
 }
 
-function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
+function Btn({label,onClick,variant="primary",size="md",icon,style={},disabled=false}){
   const bg={primary:C.red,secondary:C.white,success:C.green,ghost:"transparent",danger:C.red+"14"}[variant];
   const fg={primary:C.white,secondary:C.gray700,success:C.white,ghost:C.gray600,danger:C.red}[variant];
   const br={primary:"none",secondary:`1px solid ${C.gray200}`,success:"none",ghost:"none",danger:`1px solid ${C.red}30`}[variant];
   const pd={sm:"5px 12px",md:"8px 16px",lg:"11px 22px"}[size];
   const fs={sm:12,md:13,lg:14}[size];
   return(
-    <button onClick={onClick}
-      style={{display:"inline-flex",alignItems:"center",gap:6,background:bg,color:fg,border:br,borderRadius:6,padding:pd,fontSize:fs,fontWeight:600,cursor:"pointer",...F.body,...style}}
-      onMouseEnter={e=>e.currentTarget.style.opacity="0.82"}
-      onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+    <button onClick={onClick} disabled={disabled}
+      style={{display:"inline-flex",alignItems:"center",gap:6,background:bg,color:fg,border:br,borderRadius:6,padding:pd,fontSize:fs,fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,...F.body,...style}}
+      onMouseEnter={e=>{if(!disabled)e.currentTarget.style.opacity="0.82";}}
+      onMouseLeave={e=>{e.currentTarget.style.opacity=disabled?"0.5":"1";}}>
       {icon&&<Ic n={icon} s={13} c={fg}/>}{label}
     </button>
   );
@@ -1058,7 +1116,7 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={}}){
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
-  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=GRUPOS_MENU;
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
   // Injeta o CSS da scrollbar sutil uma única vez
   useEffect(()=>{
@@ -1181,7 +1239,7 @@ function BottomNav({user,active,onNav}){
   const mainItems=allItems.slice(0,4);
   const [showDrawer,setShowDrawer]=useState(false);
 
-  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=GRUPOS_MENU;
   const groups=GRUPOS.map(label=>({label,items:allItems.filter(n=>n.grupo===label)}));
 
   return(
@@ -3597,6 +3655,19 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     dadosAdicionais: _orderLeve.dadosAdicionais || _enriched.dadosAdicionais || "",
     centroCusto: _orderLeve.centroCusto || _enriched.centroCusto || "",
     tipo: _orderLeve.tipo || _enriched.tipo || "",
+    numeroOP: _orderLeve.numeroOP || _enriched.numeroOP || "",
+    tipoPedido: _orderLeve.tipoPedido || _enriched.tipoPedido || "",
+    formularioSobMedida: (_orderLeve.formularioSobMedida&&_orderLeve.formularioSobMedida.length)
+      ? _orderLeve.formularioSobMedida : (_enriched.formularioSobMedida||[]),
+    // Ocorrência: o card leve é a fonte confiável (vem do funil de origem).
+    ehOcorrencia: _orderLeve.ehOcorrencia || _enriched.ehOcorrencia || false,
+    ocorrenciaId: _orderLeve.ocorrenciaId || _enriched.ocorrenciaId || "",
+    ocorrenciaTipo: _orderLeve.ocorrenciaTipo || _enriched.ocorrenciaTipo || "",
+    ocorrenciaParecer: _orderLeve.ocorrenciaParecer || _enriched.ocorrenciaParecer || "",
+    ocorrenciaMotivo: _orderLeve.ocorrenciaMotivo || _enriched.ocorrenciaMotivo || "",
+    ocorrenciaRelato: _orderLeve.ocorrenciaRelato || _enriched.ocorrenciaRelato || "",
+    improcPosvendaOk: _orderLeve.improcPosvendaOk || _enriched.improcPosvendaOk || false,
+    improcSeparacaoOk: _orderLeve.improcSeparacaoOk || _enriched.improcSeparacaoOk || false,
   }:_orderLeve;
   const ETAPAS_COM_ACAO=["Em Separação","Conferência e Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Análise de Frete"];
   // A "etapa efetiva" é a que o USUÁRIO abriu (vinda da tela — ex.: "Separação"
@@ -3616,6 +3687,8 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const[motivoVoltar,setMotivoVoltar]=useState("");
   const[voltando,setVoltando]=useState(false);
   const[gerandoBordado,setGerandoBordado]=useState(false);
+  const[cancelandoBordado,setCancelandoBordado]=useState(false);
+  const[sincItens,setSincItens]=useState(false);
   const[modalGerar,setModalGerar]=useState(false);
   const[motivoAguard,setMotivoAguard]=useState("");
   const[pedidoDep,setPedidoDep]=useState("");           // vendasId do pedido escolhido
@@ -3710,6 +3783,11 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               <span style={{...F.title,fontSize:17,fontWeight:700,color:C.black,whiteSpace:"nowrap"}}>{idPedido(order)}</span>
               <TagCentroCusto cc={order.centroCusto}/>
               <TagTipo tipo={order.tipo}/>
+              {/* OCORRÊNCIA: peça de devolução — precisa ficar evidente em toda tela */}
+              {order.ehOcorrencia&&<TagOcorrencia/>}
+              {/* SOB MEDIDA: destaque + nº da OP quando já registrada */}
+              {/sob\s*medida/i.test(order.tipoPedido||"")&&<span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"3px 9px",borderRadius:6,background:"#fef3c7",color:"#92400e",border:"1px solid #f59e0b",whiteSpace:"nowrap"}}>SOB MEDIDA</span>}
+              {order.numeroOP&&<span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"3px 9px",borderRadius:6,background:"#e8f5ec",color:"#0d4d24",border:"1px solid #4a8f5f",whiteSpace:"nowrap"}}>OP {order.numeroOP}</span>}
               <ETag etapa={order.etapa}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
@@ -3763,6 +3841,57 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
               <Ic n="needle" s={13} c={C.purple}/> {gerandoBordado?"Gerando...":"Gerar Bordado"}
             </button>}
+            {/* Oposto do Gerar Bordado: cliente desistiu do bordado. Limpar os
+                arquivos no HubSpot não basta — o SGP monta o quadro pelos
+                NEGÓCIOS, então o deal de Bordado precisa ser encerrado. */}
+            {me&&me.admin&&order.bordadoId&&<button
+              disabled={cancelandoBordado}
+              onClick={async()=>{
+                const mot=window.prompt("Cancelar o bordado deste pedido?\n\nO negócio de Bordado será finalizado, o pedido seguirá SEM bordado e os itens serão desmarcados.\n\nMotivo:","Cancelado pelo cliente");
+                if(mot===null)return;
+                if(!String(mot).trim()){alert("O motivo é obrigatório.");return;}
+                setCancelandoBordado(true);
+                try{
+                  const r=await apiFetch(`/cancelar-bordado/${order.vendasId}`,"POST",{motivo:mot,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(r.success){
+                    alert("Bordado cancelado."+(r.itensLimpos?` ${r.itensLimpos} item(ns) desmarcado(s).`:"")+(r.aviso?`\n\n${r.aviso}`:""));
+                    onClose();
+                  } else alert("Erro: "+(r.error||"desconhecido"));
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setCancelandoBordado(false);}
+              }}
+              title="Cliente desistiu do bordado — encerra o bordado e segue como pedido comum"
+              style={{background:C.white,border:`1.5px solid ${C.red}`,borderRadius:6,padding:"7px 12px",cursor:cancelandoBordado?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.red,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!cancelandoBordado)e.currentTarget.style.background=C.red+"0e";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="close" s={13} c={C.red}/> {cancelandoBordado?"Cancelando...":"Cancelar Bordado"}
+            </button>}
+            {/* Itens do SGP vêm do objeto Pedidos Aprovados, criado na integração.
+                A automação só CRIA — se o item sair do pedido depois, o registro
+                fica órfão e continua na lista. Aqui a gente compara com os line
+                items atuais do Vendas e remove o que não existe mais. */}
+            {me&&me.admin&&<button
+              disabled={sincItens}
+              onClick={async()=>{
+                setSincItens(true);
+                try{
+                  const p=await apiFetch(`/sincronizar-itens/${order.vendasId}`,"POST",{});
+                  if(p.error){alert("Erro: "+p.error);return;}
+                  if(!p.total){alert("Nenhum item sobrando — a lista já está igual ao pedido.");return;}
+                  const resumo=p.orfaos.map(o=>`• ${o.sku||""} ${o.nome} ${o.tamanho||""} (qtd ${o.quantidade})${o.jaSeparado?" — JÁ TEM BIPAGEM":""}`).join("\n");
+                  if(!confirm(`Estes ${p.total} item(ns) não existem mais no pedido e serão removidos:\n\n${resumo}\n\nConfirmar?`))return;
+                  const r=await apiFetch(`/sincronizar-itens/${order.vendasId}`,"POST",{executar:true,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(r.success){alert(`${r.removidos} item(ns) removido(s).`);onClose();}
+                  else alert("Erro: "+(r.error||"desconhecido"));
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setSincItens(false);}
+              }}
+              title="Remove da lista os itens que já não existem mais no pedido"
+              style={{background:C.white,border:`1.5px solid ${C.gray300}`,borderRadius:6,padding:"7px 12px",cursor:sincItens?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.gray700,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!sincItens)e.currentTarget.style.background=C.gray50;}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="refresh" s={13} c={C.gray700}/> {sincItens?"Conferindo...":"Sincronizar Itens"}
+            </button>}
             <button
               onClick={()=>imprimirPedido(order.vendasId||order.posvendaId)}
               title="Imprimir folha de separação"
@@ -3789,13 +3918,31 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Centro de Custo",rotuloCentroCusto(order.centroCusto)||"—"],["Tipo",order.tipo||"—"],["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Centro de Custo",rotuloCentroCusto(order.centroCusto)||"—"],["Tipo",order.tipo||"—"],["Tipo de Pedido",order.tipoPedido||"—"],...(order.numeroOP?[["Nº da OP",order.numeroOP]]:[]),...(order.ehOcorrencia?[["Tipo da Ocorrência",order.ocorrenciaTipo||"—"],["Parecer da Qualidade",order.ocorrenciaParecer||"Pendente"]]:[]),["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)]].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:_loadingDet&&(k==="Prazo Faturamento do Pedido")?C.gray400:C.black,wordBreak:"break-word",fontStyle:_loadingDet&&(k==="Prazo Faturamento do Pedido")?"italic":"normal"}}>{v}</div>
                 </div>
               ))}
             </div>
+            {/* SOB MEDIDA: formulário com as medidas, anexado pela vendedora.
+                Fica logo abaixo dos dados do negócio porque é o documento que a
+                produção precisa ter em mãos em todas as etapas do sob medida. */}
+            {(order.formularioSobMedida&&order.formularioSobMedida.length>0)&&<div>
+              <div style={{...F.body,fontSize:10,color:"#92400e",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Formulário Sob Medida</div>
+              <ArquivosBox fileIds={order.formularioSobMedida} emptyText="Nenhum formulário anexado."/>
+            </div>}
+            {/* OCORRÊNCIA: relato do cliente + parecer da qualidade */}
+            {order.ehOcorrencia&&(order.ocorrenciaRelato||order.ocorrenciaMotivo)&&<div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {order.ocorrenciaRelato&&<div>
+                <div style={{...F.body,fontSize:10,color:C.red,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Relato do cliente</div>
+                <div style={{background:C.red+"08",borderRadius:6,padding:"12px 14px",...F.body,fontSize:13,color:C.gray700,lineHeight:1.6,border:`1px solid ${C.red}28`,whiteSpace:"pre-wrap"}}>{order.ocorrenciaRelato}</div>
+              </div>}
+              {order.ocorrenciaMotivo&&<div>
+                <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Parecer da Qualidade</div>
+                <div style={{background:C.gray50,borderRadius:6,padding:"12px 14px",...F.body,fontSize:13,color:C.gray700,lineHeight:1.6,border:`1px solid ${C.gray200}`,whiteSpace:"pre-wrap"}}>{order.ocorrenciaMotivo}</div>
+              </div>}
+            </div>}
             <div>
               <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Observações</div>
               <div style={{background:C.gray50,borderRadius:6,padding:"12px 14px",...F.body,fontSize:13,color:C.gray700,lineHeight:1.6,border:`1px solid ${C.gray200}`}}>{order.obs||"—"}</div>
@@ -4553,6 +4700,524 @@ function TabelaFaltantes({ pedidos, etapaLabel }) {
   );
 }
 
+// ─── BONIFICAÇÕES ─────────────────────────────────────────────────────────────
+// Processo APARTADO: o pedido nasce direto aqui, um OK já finaliza, e ele não
+// entra em nenhum indicador do sistema. Antes esses pedidos nasciam em
+// "Em Separação" e ficavam eternamente pendentes, sujando fila e métrica.
+// Quando o pedido tem bordado, o card mostra em que etapa o bordado está — quem
+// dá o OK precisa saber se a peça já está pronta.
+function Bonificacoes({onOpen,user}){
+  const [pedidos,setPedidos]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [loadError,setLoadError]=useState(null);
+  const [agindo,setAgindo]=useState({});
+  const [feito,setFeito]=useState({});
+  const [busca,setBusca]=useState("");
+
+  const carregar=()=>{
+    setLoading(true);setLoadError(null);
+    apiFetch("/bonificacoes")
+      .then(res=>{
+        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Bonificações")));
+        else setLoadError(res.error||"Erro desconhecido");
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[]);
+
+  const concluir=async(o)=>{
+    if(!o.posvendaId){alert("Pedido sem negócio de Pós-venda.");return;}
+    const aviso=o.temBordado&&!o.amOk
+      ? "\n\n⚠ Este pedido tem bordado que ainda não está aprovado/finalizado."
+      : "";
+    if(!confirm(`Concluir a bonificação do pedido ${o.pedidoLinx||o.vendasId}?${aviso}\n\nO pedido será finalizado.`))return;
+    setAgindo(p=>({...p,[o.id]:true}));
+    try{
+      const r=await apiFetch("/bonificacao-concluida/"+o.posvendaId,"POST",{ctx:{executor:user?.nome||"Usuário SGP"}});
+      if(r.success){setFeito(p=>({...p,[o.id]:r.proximaEtapa||"Finalizado"}));setTimeout(carregar,1200);}
+      else alert("Erro: "+(r.error||"desconhecido"));
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setAgindo(p=>({...p,[o.id]:false}));}
+  };
+
+  const q=busca.trim().toLowerCase();
+  const lista=(pedidos||[]).filter(o=>{
+    if(!q)return true;
+    return [o.pedidoLinx,o.vendasId,o.client,o.razaoSocial].map(x=>String(x||"").toLowerCase()).join(" ").includes(q);
+  });
+
+  return(
+    <div style={{padding:20}}>
+      <PageH title="Bonificações" sub="Processo apartado: ao dar OK o pedido é finalizado. Não entra em nenhum indicador." onRefresh={carregar} refreshing={loading}/>
+
+      <div style={{marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)}
+          placeholder="Buscar por pedido ou cliente..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando pedidos...</div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} pedido{lista.length!==1?"s":""} de bonificação</div>}
+      {!loading&&!loadError&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado para a busca.":"Nenhuma bonificação pendente."}</div>}
+
+      {lista.map(o=>{
+        const done=feito[o.id];
+        const busy=agindo[o.id];
+        return(
+          <Card key={o.id} style={{marginBottom:12,borderLeft:`3px solid ${C.teal}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:220}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <Tag label="Bonificação" color={C.teal}/>
+                  <TagCentroCusto cc={o.centroCusto}/>
+                  {o.temBordado
+                    ? <Tag label={o.amOk?"Bordado pronto":"Bordado em andamento"} color={o.amOk?C.green:C.amber}/>
+                    : <Tag label="Sem bordado" color={C.gray600}/>}
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
+                {done
+                  ? <span style={{background:C.green+"18",color:"#065f46",border:`1px solid ${C.green}55`,borderRadius:6,padding:"9px 16px",...F.body,fontWeight:700,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}>
+                      <Ic n="check" s={14} c="#065f46"/> {done}
+                    </span>
+                  : <Btn label={busy?"Finalizando...":"OK — finalizar"} icon="check" variant="success" disabled={!!busy} onClick={()=>concluir(o)}/>}
+              </div>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+// Botão de migração — em Configurações. Mostra a lista antes de mover nada.
+function MigrarBonificacoesBtn(){
+  const [carregando,setCarregando]=useState(false);
+  const [previa,setPrevia]=useState(null);
+  const simular=async()=>{
+    setCarregando(true);
+    try{
+      const r=await apiFetch("/admin/migrar-bonificacoes","POST",{});
+      if(r.error){alert("Erro: "+r.error);return;}
+      setPrevia(r);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setCarregando(false);}
+  };
+  const executar=async()=>{
+    if(!confirm(`Mover ${previa.total} pedido(s) de bonificação para a caixa de Bonificações?`))return;
+    setCarregando(true);
+    try{
+      const r=await apiFetch("/admin/migrar-bonificacoes","POST",{executar:true});
+      if(r.error){alert("Erro: "+r.error);return;}
+      alert(`Pronto: ${r.movidos} pedido(s) movido(s).`);
+      setPrevia(null);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setCarregando(false);}
+  };
+  return(
+    <Card style={{marginBottom:16}}>
+      <SecH>Migrar bonificações presas</SecH>
+      <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>
+        Procura pedidos com Tipo de pedido = Bonificação parados em etapas abertas e move para a caixa de Bonificações. Primeiro mostra a lista, sem alterar nada.
+      </div>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        <Btn label={carregando?"Consultando...":"Ver pedidos a migrar"} icon="search" variant="secondary" disabled={carregando} onClick={simular}/>
+        {previa&&previa.total>0&&<Btn label={`Migrar ${previa.total} pedido(s)`} icon="check" variant="success" disabled={carregando} onClick={executar}/>}
+      </div>
+      {previa&&<div style={{marginTop:12}}>
+        {previa.total===0
+          ? <div style={{...F.body,fontSize:13,color:C.green}}>Nenhuma bonificação presa — está tudo certo.</div>
+          : <div style={{maxHeight:240,overflowY:"auto",border:`1px solid ${C.gray200}`,borderRadius:6}} className="sgp-scroll">
+              {previa.lista.map(p=>(
+                <div key={p.posvendaId} style={{padding:"8px 12px",borderBottom:`1px solid ${C.gray100}`,...F.body,fontSize:12}}>
+                  <strong>{p.pedido||p.posvendaId}</strong> · {p.nome} <span style={{color:C.gray500}}>— {p.etapaAtual}</span>
+                </div>
+              ))}
+            </div>}
+      </div>}
+    </Card>
+  );
+}
+
+// ─── SILK / DTF ───────────────────────────────────────────────────────────────
+// Caixa de produção para pedidos com item de silk ou DTF. Silk/DTF tem
+// prioridade sobre bordado: se o pedido tem uma dessas peças, ele vem pra cá
+// depois da conferência, e a informação de bordado é ignorada.
+// Detecção espelha a do worker (ehSilkDtf) — SKU 51.2.* ou nome começando com
+// SILK/DTF. Os 08.01.* são BORDADO e NÃO entram.
+const REGEX_SILK_DTF = /^\s*(?:[\d.\-]{4,}\s+)?(silk|dtf)\b/i;
+function itemEhSilkDtf(it){
+  const sku=String(it?.sku||"").trim();
+  if(sku==="51.2.0006"||sku==="51.2.0007")return true;
+  const nome=String(it?.desc||it?.nome||it?.sku||"").trim();
+  return !!(nome&&REGEX_SILK_DTF.test(nome));
+}
+function pedidoEhSilkDtf(o){
+  if(o?.temSilkDtf===true)return true;
+  return (o?.items||[]).some(itemEhSilkDtf);
+}
+
+function SilkDtf({onOpen,slaCfg,user}){
+  const [pedidos,setPedidos]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [loadError,setLoadError]=useState(null);
+  const [agindo,setAgindo]=useState({});
+  const [feito,setFeito]=useState({});
+  const [busca,setBusca]=useState("");
+
+  const carregar=()=>{
+    setLoading(true);setLoadError(null);
+    apiFetch("/silk-dtf")
+      .then(res=>{
+        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Silk/DTF")));
+        else setLoadError(res.error||"Erro desconhecido");
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[]);
+
+  const concluir=async(o)=>{
+    if(!o.posvendaId){alert("Pedido sem negócio de Pós-venda.");return;}
+    if(!confirm(`Confirmar que o silk/DTF do pedido ${o.pedidoLinx||o.vendasId} está pronto?\n\nO pedido segue para a Expedição.`))return;
+    setAgindo(p=>({...p,[o.id]:true}));
+    try{
+      const r=await apiFetch("/silk-dtf-concluido/"+o.posvendaId,"POST",{ctx:{executor:user?.nome||"Usuário SGP"}});
+      if(r.success){setFeito(p=>({...p,[o.id]:r.proximaEtapa||"Expedição"}));setTimeout(carregar,1200);}
+      else alert("Erro: "+(r.error||"desconhecido"));
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setAgindo(p=>({...p,[o.id]:false}));}
+  };
+
+  // Relatório: uma linha por PEÇA de silk/DTF, no mesmo formato do CSV do PCP.
+  const exportarCSV=()=>{
+    const lista=pedidos||[];
+    if(!lista.length){alert("Nada para exportar.");return;}
+    const cols=["Pedido Linx","ID HubSpot","Cliente","CNPJ","SKU","Descrição","Tamanho","Quantidade","Entrou na etapa","Dias na etapa","Prazo do pedido"];
+    const linhas=[];
+    for(const o of lista){
+      const pecas=(o.items||[]).filter(itemEhSilkDtf);
+      const dias=o.etapaAt?diasUteisDesde(o.etapaAt):"";
+      const entrou=o.etapaAt?fmtD(o.etapaAt):"";
+      const prazo=dataVencimento(o)?fmtD(dataVencimento(o)):"";
+      if(!pecas.length){
+        linhas.push([o.pedidoLinx||"",o.vendasId||"",o.client||"",o.cnpj||"","","","","",entrou,dias,prazo]);
+        continue;
+      }
+      for(const it of pecas){
+        linhas.push([o.pedidoLinx||"",o.vendasId||"",o.client||"",o.cnpj||"",
+          it.sku||"",it.desc||"",it.cor||"",it.qty||0,entrou,dias,prazo]);
+      }
+    }
+    const csv="﻿"+[cols,...linhas]
+      .map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(";")).join("\r\n");
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`silk-dtf_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const q=busca.trim().toLowerCase();
+  const lista=(pedidos||[]).filter(o=>{
+    if(!q)return true;
+    const alvo=[o.pedidoLinx,o.vendasId,o.client,o.razaoSocial,
+      ...(o.items||[]).filter(itemEhSilkDtf).map(it=>it.desc)]
+      .map(x=>String(x||"").toLowerCase()).join(" ");
+    return alvo.includes(q);
+  });
+  const totalPecas=lista.reduce((s,o)=>s+(o.items||[]).filter(itemEhSilkDtf).reduce((a,it)=>a+(Number(it.qty)||0),0),0);
+
+  return(
+    <div style={{padding:20}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+        <PageH title="Silk / DTF" sub="Pedidos com peças de silk ou DTF aguardando produção. Ao concluir, seguem para a Expedição." onRefresh={carregar} refreshing={loading}/>
+        <button onClick={exportarCSV} disabled={!lista.length}
+          style={{background:lista.length?C.green:C.gray200,color:C.white,border:"none",borderRadius:7,padding:"9px 16px",cursor:lista.length?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"inline-flex",alignItems:"center",gap:7}}>
+          <Ic n="download" s={14} c={C.white}/> Exportar relatório
+        </button>
+      </div>
+
+      <div style={{marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)}
+          placeholder="Buscar por pedido, cliente ou peça..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando pedidos...</div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>
+        {lista.length} pedido{lista.length!==1?"s":""} · {totalPecas} peça{totalPecas!==1?"s":""} de silk/DTF
+      </div>}
+      {!loading&&!loadError&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado para a busca.":"Nenhum pedido em silk/DTF."}</div>}
+
+      {lista.map(o=>{
+        const done=feito[o.id];
+        const busy=agindo[o.id];
+        const sla=getSLA(o,slaCfg);
+        const pecas=(o.items||[]).filter(itemEhSilkDtf);
+        return(
+          <Card key={o.id} style={{marginBottom:12,borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:220}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <TagCentroCusto cc={o.centroCusto}/>
+                  {o.ehOcorrencia&&<TagOcorrencia size="sm"/>}
+                  <ETag etapa="Silk/DTF"/>
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)}</div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
+                {done
+                  ? <span style={{background:C.green+"18",color:"#065f46",border:`1px solid ${C.green}55`,borderRadius:6,padding:"9px 16px",...F.body,fontWeight:700,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}>
+                      <Ic n="check" s={14} c="#065f46"/> Enviado p/ {done}
+                    </span>
+                  : <Btn label={busy?"Enviando...":"Silk/DTF concluído"} icon="check" variant="success" disabled={!!busy} onClick={()=>concluir(o)}/>}
+              </div>
+            </div>
+            {pecas.length>0&&<div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${C.gray100}`}}>
+              <div style={{...F.body,fontSize:10,color:C.gray500,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Peças de silk / DTF</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {pecas.map((it,i)=>(
+                  <span key={it.id||i} style={{...F.body,fontSize:11.5,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"4px 9px",color:C.gray700}}>
+                    {it.desc||it.sku}{it.cor?` · ${it.cor}`:""} <strong>×{it.qty}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── OCORRÊNCIA ───────────────────────────────────────────────────────────────
+// Telas do funil de devolução/reclamação. Quatro modos:
+//   simples       → um botão que só avança a etapa (faturamento e pós-venda)
+//   qualidade     → formulário de parecer (tipo + procedente/improcedente + motivo)
+//   improcedencia → dois setores em paralelo; encerra quando ambos concluem
+//   painel        → visão somente leitura de tudo que está aberto no funil
+const OCOR_TIPOS = [
+  "Defeito de bordado","Tamanho errado","Item trocado","Erro de separação",
+  "Atraso na entrega","Avaria no transporte","Outro",
+];
+
+function TagOcorrencia({size="md"}){
+  const s = size==="sm";
+  return(
+    <span style={{...F.title,fontSize:s?9:10,fontWeight:800,letterSpacing:"0.08em",padding:s?"2px 7px":"3px 9px",borderRadius:5,background:C.red,color:C.white,whiteSpace:"nowrap"}}>
+      OCORRÊNCIA
+    </span>
+  );
+}
+
+function CaixaOcorrencia({title, sub, endpoint, etapaLabel, modo="simples", acaoLabel, apiPath, onOpen, slaCfg, user}) {
+  const [pedidos, setPedidos] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [agindo, setAgindo] = useState({});
+  const [feito, setFeito] = useState({});
+  const [busca, setBusca] = useState("");
+  const [form, setForm] = useState({});   // id -> {tipo, parecer, motivo}
+
+  const carregar = () => {
+    setLoading(true); setLoadError(null);
+    apiFetch(endpoint)
+      .then(res => {
+        if (res.success) setPedidos((res.data || []).map(o => normalizarCard(o, etapaLabel)));
+        else setLoadError(res.error || "Erro desconhecido");
+      })
+      .catch(e => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { carregar(); }, [endpoint]);
+
+  const postar = async (o, caminho, body, chaveBusy) => {
+    setAgindo(p => ({...p, [o.id]: chaveBusy || true}));
+    try {
+      const r = await apiFetch(caminho + "/" + (o.ocorrenciaId || o.posvendaId), "POST", {
+        ...body, ctx: { executor: user?.nome || "Usuário SGP" },
+      });
+      if (r.success) {
+        setFeito(p => ({...p, [o.id]: r.proximaEtapa || "Concluído"}));
+        setTimeout(carregar, 1200);
+      } else alert("Erro: " + (r.error || "desconhecido"));
+    } catch (e) { alert("Erro: " + e.message); }
+    finally { setAgindo(p => ({...p, [o.id]: false})); }
+  };
+
+  const salvarParecer = (o) => {
+    const f = form[o.id] || {};
+    if (!f.tipo)    { alert("Escolha o tipo da reclamação."); return; }
+    if (!f.parecer) { alert("Marque se a ocorrência é procedente ou improcedente."); return; }
+    if (!String(f.motivo || "").trim()) { alert("Descreva o motivo da análise — é obrigatório."); return; }
+    if (f.parecer === "Procedente"
+      && !confirm("Confirmar PROCEDENTE?\n\nO pedido vai ser liberado para a separação e seguir o fluxo normal de produção."))
+      return;
+    if (f.parecer === "Improcedente"
+      && !confirm("Confirmar IMPROCEDENTE?\n\nSerá aberta uma tratativa para o Pós-Venda avisar o cliente e para a Separação dar baixa no estoque."))
+      return;
+    postar(o, "/ocor-registro-reclamacao", { tipo: f.tipo, parecer: f.parecer, motivo: f.motivo });
+  };
+
+  const q = busca.trim().toLowerCase();
+  const lista = (pedidos || []).filter(o => {
+    if (!q) return true;
+    return [o.pedidoLinx, o.vendasId, o.ocorrenciaId, o.client, o.razaoSocial, o.ocorrenciaRelato]
+      .map(x => String(x || "").toLowerCase()).join(" ").includes(q);
+  });
+
+  const setF = (id, campo, valor) => setForm(p => ({...p, [id]: {...(p[id] || {}), [campo]: valor}}));
+  const lbl = {...F.body, fontSize:10, fontWeight:700, color:C.gray500, textTransform:"uppercase", letterSpacing:"0.06em", display:"block", marginBottom:5};
+
+  return (
+    <div style={{padding:20}}>
+      <PageH title={title} sub={sub} onRefresh={carregar} refreshing={loading}/>
+
+      <div style={{marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)}
+          placeholder="Buscar por pedido, cliente ou relato..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando ocorrências...</div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} ocorrência{lista.length!==1?"s":""}</div>}
+      {!loading&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhuma ocorrência encontrada para a busca.":"Nenhuma ocorrência nesta caixa."}</div>}
+
+      {lista.map(o => {
+        const done = feito[o.id];
+        const busy = agindo[o.id];
+        const f = form[o.id] || {};
+        const sla = getSLA(o, slaCfg);
+        return (
+          <Card key={o.id} style={{marginBottom:12,borderLeft:`4px solid ${C.red}`}}>
+            {/* Cabeçalho */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10,flexWrap:"wrap",marginBottom:10}}>
+              <div style={{minWidth:0,flex:1}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
+                  <TagOcorrencia size="sm"/>
+                  <span style={{...F.title,fontSize:15,fontWeight:700,color:C.black}}>{o.client||"—"}</span>
+                  {o.ocorrenciaTipo&&<Tag label={o.ocorrenciaTipo} color={C.amber}/>}
+                  {o.ocorrenciaParecer&&<Tag label={o.ocorrenciaParecer} color={o.ocorrenciaParecer==="Procedente"?C.green:C.gray600}/>}
+                </div>
+                <div style={{...F.body,fontSize:11.5,color:C.gray500}}>
+                  {o.pedidoLinx?`Pedido ${o.pedidoLinx} · `:""}HubSpot {o.ocorrenciaId||o.vendasId}
+                  {o.cnpj?` · ${o.cnpj}`:""}
+                  {sla?.texto?` · ${sla.texto}`:""}
+                </div>
+              </div>
+              <Btn label="Abrir pedido" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
+            </div>
+
+            {/* Relato do cliente — o que o vendedor registrou na abertura */}
+            {o.ocorrenciaRelato&&<div style={{padding:"10px 12px",background:C.gray50,borderRadius:6,marginBottom:10,border:`1px solid ${C.gray200}`}}>
+              <div style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>Relato do cliente</div>
+              <div style={{...F.body,fontSize:13,color:C.gray700,lineHeight:1.5,whiteSpace:"pre-wrap"}}>{o.ocorrenciaRelato}</div>
+            </div>}
+
+            {/* Parecer já registrado (aparece na tratativa de improcedência) */}
+            {modo!=="qualidade"&&o.ocorrenciaMotivo&&<div style={{padding:"10px 12px",background:C.amber+"0c",borderRadius:6,marginBottom:10,border:`1px solid ${C.amber}33`}}>
+              <div style={{...F.body,fontSize:10,fontWeight:700,color:C.amber,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>Parecer da Qualidade</div>
+              <div style={{...F.body,fontSize:13,color:C.gray700,lineHeight:1.5,whiteSpace:"pre-wrap"}}>{o.ocorrenciaMotivo}</div>
+            </div>}
+
+            {done
+              ? <div style={{padding:"10px 14px",borderRadius:6,background:C.green+"12",border:`1px solid ${C.green}33`,...F.body,fontSize:13,color:C.green,fontWeight:600}}>✓ {done}</div>
+              : <>
+                {/* MODO SIMPLES — só confirma e avança */}
+                {modo==="simples"&&
+                  <Btn label={busy?"Enviando...":acaoLabel} icon="check" variant="success" disabled={!!busy}
+                    onClick={()=>postar(o, apiPath, {})}/>}
+
+                {/* MODO QUALIDADE — tipo + parecer + motivo */}
+                {modo==="qualidade"&&<div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,marginBottom:10}}>
+                    <div>
+                      <label style={lbl}>Tipo da reclamação</label>
+                      <select value={f.tipo||""} onChange={e=>setF(o.id,"tipo",e.target.value)}
+                        style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:C.white}}>
+                        <option value="">— selecione —</option>
+                        {OCOR_TIPOS.map(t=><option key={t} value={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={lbl}>Parecer</label>
+                      <div style={{display:"flex",gap:8}}>
+                        {[["Procedente",C.green],["Improcedente",C.gray600]].map(([p,cor])=>{
+                          const on=f.parecer===p;
+                          return(
+                            <button key={p} onClick={()=>setF(o.id,"parecer",p)}
+                              style={{flex:1,padding:"9px 10px",borderRadius:6,border:`1.5px solid ${on?cor:C.gray200}`,background:on?cor+"12":C.white,color:on?cor:C.gray600,cursor:"pointer",...F.body,fontSize:12.5,fontWeight:on?700:500}}>
+                              {p}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{marginBottom:10}}>
+                    <label style={lbl}>Motivo da análise (obrigatório)</label>
+                    <textarea value={f.motivo||""} onChange={e=>setF(o.id,"motivo",e.target.value)} rows={3}
+                      placeholder={f.parecer==="Improcedente"?"Explique por que a reclamação não procede — este texto vai para o vendedor e para o cliente.":"Descreva o que foi constatado na análise."}
+                      style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",resize:"vertical"}}/>
+                  </div>
+                  <Btn label={busy?"Registrando...":"Registrar parecer"} icon="check" variant="success" disabled={!!busy}
+                    onClick={()=>salvarParecer(o)}/>
+                </div>}
+
+                {/* MODO IMPROCEDÊNCIA — dois setores em paralelo */}
+                {modo==="improcedencia"&&<div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:10}}>
+                    {[
+                      {k:"posvenda", nome:"Pós-Venda", ok:o.improcPosvendaOk, desc:"Avisar o vendedor/cliente da improcedência e o motivo."},
+                      {k:"separacao",nome:"Separação", ok:o.improcSeparacaoOk,desc:"Dar baixa no estoque das peças devolvidas."},
+                    ].map(s=>(
+                      <div key={s.k} style={{padding:"12px 14px",borderRadius:8,border:`1.5px solid ${s.ok?C.green:C.gray200}`,background:s.ok?C.green+"0a":C.white}}>
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                          <span style={{...F.body,fontSize:13,fontWeight:700,color:s.ok?C.green:C.gray700}}>{s.nome}</span>
+                          {s.ok&&<Tag label="Concluído" color={C.green}/>}
+                        </div>
+                        <div style={{...F.body,fontSize:11.5,color:C.gray500,marginBottom:10,lineHeight:1.45}}>{s.desc}</div>
+                        {s.ok
+                          ? <div style={{...F.body,fontSize:12,color:C.green,fontWeight:600}}>✓ Nada pendente aqui</div>
+                          : <Btn label={busy===s.k?"Enviando...":"Marcar como concluído"} size="sm" variant="success" icon="check" disabled={!!busy}
+                              onClick={()=>{
+                                const obs = window.prompt("Observação (opcional) — o que foi feito:", "");
+                                if (obs === null) return;
+                                postar(o, "/ocor-improcedencia", { setor: s.k, obs }, s.k);
+                              }}/>}
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{...F.body,fontSize:11.5,color:C.gray400,marginTop:10}}>
+                    A ocorrência só é encerrada quando os dois setores concluírem.
+                  </div>
+                </div>}
+
+                {/* MODO PAINEL — somente leitura */}
+                {modo==="painel"&&<div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                  <Tag label={o.etapa||"—"} color={C.gray600}/>
+                  {o.improcPosvendaOk&&<Tag label="PV concluiu" color={C.green}/>}
+                  {o.improcSeparacaoOk&&<Tag label="Separação concluiu" color={C.green}/>}
+                </div>}
+              </>}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user, faltantesExtraEndpoints}) {
   const [pedidos, setPedidos] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -4590,11 +5255,21 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
 
   const executar = async (o, acao) => {
     if (!o.posvendaId) { alert("Pedido sem negócio de Pós-venda."); return; }
+    // Ação que exige um dado do usuário antes de executar (ex.: nº da OP).
+    let extra = {};
+    if (acao.pedirCampo) {
+      const val = window.prompt(acao.pedirCampo.label, o[acao.pedirCampo.chave] || "");
+      if (val === null) return;                       // cancelou
+      const limpo = String(val).trim();
+      if (!limpo) { alert("É obrigatório informar " + acao.pedirCampo.label.toLowerCase() + "."); return; }
+      extra[acao.pedirCampo.chave] = limpo;
+    }
     if (acao.confirmMsg && !confirm(acao.confirmMsg)) return;
     setAgindo(prev => ({...prev, [o.id]: acao.label}));
     try {
       const r = await apiFetch(acao.apiPath + "/" + o.posvendaId, "POST", {
         ...(acao.body || {}),
+        ...extra,
         ctx: { executor: user?.nome || "Usuário SGP" },
       });
       if (r.success) {
@@ -4665,6 +5340,14 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
                 ))}
               </div>
             </div>
+            {/* SOB MEDIDA: o formulário com as medidas fica direto no card, sem
+                precisar abrir o pedido — quem cria a OP e quem produz precisam
+                dele em mãos o tempo todo. */}
+            {(o.formularioSobMedida&&o.formularioSobMedida.length>0)&&
+              <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${C.gray100}`}}>
+                <div style={{...F.body,fontSize:10,color:"#92400e",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Formulário Sob Medida</div>
+                <ArquivosBox fileIds={o.formularioSobMedida} emptyText="Nenhum formulário anexado."/>
+              </div>}
           </Card>
         );
       })}
@@ -4829,7 +5512,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             historico:o.historico||[],
             houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
             veioDoAguardandoAmostra:o.veioDoAguardandoAmostra===true,
-            temBordado:o.temBordado!==false,dataVencimento:o.dataVencimento||null,
+            temBordado:o.temBordado!==false,temSilkDtf:o.temSilkDtf===true,dataVencimento:o.dataVencimento||null,
             items:(o.items||[]).map(it=>({
               id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
               dest:it.direcionamento?it.direcionamento.toLowerCase():null,
@@ -5020,8 +5703,12 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
       </div>}
       {!loading&&prontos.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{aba==="saira"?"Nenhum pedido saiu do aguardando amostra no momento.":"Nenhum pedido aguardando direcionamento."}</div>}
       {prontos.map(o=>{
-        // Pedidos SEM bordado: card simplificado com botão "Conferido" só
-        if (o.temBordado === false) {
+        // [SILK/DTF] tem PRIORIDADE sobre bordado: se o pedido tem peça de silk
+        // ou DTF, a conferência manda pra caixa Silk/DTF e a informação de
+        // bordado é ignorada. Pedido SEM bordado e sem silk vai pra Expedição.
+        // Os dois usam o mesmo card simplificado, só muda o destino.
+        const ehSilk = pedidoEhSilkDtf(o);
+        if (o.temBordado === false || ehSilk) {
           const isConfirmed = confirmed[o.id];
           const sla = getSLA(o, slaCfg);
           return (
@@ -5030,7 +5717,7 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                 <div>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                     <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
-                    <Tag label="Sem bordado" color={C.gray600}/>
+                    {ehSilk?<Tag label="Silk / DTF" color={C.purple}/>:<Tag label="Sem bordado" color={C.gray600}/>}
                     <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                     {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
                   </div>
@@ -5038,8 +5725,17 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                     {o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças
                   </div>
                   <div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6}}>
-                    Este pedido não tem bordado. Confira fisicamente e envie pra Expedição.
+                    {ehSilk
+                      ? "Este pedido tem peças de silk/DTF. Confira fisicamente e envie para a produção de Silk/DTF."
+                      : "Este pedido não tem bordado. Confira fisicamente e envie pra Expedição."}
                   </div>
+                  {ehSilk&&<div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
+                    {(o.items||[]).filter(itemEhSilkDtf).map((it,i)=>(
+                      <span key={it.id||i} style={{...F.body,fontSize:11.5,background:C.purple+"10",border:`1px solid ${C.purple}33`,borderRadius:6,padding:"3px 8px",color:C.purple,fontWeight:600}}>
+                        {it.desc||it.sku}{it.cor?` · ${it.cor}`:""} ×{it.qty}
+                      </span>
+                    ))}
+                  </div>}
                 </div>
                 <div style={{display:"flex",gap:8,alignItems:"center"}}>
                   <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
@@ -5047,7 +5743,8 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                     onClick={async ()=>{
                       if (isConfirmed) return;
                       try {
-                        const r = await apiFetch("/apenas-conferido/" + o.posvendaId, "POST", {
+                        const rota = ehSilk ? "/enviar-silk-dtf/" : "/apenas-conferido/";
+                        const r = await apiFetch(rota + o.posvendaId, "POST", {
                           ctx: { executor: user?.nome || "Usuário SGP" },
                         });
                         if (r.success) {
@@ -5062,13 +5759,13 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
                     }}
                     disabled={isConfirmed}
                     style={{
-                      background: isConfirmed ? C.gray300 : C.teal,
+                      background: isConfirmed ? C.gray300 : (ehSilk ? C.purple : C.teal),
                       color: C.white, border: "none", borderRadius: 6,
                       padding: "10px 20px", cursor: isConfirmed ? "default" : "pointer",
                       fontWeight: 700, fontSize: 13, ...F.body,
                       display: "inline-flex", alignItems: "center", gap: 6,
                     }}>
-                    <Ic n="check" s={14} c={C.white}/> {isConfirmed ? "Enviado ✓" : "Conferido — enviar para Expedição"}
+                    <Ic n="check" s={14} c={C.white}/> {isConfirmed ? "Enviado ✓" : (ehSilk ? "Conferido — enviar para Silk/DTF" : "Conferido — enviar para Expedição")}
                   </button>
                 </div>
               </div>
@@ -6403,6 +7100,8 @@ function SLAConfig({slaCfg,onSave,user}){
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <MigrarReprogFisicaBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
+        <MigrarBonificacoesBtn/>
+        <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <MonitorSemPosvendaBtn/>
       </Card>
 
@@ -7240,6 +7939,145 @@ function AlteracoesFormList(){
   );
 }
 
+// ─── ACESSO EM LOTE POR MÓDULO ────────────────────────────────────────────────
+// Escolha um módulo e marque/desmarque várias pessoas de uma vez, sem precisar
+// abrir usuário por usuário. Aplica só a diferença (concede aos novos, remove
+// dos que foram desmarcados).
+function AcessoEmLote({users,onSalvo}){
+  const[modulo,setModulo]=useState("");
+  const[sel,setSel]=useState([]);
+  const[busca,setBusca]=useState("");
+  const[salvando,setSalvando]=useState(false);
+  const[msg,setMsg]=useState(null);
+
+  const comuns=useMemo(()=>(users||[]).filter(u=>!u.admin),[users]);
+  const originais=useMemo(()=>
+    comuns.filter(u=>(u.modulos||[]).includes(modulo)).map(u=>u.email),
+  [comuns,modulo]);
+
+  // Ao trocar de módulo, a seleção reflete quem já tem o acesso hoje.
+  useEffect(()=>{setSel(originais);setMsg(null);},[modulo]); // eslint-disable-line
+
+  const visiveis=useMemo(()=>{
+    const q=busca.trim().toLowerCase();
+    if(!q)return comuns;
+    return comuns.filter(u=>(u.nome||"").toLowerCase().includes(q)||(u.email||"").toLowerCase().includes(q));
+  },[comuns,busca]);
+
+  const toggle=(email)=>setSel(s=>s.includes(email)?s.filter(e=>e!==email):[...s,email]);
+  const marcarTodos=()=>{
+    const ids=visiveis.map(u=>u.email);
+    const allOn=ids.length>0&&ids.every(e=>sel.includes(e));
+    setSel(s=>allOn?s.filter(e=>!ids.includes(e)):[...new Set([...s,...ids])]);
+  };
+
+  const conceder=sel.filter(e=>!originais.includes(e));
+  const remover=originais.filter(e=>!sel.includes(e));
+  const temMudanca=conceder.length>0||remover.length>0;
+
+  const salvar=async()=>{
+    if(!modulo){alert("Escolha um módulo primeiro.");return;}
+    if(!temMudanca){alert("Nada mudou.");return;}
+    if(remover.length&&!confirm(`Você vai REMOVER o acesso de ${remover.length} pessoa(s) e conceder a ${conceder.length}. Confirma?`))return;
+    setSalvando(true);setMsg(null);
+    try{
+      let concedidos=0,removidos=0;
+      if(conceder.length){
+        const r=await apiFetch("/usuarios/modulo-lote","POST",{modulo,acao:"conceder",emails:conceder});
+        concedidos=r.alterados||0;
+      }
+      if(remover.length){
+        const r=await apiFetch("/usuarios/modulo-lote","POST",{modulo,acao:"remover",emails:remover});
+        removidos=r.alterados||0;
+      }
+      setMsg({ok:true,txt:`Pronto: ${concedidos} acesso(s) concedido(s) e ${removidos} removido(s).`});
+      onSalvo&&onSalvo();
+    }catch(e){setMsg({ok:false,txt:e.message});}
+    finally{setSalvando(false);}
+  };
+
+  const GRUPOS_LOTE=GRUPOS_MENU;
+  const inputSt={width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:C.white};
+
+  return(
+    <Card style={{marginBottom:16}}>
+      <SecH>Acesso em lote por módulo</SecH>
+      <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>
+        Criou um módulo novo? Escolha ele aqui e marque todo mundo que deve enxergar, de uma vez só. Quem já tem o acesso vem marcado — desmarcar remove.
+      </div>
+
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"flex-end",marginBottom:14}}>
+        <div style={{flex:"1 1 260px"}}>
+          <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Módulo</label>
+          <select value={modulo} onChange={e=>setModulo(e.target.value)} style={inputSt}>
+            <option value="">— escolha um módulo —</option>
+            {GRUPOS_LOTE.map(g=>{
+              const itens=NAV_ITEMS.filter(n=>n.grupo===g);
+              if(!itens.length)return null;
+              return<optgroup key={g} label={g}>
+                {itens.map(n=><option key={n.id} value={n.id}>{n.label}</option>)}
+              </optgroup>;
+            })}
+            {PERMISSOES_ESPECIAIS.length>0&&<optgroup label="Permissões especiais">
+              {PERMISSOES_ESPECIAIS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
+            </optgroup>}
+          </select>
+        </div>
+        <div style={{flex:"1 1 200px"}}>
+          <label style={{...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5}}>Buscar pessoa</label>
+          <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="nome ou e-mail" style={inputSt}/>
+        </div>
+      </div>
+
+      {!modulo
+        ?<div style={{padding:"18px 0",...F.body,fontSize:13,color:C.gray400}}>Escolha um módulo acima para liberar a lista de pessoas.</div>
+        :<>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8,flexWrap:"wrap"}}>
+            <button onClick={marcarTodos} style={{background:"none",border:`1px solid ${C.gray200}`,borderRadius:4,padding:"3px 10px",...F.body,fontSize:11,color:C.gray600,cursor:"pointer"}}>
+              {visiveis.length>0&&visiveis.every(u=>sel.includes(u.email))?"Desmarcar todos":"Marcar todos"}
+            </button>
+            <span style={{...F.body,fontSize:11.5,color:C.gray500}}>
+              {sel.length} de {comuns.length} selecionado(s)
+              {temMudanca&&<span style={{color:C.amber,fontWeight:600}}>{" · "}{conceder.length} a conceder, {remover.length} a remover</span>}
+            </span>
+          </div>
+
+          <div className="sgp-scroll" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:6,maxHeight:320,overflowY:"auto",marginBottom:14,paddingRight:2}}>
+            {visiveis.map(u=>{
+              const on=sel.includes(u.email);
+              const tinha=originais.includes(u.email);
+              const novo=on&&!tinha, saindo=!on&&tinha;
+              const borda=novo?C.green:saindo?C.amber:on?C.red:C.gray200;
+              return(
+                <div key={u.email} onClick={()=>toggle(u.email)}
+                  style={{display:"flex",alignItems:"center",gap:8,padding:"8px 11px",borderRadius:6,border:`1.5px solid ${borda}`,background:on?borda+"0c":C.white,cursor:"pointer"}}>
+                  <div style={{width:16,height:16,borderRadius:4,border:`1.5px solid ${on?borda:C.gray300}`,background:on?borda:C.white,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    {on&&<Ic n="check" s={11} c={C.white}/>}
+                  </div>
+                  <div style={{minWidth:0,flex:1}}>
+                    <div style={{...F.body,fontSize:12,color:on?C.black:C.gray600,fontWeight:on?600:400,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.nome}</div>
+                    <div style={{...F.body,fontSize:10,color:C.gray400,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.email}</div>
+                  </div>
+                  {novo&&<span style={{...F.title,fontSize:8.5,fontWeight:800,letterSpacing:"0.06em",padding:"2px 6px",borderRadius:4,background:C.green+"18",color:C.green}}>NOVO</span>}
+                  {saindo&&<span style={{...F.title,fontSize:8.5,fontWeight:800,letterSpacing:"0.06em",padding:"2px 6px",borderRadius:4,background:C.amber+"20",color:C.amber}}>SAI</span>}
+                </div>
+              );
+            })}
+            {visiveis.length===0&&<div style={{...F.body,fontSize:12,color:C.gray400,padding:"12px 0"}}>Nenhuma pessoa encontrada.</div>}
+          </div>
+
+          <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+            <Btn label={salvando?"Aplicando...":"Aplicar acessos"} icon="check" variant="success" onClick={salvar} disabled={salvando||!temMudanca}/>
+            {temMudanca&&<Btn label="Descartar mudanças" variant="secondary" onClick={()=>setSel(originais)}/>}
+            <span style={{...F.body,fontSize:11,color:C.gray400}}>Administradores não aparecem — já têm acesso a tudo.</span>
+          </div>
+        </>}
+
+      {msg&&<div style={{marginTop:12,padding:"10px 14px",borderRadius:6,background:(msg.ok?C.green:C.red)+"12",border:`1px solid ${(msg.ok?C.green:C.red)}33`,...F.body,fontSize:13,color:msg.ok?C.green:C.red}}>{msg.txt}</div>}
+    </Card>
+  );
+}
+
 function Usuarios(){
   const[users,setUsers]=useState([]);
   const[loading,setLoading]=useState(true);
@@ -7267,7 +8105,7 @@ function Usuarios(){
   };
   useEffect(carregar,[]);
 
-  const GRUPOS=["Principal","Análise","Separação","PCP","Amostra","Operação","Outros","Cadastros","Sistema"];
+  const GRUPOS=GRUPOS_MENU;
 
   const toggleMod=(m)=>setForm(f=>({...f,modulos:f.modulos.includes(m)?f.modulos.filter(x=>x!==m):[...f.modulos,m]}));
   const toggleGrupo=(grupo)=>{
@@ -7398,6 +8236,8 @@ function Usuarios(){
           <Btn label="Cancelar" variant="secondary" onClick={()=>setShow(false)}/>
         </div>
       </Card>}
+
+      <AcessoEmLote users={users} onSalvo={carregar}/>
 
       <Card style={{marginBottom:16,background:C.gray50}}>
         <SecH>Diagnóstico de login</SecH>
@@ -7860,6 +8700,21 @@ function Folha({emit,o,fmtDt}){
         <span style={{display:"inline-flex",alignItems:"center",gap:5}}><Box simb="P" cor="#7a2a06" tam={12}/> PARCIAL</span>
       </div>
 
+      {/* OCORRÊNCIA: tarja no topo da folha. Quem separa precisa saber de cara que
+          é peça devolvida, não pedido novo — por isso vem antes dos dados do cliente. */}
+      {o.ehOcorrencia&&<div className="produto-row" style={{background:"#fde8e8",border:"2px solid #c0392b",borderRadius:8,padding:"10px 14px",marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+          <span style={{...F.title,fontSize:13,fontWeight:800,letterSpacing:"0.08em",color:"#fff",background:"#c0392b",padding:"4px 12px",borderRadius:5}}>PEDIDO DE OCORRÊNCIA</span>
+          {o.ocorrenciaTipo&&<span style={{...F.body,fontSize:12,fontWeight:800,color:"#7a1c12"}}>{o.ocorrenciaTipo}</span>}
+        </div>
+        {o.ocorrenciaRelato&&<div style={{...F.body,fontSize:11,color:"#3a1210",marginTop:6,fontWeight:600,lineHeight:1.45}}>
+          <b>Relato do cliente:</b> {o.ocorrenciaRelato}
+        </div>}
+        {o.ocorrenciaMotivo&&<div style={{...F.body,fontSize:11,color:"#3a1210",marginTop:3,fontWeight:600,lineHeight:1.45}}>
+          <b>Parecer da qualidade:</b> {o.ocorrenciaMotivo}
+        </div>}
+      </div>}
+
       {/* Cliente */}
       <div className="produto-row" style={{background:"#f0f0f0",border:"1px solid #c0c0c0",borderRadius:8,padding:"10px 14px",marginBottom:14,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
         <div style={{minWidth:0,flex:1}}>
@@ -7868,6 +8723,10 @@ function Folha({emit,o,fmtDt}){
           {/* Clifor ao lado do nome — é o código que a operação usa pra identificar
               o cliente rapidamente, então fica em destaque junto do nome. */}
           {o.clifor&&<span style={{...F.body,fontSize:11.5,fontWeight:700,color:"#333",marginLeft:8,background:"#e4e4e4",border:"1px solid #b8b8b8",borderRadius:5,padding:"1px 7px",whiteSpace:"nowrap"}}>Clifor: {o.clifor}</span>}
+          {/* Razão social: só aparece quando difere do nome fantasia, pra não
+              repetir a mesma informação duas vezes na folha. */}
+          {(o.razaoSocial&&o.razaoSocial.trim()&&o.razaoSocial.trim().toLowerCase()!==String(o.cliente||"").trim().toLowerCase())&&
+            <div style={{...F.body,fontSize:11.5,color:"#222",marginTop:2,fontWeight:600}}>Razão social: {o.razaoSocial}</div>}
           {(o.cnpj||o.endereco||o.inscricaoEstadual)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.cnpj&&`CNPJ: ${o.cnpj}`}{o.inscricaoEstadual?((o.cnpj?" · ":"")+`IE: ${o.inscricaoEstadual}`):""}{o.endereco?((o.cnpj||o.inscricaoEstadual)?" · ":"")+o.endereco:""}</div>}
           {(o.representante||o.condicaoPagamento)&&<div style={{...F.body,fontSize:11,color:"#222",marginTop:2,fontWeight:600}}>{o.representante?`Representante: ${o.representante}`:""}{o.condicaoPagamento?((o.representante?" · ":"")+`Cond. pagto: ${o.condicaoPagamento}`):""}</div>}
         </div>
@@ -9229,9 +10088,14 @@ function AppInner(){
     gerencial:"Gerencial",historico:"Histórico",ranking:"Ranking / Premiação",
     pedidos:"Pedidos em Aberto",direcionamento:"Direcionamento",
     analise_pcp:"Análise PCP",buscar_loja:"Buscar Produto em Loja",analise_producao:"Análise da Produção",
+    op_sob_medida:"Criação de OP Sob Medida",aguardando_producao_sm:"Aguardando Produção Sob Medida",
+    bonificacoes:"Bonificações",
+    ocorrencias:"Painel de Ocorrências",ocor_entrada_devolucao:"Entrada da Devolução",
+    ocor_ajuste_pedido:"Ajuste do Pedido",ocor_registro_reclamacao:"Registro de Reclamação",
+    ocor_improcedencia:"Tratativa de Improcedência",
     programacao:"Programação",amostra_digital:"Amostra Digital",amostra_fisica:"Amostra Física",
     alteracao_amostra_digital:"Alteração de Amostra Digital",alteracao_amostra_fisica:"Alteração de Amostra Física",
-    bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",
+    bordado_interno:"Bordado Interno",bordado_externo:"Bordado Externo",silk_dtf:"Silk / DTF",
     expedicao:"Expedição",faturamento:"Faturamento",finalizados:"Finalizados",alteracoes_form:"Alterações de Formulário",codigos_barra:"Códigos de Barra",impressao_pedido:"Impressão de Pedido",sla:"Configurações",usuarios:"Usuários",
   };
   const nav=id=>{setPage(id);setShowN(false);};
@@ -9257,6 +10121,39 @@ function AppInner(){
             {page==="pedidos"&&<TodosPedidos onOpen={setSel} slaCfg={slaCfg} initialBusca={buscaPedidos}/>}
             {page==="em_separacao"&&<Fila title="Em Separação" etapa="Em Separação" endpoint="/em-separacao" orders={orders} onOpen={setSel} actionLabel="Ver pedido" actionColor={C.gray500} slaCfg={slaCfg}/>}
             {page==="conferencia_separacao"&&<ConferenciaSeparacao orders={orders} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="op_sob_medida"&&<CaixaPCP title="Criação de OP Sob Medida" sub="Pedidos sob medida aguardando a abertura da ordem de produção." endpoint="/op-sob-medida" etapaLabel="Criação de OP Sob Medida" acoes={[
+              {label:"Registrar OP", cor:C.red, icon:"check", apiPath:"/op-sob-medida",
+               pedirCampo:{chave:"numeroOP", label:"Número da OP"}},
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="aguardando_producao_sm"&&<CaixaPCP title="Aguardando Produção Sob Medida" sub="Peças sob medida em produção. Ao concluir, o pedido segue para Conferência e Direcionamento." endpoint="/aguardando-producao-sm" etapaLabel="Aguardando Produção Sob Medida" acoes={[
+              {label:"Produção concluída", cor:C.green, icon:"check", apiPath:"/producao-sm-concluida",
+               confirmMsg:"Confirmar que a produção da peça sob medida foi concluída? O pedido vai para Conferência e Direcionamento."},
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="bonificacoes"&&<Bonificacoes onOpen={setSel} user={user}/>}
+            {page==="silk_dtf"&&<SilkDtf onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {/* ── OCORRÊNCIA (devolução / reclamação) ─────────────────────── */}
+            {page==="ocorrencias"&&<CaixaOcorrencia title="Painel de Ocorrências"
+              sub="Tudo que está aberto no funil de ocorrência, em qualquer etapa."
+              endpoint="/ocorrencias" etapaLabel="Ocorrência" modo="painel"
+              onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="ocor_entrada_devolucao"&&<CaixaOcorrencia title="Entrada da Devolução"
+              sub="Faturamento: dar entrada na nota de devolução. Ao confirmar, segue para o Ajuste do Pedido."
+              endpoint="/ocor-entrada-devolucao" etapaLabel="Entrada da Devolução" modo="simples"
+              acaoLabel="Entrada realizada" apiPath="/ocor-entrada-devolucao"
+              onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="ocor_ajuste_pedido"&&<CaixaOcorrencia title="Ajuste do Pedido"
+              sub="Pós-Venda: fazer as alterações necessárias no pedido. Ao concluir, segue para a Qualidade."
+              endpoint="/ocor-ajuste-pedido" etapaLabel="Ajuste do Pedido" modo="simples"
+              acaoLabel="Ajustes concluídos" apiPath="/ocor-ajuste-pedido"
+              onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="ocor_registro_reclamacao"&&<CaixaOcorrencia title="Registro de Reclamação"
+              sub="Qualidade: analisar e dar o parecer. Procedente libera a separação; improcedente abre tratativa."
+              endpoint="/ocor-registro-reclamacao" etapaLabel="Registro de Reclamação" modo="qualidade"
+              onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            {page==="ocor_improcedencia"&&<CaixaOcorrencia title="Tratativa de Improcedência"
+              sub="Pós-Venda avisa o cliente e a Separação dá baixa no estoque. Encerra quando os dois concluírem."
+              endpoint="/ocor-improcedencia" etapaLabel="Tratativa de Improcedência" modo="improcedencia"
+              onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {page==="analise_pcp"&&<CaixaPCP title="Análise PCP" sub="Pedidos separados parciais aguardando decisão do PCP." endpoint="/analise-pcp" etapaLabel="Análise PCP" acoes={[
               {label:"Buscar em loja", cor:C.purple, icon:"inbox", apiPath:"/pcp-rotear", body:{destino:"loja"}},
               {label:"Enviar p/ produção", cor:"#0891b2", icon:"box", apiPath:"/pcp-rotear", body:{destino:"producao"}},
