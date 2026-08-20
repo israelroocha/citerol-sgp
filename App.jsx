@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component } from "react";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v2.76.0";
+const SGP_VERSION = "v3.07.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -17,16 +17,34 @@ const SGP_TOKEN  = "sgp_citerol_2024_xK9mP";
 // pra sempre — sem erro, sem botão de tentar de novo. Com o limite, a falha
 // aparece na tela e o usuário consegue reagir (Atualizar).
 const API_TIMEOUT_MS = 45000;
-async function apiFetch(path, method = "GET", body = null) {
+// Envios com anexo (programação, amostras, upload de etapa) precisam de folga:
+// o tempo inclui a subida dos bytes pelo navegador, que depende da internet
+// da fábrica. 3 min evita o falso "servidor demorou demais" em arquivo grande.
+const UPLOAD_TIMEOUT_MS = 180000;
+async function apiFetch(path, method = "GET", body = null, opts = null) {
+  // Envio com arquivo demora legitimamente mais que uma leitura: o navegador
+  // ainda está subindo os bytes quando o timeout padrão (45s) estoura. Quem
+  // manda anexo passa { timeoutMs } maior.
+  const limiteMs = (opts && opts.timeoutMs) || API_TIMEOUT_MS;
   const doFetch = async () => {
     const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-    const timer = ctrl ? setTimeout(() => ctrl.abort(), API_TIMEOUT_MS) : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), limiteMs) : null;
     try {
       return await fetch(`${WORKER_URL}${path}`, {
         method,
         headers: {
           "Content-Type": "application/json",
           "X-SGP-Token": SGP_TOKEN,
+          // Sessão individual — SÓ nas rotas que precisam dela (bordador externo).
+          // Enviar em tudo exigia que o worker declarasse o header no CORS; sem
+          // isso o navegador barrava TODAS as chamadas no preflight, inclusive o
+          // login. Restringir aqui evita que um deploy fora de ordem derrube o
+          // sistema inteiro de novo.
+          ...(function(){
+            if (!String(path||"").startsWith("/bordador/")) return {};
+            try { const t = localStorage.getItem("sgp_sessao"); return t ? {"X-Sessao": t} : {}; }
+            catch { return {}; }
+          })(),
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: ctrl ? ctrl.signal : undefined,
@@ -53,14 +71,19 @@ async function apiFetch(path, method = "GET", body = null) {
         // Mostra a MENSAGEM que o worker devolveu, não só o código HTTP. Antes
         // aparecia só "Worker POST /voltar-etapa/... → 400", que não dizia nada
         // ao usuário nem ajudava a diagnosticar.
-        let detalhe = "";
+        let detalhe = "", corpoErro = null;
         try {
           const corpo = await res.clone().json();
+          corpoErro = corpo;
           if (corpo && corpo.error) detalhe = String(corpo.error);
         } catch {
           try { const t = await res.text(); if (t && t.length < 300) detalhe = t; } catch {}
         }
-        throw new Error(detalhe || `Worker ${method} ${path} → ${res.status}`);
+        const err = new Error(detalhe || `Worker ${method} ${path} → ${res.status}`);
+        // Expõe status + corpo pra quem chama poder tratar casos específicos
+        // (ex.: 409 com precisaConfirmar no Gerar Bordado).
+        err.status = res.status; err.corpo = corpoErro;
+        throw err;
       }
       return res.json();
     } catch (e) {
@@ -92,7 +115,12 @@ async function _fetchSnap(force){
   if (_snapState.loading) return; // dedup
   _snapState.loading = true; _emitSnap();
   try {
-    const r = await apiFetch("/snapshot-aberto" + (force ? "?force=1" : ""));
+    // O quadro tem tempo próprio: quando o cache está vazio, o worker precisa
+    // reconstruir tudo do HubSpot e isso passa dos 45s padrão. Com o timeout
+    // curto o front abortava e a tela ficava zerada com "não foi possível
+    // atualizar" — mesmo com o worker ainda trabalhando e terminando bem.
+    const r = await apiFetch("/snapshot-aberto" + (force ? "?force=1" : ""), "GET", null,
+      { timeoutMs: 120000 });
     // ESTABILIDADE: se a resposta vier VAZIA (build parcial/timeout no worker)
     // mas já temos um quadro carregado, MANTÉM o que está na tela. Antes, uma
     // resposta ruim zerava tudo e depois voltava — a tela "piscava".
@@ -100,15 +128,56 @@ async function _fetchSnap(force){
     if (!temPedidos && _snapState.data) {
       _snapState.lastFetch = Date.now() - 25000;   // tenta de novo em ~5s
     } else {
+      // Reaplica as remoções recentes: o HubSpot pode ainda não ter indexado a
+      // nova etapa e devolver o pedido na fila antiga — sem isso o card sumia e
+      // voltava, dando a impressão de que a ação não tinha funcionado.
+      _aplicarRemocoes(r);
       _snapState.data = r;
       _snapState.lastFetch = Date.now();
     }
     _snapState.error = null;
   } catch (e) {
+    // Guarda a mensagem REAL do worker: "não foi possível atualizar" sozinho
+    // não diz se foi timeout, erro do HubSpot ou queda de rede.
     _snapState.error = e.message || "erro ao carregar";
+    try { console.error("[SGP snapshot]", e); } catch {}
   } finally {
     _snapState.loading = false; _emitSnap();
   }
+}
+// Remove um pedido do quadro em memória, na hora, sem esperar a reconstrução.
+// Depois de uma AÇÃO o worker leva alguns segundos pra remontar o snapshot —
+// nesse intervalo o card continuava na caixa e parecia que a ação não pegou.
+// Aqui ele some imediatamente; o refresh que roda logo atrás confirma.
+// Se `etapa` for informada, tira só daquela caixa (o pedido pode estar em mais
+// de uma); sem etapa, tira de todas.
+// Registro das remoções otimistas. O HubSpot leva alguns segundos pra indexar a
+// nova etapa, então o snapshot seguinte ainda pode trazer o pedido na fila
+// antiga — e o card VOLTAVA depois de já ter sumido. Guardamos o que foi
+// removido e reaplicamos em todo snapshot recebido, por até 2 minutos.
+const _snapRemovidos = new Map();   // vendasId -> { etapa, ts }
+const REMOCAO_TTL_MS = 120000;
+function _aplicarRemocoes(data){
+  if (!data || !data.porEtapa) return;
+  const agora = Date.now();
+  for (const [vid, info] of _snapRemovidos) {
+    if (agora - info.ts > REMOCAO_TTL_MS) { _snapRemovidos.delete(vid); continue; }
+    for (const nome of Object.keys(data.porEtapa)) {
+      if (info.etapa && nome !== info.etapa) continue;
+      const g = data.porEtapa[nome];
+      if (!g || !Array.isArray(g.items)) continue;
+      g.items = g.items.filter(it => String(it.vendasId || "") !== vid);
+    }
+  }
+}
+function snapRemoverPedido(vendasId, etapa){
+  if (!vendasId) return;
+  const alvo = String(vendasId);
+  _snapRemovidos.set(alvo, { etapa: etapa || null, ts: Date.now() });
+  _aplicarRemocoes(_snapState.data);
+  // Força o próximo useSnapshotAberto a rebuscar (não espera os 30s).
+  _snapState.lastFetch = 0;
+  _emitSnap();
 }
 function useSnapshotAberto(){
   const [, force] = useState(0);
@@ -165,7 +234,8 @@ function SnapStatus({snap}){
   const parcial = snap.data && snap.data.parcial;
   const cor = snap.error ? C.red : parcial ? C.amber : C.gray500;
   const txt = snap.error
-    ? "Não foi possível atualizar — última carga " + _ageStr(snap.lastFetch)
+    ? "Não foi possível atualizar — " + String(snap.error).slice(0,90)
+      + (snap.lastFetch ? " · última carga " + _ageStr(snap.lastFetch) : " · nunca carregou")
     : parcial
       ? `Atualizado ${_ageStr(snap.lastFetch)} · algumas etapas falharam (${(snap.data.etapasComErro||[]).join(", ")})`
       : `Atualizado ${_ageStr(snap.lastFetch)}`;
@@ -213,6 +283,7 @@ const STAGE_COLOR = {
   "Conferência e Direcionamento":"#059669",
   "Bordado Interno":C.green,"Bordado Externo":C.purple,
   "Expedição":C.teal,"Análise de Frete":"#0891b2",
+  "Pendente Pagamento":"#be123c",
 };
 
 // ─── ÍCONES SVG ───────────────────────────────────────────────────────────────
@@ -220,6 +291,9 @@ const STAGE_COLOR = {
 const ICONS = {
   home:      "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
   pin:       "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
+  // Faltavam no mapa: o menu e a caixa de arquivos já pediam esses dois nomes.
+  search:    "M21 21l-4.35-4.35 M11 19a8 8 0 100-16 8 8 0 000 16z",
+  chevDown:  "M6 9l6 6 6-6",
   grid:      "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",
   funnel:    "M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z",
   chart:     "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
@@ -277,6 +351,8 @@ const SLA_DEF = {
   "Conferência e Direcionamento":8,
   "Bordado Interno":72,"Bordado Externo":120,
   "Expedição":8,"Análise de Frete":8,
+  // Retido esperando o cliente pagar — o relógio continua correndo.
+  "Pendente Pagamento":24,
 };
 
 // ─── MÓDULOS DO SISTEMA ───────────────────────────────────────────────────────
@@ -290,11 +366,11 @@ const NAV_ITEMS = [
   {id:"funil",       label:"Funil em Tempo Real",icon:"funnel",  grupo:"Principal"},
   {id:"posvenda",    label:"Painel Pós-Venda",   icon:"phone",   grupo:"Principal"},
   // Análise
-  {id:"painel_fluxo",    label:"Painel de Fluxo",          icon:"activity",grupo:"Análise"},
-  {id:"gestao_vista",    label:"Gestão à Vista",           icon:"monitor", grupo:"Análise"},
-  {id:"pedidos_risco",   label:"Pedidos em Risco",         icon:"warn",    grupo:"Análise"},
-  {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Análise"},
-  {id:"rel_pendencias",  label:"Relatório de Pendências",  icon:"clock",   grupo:"Análise"},
+  {id:"painel_fluxo",    label:"Painel de Fluxo",          icon:"activity",grupo:"Indicadores"},
+  {id:"gestao_vista",    label:"Gestão à Vista",           icon:"monitor", grupo:"Indicadores"},
+  {id:"pedidos_risco",   label:"Pedidos em Risco",         icon:"warn",    grupo:"Indicadores"},
+  {id:"alteracoes_form", label:"Alterações de Formulário", icon:"warn", grupo:"Indicadores"},
+  {id:"rel_pendencias",  label:"Relatório de Pendências",  icon:"clock",   grupo:"Indicadores"},
   // ── Separação ─────────────────────────────────────────────────────────────
   {id:"em_separacao",            label:"Em Separação",             icon:"inbox",   grupo:"Separação"},
   {id:"conferencia_separacao",   label:"Conferência Separação",    icon:"check",   grupo:"Separação"},
@@ -326,15 +402,20 @@ const NAV_ITEMS = [
   {id:"silk_dtf",                label:"Silk / DTF",               icon:"image",   grupo:"Operação"},
   {id:"expedicao",               label:"Expedição",                icon:"box",     grupo:"Operação"},
   // ── Outros (fora de grupo, colapsável) ────────────────────────────────────
-  {id:"analise_frete",           label:"Análise de Frete",         icon:"send",    grupo:"Outros"},
-  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Outros"},
-  {id:"impressao_pedido",        label:"Impressão de Pedido",      icon:"print",   grupo:"Outros"},
-  {id:"pendencia_comercial",     label:"Pendência Comercial",      icon:"clock",   grupo:"Outros"},
-  {id:"aguardando_pedido",       label:"Aguardando Outro Pedido",  icon:"clock",   grupo:"Outros"},
-  {id:"pedidos",                 label:"Pedidos em Aberto",        icon:"list",    grupo:"Outros"},
-  {id:"banco_imagens",           label:"Banco de Imagens",         icon:"image",   grupo:"Outros"},
+  // Acesso externo: aparece só para quem está vinculado a um bordador.
+  {id:"bordador_demandas",       label:"Minhas Demandas",          icon:"needle",  grupo:"Bordador"},
+  {id:"pendente_pagamento",      label:"Pendente Pagamento",       icon:"clock",   grupo:"Faturamento"},
+  {id:"analise_frete",           label:"Análise de Frete",         icon:"send",    grupo:"Faturamento"},
+  {id:"finalizados",             label:"Finalizados",              icon:"check",   grupo:"Faturamento"},
+  // Pausados: pedidos parados esperando algo de fora da produção.
+  {id:"pendencia_comercial",     label:"Pendência Comercial",      icon:"clock",   grupo:"Pausados"},
+  {id:"aguardando_pedido",       label:"Aguardando Outro Pedido",  icon:"clock",   grupo:"Pausados"},
+  // Ferramentas: telas de apoio, não são filas de trabalho.
+  {id:"pedidos",                 label:"Pedidos em Aberto",        icon:"list",    grupo:"Ferramentas"},
+  {id:"impressao_pedido",        label:"Impressão de Pedido",      icon:"print",   grupo:"Ferramentas"},
+  {id:"banco_imagens",           label:"Banco de Imagens",         icon:"image",   grupo:"Ferramentas"},
   // Cadastros
-  {id:"codigos_barra", label:"Códigos de Barra",   icon:"barcode", grupo:"Cadastros"},
+  {id:"codigos_barra", label:"Códigos de Barra",   icon:"barcode", grupo:"Ferramentas"},
   // Sistema
   {id:"sla",         label:"Configurações",     icon:"gear",    grupo:"Sistema"},
   {id:"usuarios",    label:"Usuários",           icon:"users",   grupo:"Sistema"},
@@ -343,7 +424,10 @@ const NAV_ITEMS = [
 // Ordem dos grupos no menu e nas telas de permissão. Centralizada de propósito:
 // ao criar um grupo novo em NAV_ITEMS, basta incluir aqui e ele aparece em todos
 // os lugares (sidebar, menu mobile, cadastro de usuário e acesso em lote).
-const GRUPOS_MENU = ["Principal","Análise","Separação","PCP","Ocorrência","Amostra","Operação","Outros","Cadastros","Sistema"];
+// Ordem dos grupos no menu. "Outros" era um depósito com 8 itens sem relação
+// entre si — virou Faturamento / Pausados / Ferramentas. "Análise" virou
+// "Indicadores", que descreve o que realmente tem lá dentro.
+const GRUPOS_MENU = ["Bordador","Principal","Indicadores","Separação","PCP","Ocorrência","Amostra","Operação","Faturamento","Pausados","Ferramentas","Sistema"];
 
 // Mapeia módulo de operação -> etapa do funil (para "Minhas Demandas")
 const MODULO_ETAPA = {
@@ -368,6 +452,7 @@ const MODULO_ETAPA = {
   silk_dtf:                   "Silk/DTF",
   expedicao:                  "Expedição",
   analise_frete:              "Análise de Frete",
+  pendente_pagamento:         "Pendente Pagamento",
   pendencia_comercial:        "Pendência Comercial",
   aguardando_pedido:          "Aguardando Outro Pedido",
   ocor_entrada_devolucao:     "Entrada da Devolução",
@@ -398,6 +483,7 @@ const MODULO_ENDPOINT = {
   silk_dtf:                   "/silk-dtf",
   expedicao:                  "/expedicao",
   analise_frete:              "/analise-frete",
+  pendente_pagamento:         "/pendente-pagamento",
   pendencia_comercial:        "/pendencia-comercial",
   aguardando_pedido:          "/aguardando-pedido",
   ocor_entrada_devolucao:     "/ocor-entrada-devolucao",
@@ -437,6 +523,11 @@ const ETAPA_STAGE_ID = {
 // Helper: usuário tem acesso a um módulo?
 function temAcesso(user, moduloId) {
   if (!user) return false;
+  // BORDADOR EXTERNO é terceiro: só existe a tela dele. Nem chat, nem nada.
+  // A trava real está no worker (as rotas /bordador/* resolvem o bordador pelo
+  // cadastro, não pelo que o front manda) — isto aqui é só a interface.
+  if (user.bordadorExterno) return moduloId === "bordador_demandas";
+  if (moduloId === "bordador_demandas") return false;
   if (moduloId === "chat") return true; // chat é de todos
   if (user.admin) return true; // admin vê tudo (inclui Raio-X)
   return (user.modulos || []).includes(moduloId);
@@ -445,10 +536,20 @@ function temAcesso(user, moduloId) {
 // Ordem lógica do funil — usada pelo "Voltar Etapa" pra oferecer só as etapas
 // ANTERIORES à atual do pedido. Igual à do worker (VOLTAR_ETAPA_MAP).
 const FUNIL_ORDEM = [
-  "Em Separação", "Conferência Separação", "Análise PCP", "Buscar em Loja",
+  "Em Separação", "Conferência Separação",
+  // Caixas apartadas: precisam estar aqui para o "Alterar Etapa" conseguir
+  // devolver um pedido que caiu nelas por engano. Sem isso a etapa atual não é
+  // encontrada na ordem e a tela não oferece nenhum destino.
+  "Bonificações", "Criação de OP Sob Medida", "Aguardando Produção Sob Medida",
+  "Análise PCP", "Buscar em Loja",
   "Análise Produção", "Programação", "Amostra Digital", "Aprovação de Amostra Digital",
-  "Amostra Física", "Aprovação de Amostra Física", "Conferência e Direcionamento",
-  "Bordado Interno", "Bordado Externo", "Bordado Interno e Externo", "Expedição", "Análise de Frete",
+  "Amostra Física", "Aprovação de Amostra Física",
+  // "Liberado para Bordar" não é caixa do SGP (o card fica em "Conferência e
+  // Direcionamento") — entra aqui só pra o Alterar Etapa poder mover SOMENTE o
+  // deal de Bordado. Não vira coluna: as colunas vêm de etapasDoSnapshot().
+  "Liberado para Bordar", "Conferência e Direcionamento",
+  "Bordado Interno", "Bordado Externo", "Bordado Interno e Externo", "Silk/DTF", "Expedição",
+  "Pendente Pagamento", "Análise de Frete",
 ];
 // Índice da etapa no funil (aceita nomes equivalentes de "Conferência e Direcionamento").
 function idxFunil(etapa){
@@ -526,7 +627,85 @@ const fmtDur=(min)=>{
 // Data limite (vencimento) do pedido — vem calculada do Worker.
 // COM bordado sem amostra aprovada => null (ainda não há prazo).
 // NÃO faz fallback para closedate (prazoFinal), que não reflete a regra.
-const dataVencimento=(o)=>o.dataVencimento||null;
+// A DATA ESPECIAL é um prazo combinado caso a caso entre expedição e comercial.
+// Quando existe, ela MANDA sobre o vencimento calculado pelo SGP. Vazia, nada
+// muda: o pedido segue a regra normal de sempre.
+const dataVencimento=(o)=>o?.dataEspecial||o?.dataVencimento||null;
+const temDataEspecial=(o)=>!!(o&&o.dataEspecial);
+// Dourado — a cor que a expedição usa pra achar esses pedidos no meio da fila.
+const COR_ESPECIAL="#b8860b";
+const BG_ESPECIAL="#fdf6e3";
+
+// ── PRAZO É DIA, NÃO INSTANTE ────────────────────────────────────────────────
+// data_vencimento é propriedade `date` do HubSpot: chega como meia-noite UTC
+// ("2026-08-18" → 2026-08-18T00:00:00Z). No Brasil isso já é passado desde as
+// 21h do dia ANTERIOR — então todo pedido que vence hoje era exibido como
+// vencido, e as datas apareciam um dia antes na tela e no Excel.
+// A regra é: o pedido tem o DIA INTEIRO do vencimento.
+const TZ_BR_MS=3*60*60*1000;
+function fimDoDiaVenc(iso){
+  if(!iso)return null;
+  const txt=String(iso);
+  const d=new Date(txt);
+  if(isNaN(d.getTime()))return null;
+  // "2026-08-18" / "...T00:00:00Z" = propriedade date do HubSpot: o dia é o que
+  // está escrito (UTC). Com hora real, o dia é o de Brasília.
+  const soData=/^\d{4}-\d{2}-\d{2}$/.test(txt)||/T00:00:00(\.000)?Z?$/.test(txt);
+  const ref=soData?d:new Date(d.getTime()-TZ_BR_MS);
+  return Date.UTC(ref.getUTCFullYear(),ref.getUTCMonth(),ref.getUTCDate(),23,59,59,999)+TZ_BR_MS;
+}
+// Vencido? (só depois do fim do dia do vencimento)
+function venceuAntes(iso,refMs){
+  const f=fimDoDiaVenc(iso);
+  return f!=null&&f<(refMs||Date.now());
+}
+// Formata a data de vencimento sem escorregar um dia por causa do fuso.
+function fmtVenc(iso,curto){
+  const f=fimDoDiaVenc(iso);
+  if(f==null)return "—";
+  const d=new Date(f-TZ_BR_MS);
+  const dia=String(d.getUTCDate()).padStart(2,"0"), mes=String(d.getUTCMonth()+1).padStart(2,"0");
+  return curto?`${dia}/${mes}`:`${dia}/${mes}/${String(d.getUTCFullYear()).slice(2)}`;
+}
+
+// ── PRAZO DOS PEDIDOS SOB MEDIDA ─────────────────────────────────────────────
+// Sob medida não segue o SLA de bordado/sem bordado: a peça é fabricada do zero
+// e o prazo combinado com o cliente é de 60 dias corridos contados do
+// FECHAMENTO do pedido (closedate do negócio de Vendas, exposto como
+// dataFechamento). Também não faz sentido cobrar separação nessas etapas — não
+// há estoque a separar, a peça ainda vai ser produzida.
+const PRAZO_SOB_MEDIDA_DIAS=60;
+const ETAPAS_SOB_MEDIDA=["Criação de OP Sob Medida","Aguardando Produção Sob Medida"];
+const ehEtapaSobMedida=(etapa)=>ETAPAS_SOB_MEDIDA.includes(etapa);
+function prazoSobMedida(o){
+  const base=o?.dataFechamento||o?.entradaAt||null;
+  if(!base)return null;
+  const venc=new Date(base);
+  if(isNaN(venc.getTime()))return null;
+  venc.setDate(venc.getDate()+PRAZO_SOB_MEDIDA_DIAS);
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const alvo=new Date(venc);alvo.setHours(0,0,0,0);
+  const dias=Math.round((alvo-hoje)/86400000);
+  return {data:venc,dias,atrasado:dias<0,venceHoje:dias===0};
+}
+// Etiqueta do prazo sob medida — verde folgado, âmbar perto, vermelho atrasado.
+function PrazoSobMedida({o,inline}){
+  const p=prazoSobMedida(o);
+  if(!p)return(
+    <span style={{...F.body,fontSize:11,color:C.gray400}}>Prazo: emissão não informada</span>
+  );
+  const cor=p.atrasado?C.red:p.dias<=10?C.amber:C.green;
+  const txt=p.atrasado
+    ?`atrasado ${Math.abs(p.dias)} dia${Math.abs(p.dias)>1?"s":""}`
+    :p.venceHoje?"vence hoje":`faltam ${p.dias} dia${p.dias>1?"s":""}`;
+  return(
+    <span style={{display:"inline-flex",alignItems:"center",gap:5,background:cor+"14",color:cor,
+      border:`1px solid ${cor}55`,borderRadius:6,padding:inline?"2px 9px":"3px 10px",
+      ...F.body,fontSize:inline?10:11,fontWeight:700,whiteSpace:"nowrap"}}>
+      PRAZO {fmtDS(p.data.toISOString())} · {txt}
+    </span>
+  );
+}
 const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
   const da=dataVencimento(a), db=dataVencimento(b);
   if(!da&&!db)return 0;
@@ -666,6 +845,9 @@ const normalizarCard=(o,etapa)=>({
   dataVencimento:o.dataVencimento||null,
   prazoFinal:o.prazoFinal||null,
   dataFechamento:o.dataFechamento||o.prazoFinal||null,
+  dataEspecial:o.dataEspecial||null,
+  // Histórico: quando o pedido entrou na etapa final e o nº da NF, quando houver.
+  finalizadoEm:o.finalizadoEm||null,notaFiscal:o.notaFiscal||"",
   qtdTotal:Number(o.qtdTotal||0),qtdSeparada:Number(o.qtdSeparada||0),
   totalItensSeparacao:Number(o.totalItensSeparacao||0),qtdItensSeparados:Number(o.qtdItensSeparados||0),
   statusSeparacao:o.statusSeparacao||"pendente",
@@ -681,6 +863,9 @@ const normalizarCard=(o,etapa)=>({
   etapa:o.etapa||etapa,amOk:o.amostrasAprovada||false,sepOk:o.separacaoCompleta||false,
   statusFaturamento: o.statusFaturamento || "",
   entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+  // SLA da Conferência e Direcionamento contado a partir da aprovação da amostra
+  // (pedido separado antes do bordado ficar pronto — ver worker).
+  slaDesdeAprovacaoAmostra:o.slaDesdeAprovacaoAmostra===true,
   alertas:o.alertas||[],concluido:false,
   bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
   items:(o.items||[]).map(it=>({
@@ -723,7 +908,7 @@ function baixarExcelFinalizados(lista,de,ate){
   const esc=(v)=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const cols=["Pedido","Cliente","CNPJ","Centro de Custo","Bordado","Valor (R$)","Data de Vencimento","Data de Finalização","Vendedor"];
   const linhas=lista.map(o=>{
-    const venc=o.dataVencimento?new Date(o.dataVencimento).toLocaleDateString("pt-BR"):"";
+    const venc=dataVencimento(o)?fmtVenc(dataVencimento(o)):"";
     const fin=o.dataFinalizacao?new Date(o.dataFinalizacao).toLocaleDateString("pt-BR"):"";
     const valor=Number(o.valor||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
     return [o.id,o.client,o.cnpj||"",o.centroCusto||"",o.temBordado===false?"Sem bordado":"Com bordado",valor,venc,fin,o.vendedor||""];
@@ -1043,8 +1228,24 @@ function Tag({label,color=C.gray600}){
   return <span style={{background:color+"18",color,border:`1px solid ${color}30`,borderRadius:3,padding:"2px 8px",fontSize:11,fontWeight:600,...F.body,display:"inline-block"}}>{label}</span>;
 }
 
-function Card({children,style={},onClick}){
-  return <div onClick={onClick} style={{background:C.white,borderRadius:8,padding:18,border:`1px solid ${C.gray200}`,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
+function Card({children,style={},onClick,especial}){
+  // especial = pedido com DATA ESPECIAL combinada. Fundo dourado pra a
+  // expedição achar de longe no meio da fila.
+  const base = especial
+    ? {background:BG_ESPECIAL,border:`1.5px solid ${COR_ESPECIAL}`}
+    : {background:C.white,border:`1px solid ${C.gray200}`};
+  return <div onClick={onClick} style={{...base,borderRadius:8,padding:18,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
+}
+
+// Selo do prazo combinado. Aparece junto do número do pedido em qualquer fila.
+function TagDataEspecial({o,size}){
+  if(!temDataEspecial(o))return null;
+  return <span title={"Prazo combinado entre expedição e comercial: "+fmtVenc(o.dataEspecial)}
+    style={{display:"inline-flex",alignItems:"center",gap:5,background:COR_ESPECIAL,color:"#fff",
+      borderRadius:6,padding:size==="sm"?"2px 8px":"3px 10px",...F.body,
+      fontSize:size==="sm"?10:11,fontWeight:800,letterSpacing:"0.04em",whiteSpace:"nowrap"}}>
+    DATA ESPECIAL {fmtVenc(o.dataEspecial,true)}
+  </span>;
 }
 
 function SecH({children,style={}}){
@@ -1114,10 +1315,61 @@ function Btn({label,onClick,variant="primary",size="md",icon,style={},disabled=f
 }
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
-function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
+// Módulos fixados pelo usuário (por navegador). São os 3-4 que a pessoa usa o
+// dia inteiro — a separação vive em "Em Separação", a Luiza em "Amostra
+// Digital". Ficam no topo, fora dos grupos.
+const LS_FIXADOS = "sgp_menu_fixados";
+function lerFixados(){
+  try { const r = localStorage.getItem(LS_FIXADOS); return r ? JSON.parse(r) : []; }
+  catch { return []; }
+}
+// Normaliza pra busca sem acento: "programacao" acha "Programação".
+function semAcento(txt){
+  return String(txt||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+}
+
+function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal,contagens}){
   const items=NAV_ITEMS.filter(n=>temAcesso(user,n.id));
   const GRUPOS=GRUPOS_MENU;
   const groups=GRUPOS.map(label=>({label,items:items.filter(n=>n.grupo===label)}));
+  const [busca,setBusca]=useState("");
+  const [fixados,setFixados]=useState(lerFixados);
+  const buscaRef=useRef(null);
+
+  const alternarFixo=(id)=>{
+    setFixados(prev=>{
+      const novo=prev.includes(id)?prev.filter(x=>x!==id):[...prev,id].slice(0,8);
+      try{ localStorage.setItem(LS_FIXADOS,JSON.stringify(novo)); }catch{}
+      return novo;
+    });
+  };
+
+  // Ctrl+K / Cmd+K foca a busca de qualquer lugar do sistema.
+  useEffect(()=>{
+    const onKey=(e)=>{
+      if((e.ctrlKey||e.metaKey)&&String(e.key).toLowerCase()==="k"){
+        e.preventDefault();
+        if(collapsed) onToggle();
+        setTimeout(()=>buscaRef.current&&buscaRef.current.focus(),60);
+      }
+      if(e.key==="Escape"&&document.activeElement===buscaRef.current){ setBusca(""); buscaRef.current.blur(); }
+    };
+    window.addEventListener("keydown",onKey);
+    return ()=>window.removeEventListener("keydown",onKey);
+  },[collapsed,onToggle]);
+
+  const q=semAcento(busca.trim());
+  // Busca casa com o nome do módulo E com o nome do grupo ("faturamento" acha
+  // Análise de Frete). Ordena quem começa com o termo primeiro.
+  const resultados=q
+    ? items.filter(n=>semAcento(n.label).includes(q)||semAcento(n.grupo).includes(q))
+        .sort((a,b)=>{
+          const ia=semAcento(a.label).startsWith(q)?0:1, ib=semAcento(b.label).startsWith(q)?0:1;
+          return ia-ib||a.label.localeCompare(b.label);
+        })
+    : [];
+  const itensFixados=fixados.map(id=>items.find(n=>n.id===id)).filter(Boolean);
+  const contarGrupo=(g)=>g.items.reduce((s,n)=>s+(contagens?.[n.id]||0),0);
   // Injeta o CSS da scrollbar sutil uma única vez
   useEffect(()=>{
     if(document.getElementById("sgp-scroll-style"))return;
@@ -1148,8 +1400,48 @@ function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
           <Ic n={collapsed?"chevR":"chevL"} s={12} c={C.gray500}/>
         </button>
       </div>
+      {/* Busca — atalho Ctrl+K. Com 47 módulos, procurar visualmente é o gargalo. */}
+      {!collapsed&&
+        <div style={{padding:"10px 12px",borderBottom:`1px solid ${C.gray200}`}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,border:`1px solid ${C.gray200}`,borderRadius:7,padding:"7px 9px",background:C.white}}>
+            <Ic n="search" s={13} c={C.gray400}/>
+            <input ref={buscaRef} value={busca} onChange={e=>setBusca(e.target.value)}
+              onKeyDown={e=>{ if(e.key==="Enter"&&resultados.length){ onNav(resultados[0].id); setBusca(""); e.currentTarget.blur(); } }}
+              placeholder="Buscar módulo"
+              style={{flex:1,minWidth:0,border:"none",outline:"none",...F.body,fontSize:12.5,background:"transparent",color:C.black}}/>
+            {busca
+              ? <span onClick={()=>setBusca("")} style={{cursor:"pointer",display:"flex"}}><Ic n="close" s={12} c={C.gray400}/></span>
+              : <span style={{...F.body,fontSize:9.5,color:C.gray400,border:`1px solid ${C.gray200}`,borderRadius:4,padding:"1px 4px",whiteSpace:"nowrap"}}>Ctrl K</span>}
+          </div>
+        </div>}
+
       <div className="sgp-scroll" style={{flex:1,overflowY:"auto",padding:"6px 0"}}>
-        {groups.map(g => (
+        {/* Resultados da busca substituem o menu inteiro enquanto há termo. */}
+        {!collapsed&&q&&<>
+          {resultados.length===0&&<div style={{...F.body,fontSize:12,color:C.gray400,padding:"14px 20px"}}>Nenhum módulo encontrado.</div>}
+          {resultados.map((n,i)=>(
+            <div key={n.id} onClick={()=>{onNav(n.id);setBusca("");}}
+              style={{display:"flex",alignItems:"center",gap:10,padding:"8px 20px",cursor:"pointer",background:i===0?C.red+"0e":"transparent",borderLeft:i===0?`2px solid ${C.red}`:"2px solid transparent"}}
+              onMouseEnter={e=>{if(i!==0)e.currentTarget.style.background=C.gray50;}}
+              onMouseLeave={e=>{if(i!==0)e.currentTarget.style.background="transparent";}}>
+              <Ic n={n.icon} s={15} c={i===0?C.red:C.gray500}/>
+              <span style={{...F.body,fontSize:13,color:i===0?C.red:C.gray700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{n.label}</span>
+              <span style={{marginLeft:"auto",...F.body,fontSize:10,color:C.gray400,whiteSpace:"nowrap"}}>{n.grupo}</span>
+            </div>
+          ))}
+        </>}
+
+        {/* FIXADOS — atalho pessoal, some durante a busca. */}
+        {!q&&itensFixados.length>0&&
+          <div style={{marginBottom:4,paddingBottom:6,borderBottom:`1px solid ${C.gray100}`}}>
+            {!collapsed&&<div style={{...F.body,fontSize:9,fontWeight:700,color:C.gray400,textTransform:"uppercase",letterSpacing:"0.1em",padding:"10px 20px 4px"}}>Fixados</div>}
+            {itensFixados.map(n=>(
+              <MenuItem key={"fix-"+n.id} n={n} collapsed={collapsed} active={active} onNav={onNav}
+                chatTotal={chatTotal} contagens={contagens} fixo onFixar={alternarFixo}/>
+            ))}
+          </div>}
+
+        {!q&&groups.map(g => (
           <MenuGrupo
             key={g.label}
             grupo={g}
@@ -1157,6 +1449,10 @@ function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
             active={active}
             onNav={onNav}
             chatTotal={chatTotal}
+            contagens={contagens}
+            total={contarGrupo(g)}
+            fixados={fixados}
+            onFixar={alternarFixo}
           />
         ))}
       </div>
@@ -1173,16 +1469,59 @@ function Sidebar({user,active,onNav,collapsed,onToggle,chatTotal}){
 
 // Item do menu — extraído pra que os hooks (useState) fiquem no topo do componente,
 // respeitando a regra dos Hooks do React (evita o erro #300).
-function MenuGrupo({grupo, collapsed, active, onNav, chatTotal}) {
+// Uma linha do menu. Extraído pra ser reusado pelos Fixados e pelos grupos.
+// A estrela só aparece no hover — não polui, mas está sempre a um clique.
+function MenuItem({n, collapsed, active, onNav, chatTotal, contagens, fixo, onFixar}) {
+  const [hover, setHover] = useState(false);
+  const on = active === n.id;
+  const badge = (n.id === "chat" && chatTotal > 0) ? chatTotal : 0;
+  const qtd = contagens ? (contagens[n.id] || 0) : 0;
+  return (
+    <div onClick={()=>onNav(n.id)}
+      onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
+      style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",
+        background:on?C.red+"0e":(hover?C.gray50:"transparent"),
+        borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",
+        color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start",position:"relative"}}>
+      <div style={{position:"relative",display:"flex"}}>
+        <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
+        {collapsed&&badge>0&&<span style={{position:"absolute",top:-6,right:-8,background:C.red,color:C.white,borderRadius:9,fontSize:9,fontWeight:800,padding:"1px 5px",...F.body}}>{badge>9?"9+":badge}</span>}
+      </div>
+      {!collapsed&&<span style={{...F.body,fontSize:13,fontWeight:on?600:400,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{n.label}</span>}
+      {!collapsed&&<span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
+        {onFixar&&(hover||fixo)&&
+          <span title={fixo?"Desafixar do topo":"Fixar no topo"}
+            onClick={e=>{e.stopPropagation();onFixar(n.id);}}
+            style={{display:"flex",cursor:"pointer"}}>
+            <Ic n="pin" s={12} c={fixo?C.red:C.gray300}/>
+          </span>}
+        {badge>0
+          ? <span style={{background:C.red,color:C.white,borderRadius:10,fontSize:10,fontWeight:800,padding:"1px 7px",...F.body}}>{badge}</span>
+          : qtd>0
+            ? <span style={{...F.body,fontSize:10.5,fontWeight:700,color:on?C.red:C.gray400}}>{qtd}</span>
+            : null}
+      </span>}
+    </div>
+  );
+}
+
+// Grupo do menu. TODOS colapsam agora (antes só "Outros" e "Cadastros"), e o
+// padrão é fechado — com 47 módulos abertos, o menu virava uma parede de texto.
+// O grupo do módulo ativo abre sozinho, então navegar nunca deixa o usuário
+// perdido. A escolha de cada grupo fica salva por usuário.
+function MenuGrupo({grupo, collapsed, active, onNav, chatTotal, contagens, total, fixados, onFixar}) {
   const gi = grupo.items;
-  const podeColapsar = grupo.label === "Outros" || grupo.label === "Cadastros";
+  const temAtivo = gi.some(n => n.id === active);
   const chaveLS = "sgp_menu_grupo_" + grupo.label;
   const [aberto, setAberto] = useState(() => {
-    if (!podeColapsar) return true;
+    // Principal fica sempre aberto: são os painéis de entrada do sistema.
+    if (grupo.label === "Principal") return true;
     const salvo = typeof localStorage !== "undefined" ? localStorage.getItem(chaveLS) : null;
-    // Padrão: "Outros" começa fechado, "Cadastros" começa fechado
     return salvo === null ? false : salvo === "1";
   });
+  // Ao navegar pra um módulo de outro grupo, abre o grupo dele.
+  useEffect(()=>{ if(temAtivo) setAberto(true); },[temAtivo]);
+  const podeColapsar = grupo.label !== "Principal";
   const toggle = () => {
     setAberto(v => {
       const novo = !v;
@@ -1200,36 +1539,27 @@ function MenuGrupo({grupo, collapsed, active, onNav, chatTotal}) {
             ...F.body, fontSize:9, fontWeight:700, color:C.gray400,
             textTransform:"uppercase", letterSpacing:"0.1em",
             padding:"10px 20px 4px",
-            display:"flex", alignItems:"center", justifyContent:"space-between",
+            display:"flex", alignItems:"center", gap:6,
             cursor: podeColapsar ? "pointer" : "default",
             userSelect: "none",
           }}
         >
           <span>{grupo.label}</span>
+          {/* Total do grupo quando fechado: mostra onde tem trabalho sem abrir. */}
+          {!aberto && total > 0 &&
+            <span style={{...F.body,fontSize:9.5,fontWeight:700,color:C.gray500,background:C.gray100,borderRadius:8,padding:"1px 6px"}}>{total}</span>}
           {podeColapsar && (
-            <span style={{display:"inline-flex", transition:"transform 0.15s", transform: aberto ? "rotate(0deg)" : "rotate(-90deg)"}}>
+            <span style={{marginLeft:"auto",display:"inline-flex", transition:"transform 0.15s", transform: aberto ? "rotate(0deg)" : "rotate(-90deg)"}}>
               <Ic n="chevDown" s={10} c={C.gray400}/>
             </span>
           )}
         </div>
       )}
-      {(collapsed || !podeColapsar || aberto) && gi.map(n => {
-        const on = active === n.id;
-        const badge = (n.id === "chat" && chatTotal > 0) ? chatTotal : 0;
-        return (
-          <div key={n.id} onClick={()=>onNav(n.id)}
-            style={{display:"flex",alignItems:"center",gap:10,padding:collapsed?"10px 0":"8px 20px",cursor:"pointer",background:on?C.red+"0e":"transparent",borderLeft:on?`2px solid ${C.red}`:"2px solid transparent",color:on?C.red:C.gray600,justifyContent:collapsed?"center":"flex-start",position:"relative"}}
-            onMouseEnter={e=>{if(!on)e.currentTarget.style.background=C.gray50;}}
-            onMouseLeave={e=>{if(!on)e.currentTarget.style.background="transparent";}}>
-            <div style={{position:"relative",display:"flex"}}>
-              <Ic n={n.icon} s={15} c={on?C.red:C.gray500}/>
-              {collapsed&&badge>0&&<span style={{position:"absolute",top:-6,right:-8,background:C.red,color:C.white,borderRadius:9,fontSize:9,fontWeight:800,padding:"1px 5px",...F.body}}>{badge>9?"9+":badge}</span>}
-            </div>
-            {!collapsed&&<span style={{...F.body,fontSize:13,fontWeight:on?600:400,whiteSpace:"nowrap"}}>{n.label}</span>}
-            {!collapsed&&badge>0&&<span style={{marginLeft:"auto",background:C.red,color:C.white,borderRadius:10,fontSize:10,fontWeight:800,padding:"1px 7px",...F.body}}>{badge}</span>}
-          </div>
-        );
-      })}
+      {(collapsed || !podeColapsar || aberto) && gi.map(n => (
+        <MenuItem key={n.id} n={n} collapsed={collapsed} active={active} onNav={onNav}
+          chatTotal={chatTotal} contagens={contagens}
+          fixo={!!(fixados&&fixados.includes(n.id))} onFixar={onFixar}/>
+      ))}
     </div>
   );
 }
@@ -1945,19 +2275,32 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     setEnviando(true);
     try{
       const toB64=(f)=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
+      // ── ANEXO ÚNICO PARA VÁRIOS BORDADOS ────────────────────────────────
+      // "Anexar 1 arquivo aos selecionados" colocava o MESMO arquivo em cada
+      // bordado. Num pedido com 17 bordados o payload ia com 17 cópias do
+      // base64 (dezenas de MB) e o worker fazia 17 uploads — estourava os 45s
+      // e dava "O servidor demorou demais para responder".
+      // Agora cada arquivo vai UMA vez em `anexos` e as execuções só apontam
+      // pra ele por {ref}. O worker resolve a referência e sobe uma vez só.
+      const anexos={};
+      const refDe=async(f)=>{
+        const chave=`${f.name}|${f.size}|${f.lastModified||0}`;
+        if(!anexos[chave]) anexos[chave]={fileName:f.name,fileBase64:await toB64(f)};
+        return {ref:chave,fileName:f.name};
+      };
       const execucoes=[];
       for(const b of bordadosPraExecutar){
         const i=bordados.indexOf(b);
         const st=data[keyOf(b,i)]||{dificuldade:"",files:[]};
         const arquivos=[];
-        for(const f of st.files) arquivos.push({fileBase64:await toB64(f),fileName:f.name});
+        for(const f of st.files) arquivos.push(await refDe(f));
         // Amostra Digital: EMB de programação (campo adicional) → propriedadeEmb
         const arquivosEmb=[];
-        if(temEmb) for(const f of (st.embFiles||[])) arquivosEmb.push({fileBase64:await toB64(f),fileName:f.name});
+        if(temEmb) for(const f of (st.embFiles||[])) arquivosEmb.push(await refDe(f));
         const difsB=comDificuldade?getDifs(keyOf(b,i)).filter(Boolean):[];
         execucoes.push({nomeArquivo:nomeLimpo(b.fileName),fileId:b.fileId?String(b.fileId):"",position:(b.position||b.positionLabel)?String(b.position||b.positionLabel):"",dificuldade:comDificuldade?(difsB[0]||""):"",numProgramacoes:comDificuldade?difsB.length:0,dificuldades:difsB,arquivos,arquivosEmb});
       }
-      const m=await onAction(order.id,"exec_bordado",{execucoes,propriedadeEmb:temEmb?"programacao_de_bordado":""});
+      const m=await onAction(order.id,"exec_bordado",{execucoes,anexos,propriedadeEmb:temEmb?"programacao_de_bordado":""});
       // Registra quem executou cada bordado (só na Programação assumível)
       if(ehProgAssumivel&&order.bordadoId){
         try{
@@ -2669,6 +3012,109 @@ function BipagemExpedicao({order,onChange,user}){
 // ─── AÇÃO: RETIRAR E CONFERIR ─────────────────────────────────────────────────
 // Sub-componente pra encapsular os hooks (useState) que antes ficavam dentro
 // de um `if` do AcaoTab — o que quebrava as regras dos Hooks do React (#300).
+// Observação do pedido, destacada. Traz instrução de produção ("fazer um tamanho
+// acima da XG", "cliente não recebe nos últimos dias do mês") que quem executa a
+// etapa precisa ler ANTES de agir — não vale exigir que troque de aba.
+function ObsDoPedido({order}){
+  const txt=[order.obs,order.dadosAdicionais].filter(x=>String(x||"").trim()).join("\n");
+  if(!txt.trim())return null;
+  return(
+    <div style={{background:"#fffbeb",border:"1.5px solid #f59e0b55",borderRadius:8,padding:"12px 14px"}}>
+      <div style={{...F.body,fontSize:10,color:"#92400e",fontWeight:800,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6,display:"flex",alignItems:"center",gap:6}}>
+        <Ic n="warn" s={12} c="#92400e"/> Observações do pedido
+      </div>
+      <div style={{...F.body,fontSize:13.5,color:"#3a2a08",lineHeight:1.55,whiteSpace:"pre-wrap",fontWeight:600}}>{txt}</div>
+    </div>
+  );
+}
+
+// Lista compacta dos itens do pedido, pra conferir sem sair da aba Executar.
+function ItensResumo({order,titulo="Itens do pedido"}){
+  const itens=(order.items||[]).filter(it=>!it.naoSeparavel);
+  if(!itens.length)return null;
+  const total=itens.reduce((s,it)=>s+(Number(it.qty)||0),0);
+  return(
+    <div>
+      <div style={{...F.body,fontSize:10,color:C.gray500,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>
+        {titulo} — {itens.length} linha{itens.length!==1?"s":""} · {total} peça{total!==1?"s":""}
+      </div>
+      <div style={{border:`1px solid ${C.gray200}`,borderRadius:8,overflow:"hidden"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",...F.body,fontSize:12.5}}>
+          <thead><tr style={{background:C.gray50,borderBottom:`1px solid ${C.gray200}`}}>
+            {["SKU","Descrição","Tam.","Qtd"].map((h,i)=>(
+              <th key={h} style={{padding:"8px 10px",textAlign:i>=2?"center":"left",...F.body,fontSize:10,color:C.gray500,fontWeight:700,textTransform:"uppercase"}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>{itens.map((it,i)=>(
+            <tr key={it.id||i} style={{borderBottom:`1px solid ${C.gray100}`}}>
+              <td style={{padding:"7px 10px",color:C.gray600,whiteSpace:"nowrap"}}>{it.sku||"—"}</td>
+              <td style={{padding:"7px 10px",color:C.black}}>{it.desc||"—"}</td>
+              <td style={{padding:"7px 10px",textAlign:"center",color:C.gray700,fontWeight:600}}>{it.cor||"—"}</td>
+              <td style={{padding:"7px 10px",textAlign:"center",fontWeight:700}}>{it.qty}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// Criação de OP Sob Medida: a responsável abre a OP no sistema de produção e
+// registra o número aqui. Campo obrigatório — sem o número não dá pra rastrear
+// a peça depois.
+function CriarOPSobMedidaAcao({order, setActionMsg, setActionDone, onAction}){
+  const [numeroOP,setNumeroOP]=useState(order.numeroOP||"");
+  const [obs,setObs]=useState("");
+  const [enviando,setEnviando]=useState(false);
+  const enviar=async()=>{
+    const op=String(numeroOP||"").trim();
+    if(!op){alert("Informe o número da OP.");return;}
+    setEnviando(true);
+    try{
+      const m=await onAction(order.id,"op_sob_medida",{numeroOP:op,obs:obs.trim()});
+      setActionMsg(m||"");setActionDone(true);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setEnviando(false);}
+  };
+  const lbl={...F.body,fontSize:10,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:5};
+  const inp={width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",...F.body,fontSize:14,outline:"none",boxSizing:"border-box"};
+  return(
+    <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+        <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:8}}>CRIAÇÃO DE OP SOB MEDIDA</div>
+        <div style={{...F.body,fontSize:13,color:C.gray600}}>
+          Abra a ordem de produção no sistema e registre o número aqui. O pedido segue para <strong>Aguardando Produção Sob Medida</strong>.
+        </div>
+        <div style={{marginTop:10}}><PrazoSobMedida o={order}/></div>
+      </div>
+      {/* Observação do pedido em destaque: costuma trazer instrução de produção
+          ("fazer um tamanho acima da XG"), que quem abre a OP precisa ler. */}
+      <ObsDoPedido order={order}/>
+      {(order.formularioSobMedida&&order.formularioSobMedida.length>0)&&<div>
+        <div style={{...F.body,fontSize:10,color:"#92400e",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Formulário Sob Medida</div>
+        <ArquivosBox fileIds={order.formularioSobMedida} emptyText="Nenhum formulário anexado."/>
+      </div>}
+      {/* Itens que vão para a OP — conferir sem trocar de aba */}
+      <ItensResumo order={order} titulo="Itens para a OP"/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
+        <div>
+          <label style={lbl}>Número da OP</label>
+          <input value={numeroOP} onChange={e=>setNumeroOP(e.target.value)} placeholder="Ex: 12345"
+            onKeyDown={e=>e.key==="Enter"&&enviar()} style={inp} autoFocus/>
+        </div>
+        <div>
+          <label style={lbl}>Observação (opcional)</label>
+          <input value={obs} onChange={e=>setObs(e.target.value)} placeholder="algo relevante da produção" style={inp}/>
+        </div>
+      </div>
+      <button onClick={enviar} disabled={enviando||!String(numeroOP||"").trim()}
+        style={{background:(enviando||!String(numeroOP||"").trim())?C.gray300:C.red,color:C.white,border:"none",borderRadius:8,padding:"13px 24px",...F.body,fontWeight:700,fontSize:14,cursor:enviando?"wait":(String(numeroOP||"").trim()?"pointer":"not-allowed"),display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8,alignSelf:"flex-start"}}>
+        <Ic n="check" s={16} c={C.white}/> {enviando?"Registrando...":"Registrar OP"}
+      </button>
+    </div>
+  );
+}
+
 function RetirarConferirAcao({order, me, setActionMsg, setActionDone}){
   const itensSep = order.items.filter(i => !i.naoSeparavel);
   const totalPecas = itensSep.reduce((s,i)=>s+Number(i.qty||0),0);
@@ -2735,7 +3181,68 @@ function RetirarConferirAcao({order, me, setActionMsg, setActionDone}){
   );
 }
 
-function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile,loadingDet,setTemPendencias}){
+// ── CAIXA DE ANEXO MÚLTIPLO ──────────────────────────────────────────────────
+// Um único "slot" que aceita N arquivos: clique ou arraste várias vezes e a
+// lista vai acumulando. O worker sobe todos e grava os fileIds separados por
+// ";" na MESMA propriedade — formato que o SGP já lia como lista em todo lugar
+// (ArquivosBox, snapshot, folha de impressão), então nada mais precisou mudar.
+// Dedup por nome+tamanho pra o usuário não anexar o mesmo arquivo duas vezes.
+function CaixaAnexos({files,setFiles,accept,inputId,textoVazio="Clique ou arraste os arquivos aqui",compacto=false}){
+  const lista=files||[];
+  const add=(fl)=>{
+    const novos=Array.from(fl||[]).filter(Boolean);
+    if(!novos.length)return;
+    setFiles(prev=>{
+      const mapa=new Map((prev||[]).map(f=>[f.name+"|"+f.size,f]));
+      novos.forEach(f=>mapa.set(f.name+"|"+f.size,f));
+      return [...mapa.values()];
+    });
+  };
+  const tem=lista.length>0;
+  return(
+    <div>
+      <div style={{border:`2px dashed ${tem?C.green:C.gray200}`,borderRadius:8,padding:compacto?"20px":"28px 20px",textAlign:"center",background:tem?C.green+"06":C.gray50,cursor:"pointer",transition:"all 0.2s"}}
+        onClick={()=>document.getElementById(inputId)?.click()}
+        onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor=C.red;}}
+        onDragLeave={e=>e.currentTarget.style.borderColor=tem?C.green:C.gray200}
+        onDrop={e=>{e.preventDefault();add(e.dataTransfer.files);e.currentTarget.style.borderColor=C.green;}}>
+        <input id={inputId} type="file" multiple accept={accept||undefined} style={{display:"none"}}
+          onChange={e=>{add(e.target.files);e.target.value="";}}/>
+        {!compacto&&<Ic n="download" s={26} c={C.gray300} style={{margin:"0 auto 8px",display:"block"}}/>}
+        <div style={{...F.body,fontSize:13,color:tem?C.green:C.gray500,fontWeight:tem?700:400}}>
+          {tem?"+ Adicionar mais arquivos":textoVazio}
+        </div>
+        {accept&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Formatos aceitos: {accept}</div>}
+      </div>
+      {tem&&<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:10}}>
+        {lista.map((f,i)=>(
+          <div key={f.name+"|"+f.size+"|"+i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",background:C.green+"0a",border:`1px solid ${C.green}40`,borderRadius:6}}>
+            <Ic n="check" s={14} c={C.green}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{...F.body,fontWeight:700,fontSize:13,color:C.gray700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{f.name}</div>
+              <div style={{...F.body,fontSize:11,color:C.gray500}}>{(f.size/1024).toFixed(0)} KB</div>
+            </div>
+            <button title="Remover deste envio"
+              onClick={e=>{e.stopPropagation();setFiles(prev=>prev.filter((_,j)=>j!==i));}}
+              style={{background:"none",border:"none",color:C.red,cursor:"pointer",...F.body,fontSize:18,fontWeight:700,lineHeight:1,padding:"0 6px"}}>×</button>
+          </div>
+        ))}
+        <div style={{...F.body,fontSize:11,color:C.gray500}}>
+          {lista.length} arquivo{lista.length>1?"s":""} será{lista.length>1?"ão":""} enviado{lista.length>1?"s":""} neste slot.
+        </div>
+      </div>}
+    </div>
+  );
+}
+// Converte um File em base64 puro (sem o prefixo data:).
+const arquivoParaBase64=(f)=>new Promise((res,rej)=>{
+  const r=new FileReader();
+  r.onload=()=>res(String(r.result).split(",")[1]);
+  r.onerror=rej;
+  r.readAsDataURL(f);
+});
+
+function AcaoTab({order,me,uploadFiles,setUploadFiles,obsText,setObsText,actionDone,setActionDone,actionMsg,setActionMsg,itemSel,itemDest,nSel,allDestDefined,skus,itensDirecionaveis,toggleItemSel,selAllItems,setDestSel,setDestAll,setDestOne,onAction,isMobile,loadingDet,setTemPendencias}){
   const etapa=order.etapa;
   const[uploading,setUploading]=useState(false);
   const[bipReady,setBipReady]=useState(false);
@@ -2829,6 +3336,44 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         <button onClick={async()=>{try{const m=await onAction(order.id,"confirmar_amostra_fisica",{});setActionMsg(m||"");setActionDone(true);}catch(e){alert("Erro: "+e.message);}}}
           style={{background:"#be185d",color:C.white,border:"none",borderRadius:8,padding:"13px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,alignSelf:"flex-start",paddingLeft:24,paddingRight:24}}>
           <Ic n="check" s={16} c={C.white}/> Confirmar amostra física pronta
+        </button>
+      </div>
+    );
+  }
+
+  // ── SOB MEDIDA ─────────────────────────────────────────────────────────────
+  // (componente da criação de OP logo abaixo do bloco)
+  // As duas etapas de sob medida não tinham aba Executar: a ação só existia no
+  // botão da fila, então quem abria o pedido pra conferir o formulário ficava
+  // sem como agir e tinha que fechar e voltar.
+  if(etapa==="Criação de OP Sob Medida"){
+    return <CriarOPSobMedidaAcao order={order} setActionMsg={setActionMsg} setActionDone={setActionDone} onAction={onAction}/>;
+  }
+  if(etapa==="Aguardando Produção Sob Medida"){
+    return(
+      <div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+        <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px"}}>
+          <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:8}}>AGUARDANDO PRODUÇÃO SOB MEDIDA</div>
+          <div style={{...F.body,fontSize:13,color:C.gray600}}>
+            {order.numeroOP
+              ? <>Peça em produção pela <strong>OP {order.numeroOP}</strong>. Quando ficar pronta, confirme abaixo — o pedido segue para Conferência e Direcionamento.</>
+              : <>Peça em produção. Quando ficar pronta, confirme abaixo — o pedido segue para Conferência e Direcionamento.</>}
+          </div>
+          <div style={{marginTop:10}}><PrazoSobMedida o={order}/></div>
+        </div>
+        <ObsDoPedido order={order}/>
+        {(order.formularioSobMedida&&order.formularioSobMedida.length>0)&&<div>
+          <div style={{...F.body,fontSize:10,color:"#92400e",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:6}}>Formulário Sob Medida</div>
+          <ArquivosBox fileIds={order.formularioSobMedida} emptyText="Nenhum formulário anexado."/>
+        </div>}
+        <ItensResumo order={order} titulo="Itens em produção"/>
+        <button onClick={async()=>{
+            if(!confirm("Confirmar que a produção da peça sob medida foi concluída?\n\nO pedido vai para Conferência e Direcionamento."))return;
+            try{const m=await onAction(order.id,"producao_sm_concluida",{});setActionMsg(m||"");setActionDone(true);}
+            catch(e){alert("Erro: "+e.message);}
+          }}
+          style={{background:C.green,color:C.white,border:"none",borderRadius:8,padding:"13px 24px",...F.body,fontWeight:700,fontSize:14,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8,alignSelf:"flex-start"}}>
+          <Ic n="check" s={16} c={C.white}/> Produção concluída
         </button>
       </div>
     );
@@ -3009,31 +3554,10 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivos do vendedor (referência)</label>
           <ArquivosBox fileIds={refIds}/>
         </div>:null; })()}
-        {/* Upload */}
+        {/* Upload — aceita VÁRIOS arquivos no mesmo slot */}
         <div>
-          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivo</label>
-          <div style={{border:`2px dashed ${uploadFile?C.green:C.gray200}`,borderRadius:8,padding:"28px 20px",textAlign:"center",background:uploadFile?C.green+"06":C.gray50,cursor:"pointer",transition:"all 0.2s"}}
-            onClick={()=>document.getElementById("upload-input").click()}
-            onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor=C.red;}}
-            onDragLeave={e=>e.currentTarget.style.borderColor=uploadFile?C.green:C.gray200}
-            onDrop={e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f){setUploadFile(f);setUploadName(f.name);}e.currentTarget.style.borderColor=C.green;}}>
-            <input id="upload-input" type="file" accept={config.accept} style={{display:"none"}}
-              onChange={e=>{const f=e.target.files[0];if(f){setUploadFile(f);setUploadName(f.name);}}}/>
-            {uploadFile
-              ?<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
-                  <Ic n="check" s={20} c={C.green}/>
-                  <div style={{textAlign:"left"}}>
-                    <div style={{...F.body,fontWeight:700,fontSize:14,color:C.green}}>{uploadName}</div>
-                    <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2}}>Arquivo selecionado · clique para trocar</div>
-                  </div>
-                </div>
-              :<div>
-                  <Ic n="download" s={28} c={C.gray300} style={{margin:"0 auto 8px",display:"block"}}/>
-                  <div style={{...F.body,fontSize:13,color:C.gray500}}>Clique ou arraste o arquivo aqui</div>
-                  <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Formatos aceitos: {config.accept}</div>
-                </div>
-            }
-          </div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Arquivos</label>
+          <CaixaAnexos files={uploadFiles} setFiles={setUploadFiles} accept={config.accept} inputId="upload-input"/>
         </div>
         {/* Observação */}
         <div>
@@ -3042,19 +3566,19 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
         </div>
         <button onClick={async()=>{
-            if(!uploadFile){alert("Anexe um arquivo antes de confirmar.");return;}
+            if(!uploadFiles.length){alert("Anexe pelo menos um arquivo antes de confirmar.");return;}
             setUploading(true);
             try{
-              // Converte o arquivo em base64
-              const base64=await new Promise((res,rej)=>{
-                const r=new FileReader();
-                r.onload=()=>res(r.result.split(",")[1]);
-                r.onerror=rej;
-                r.readAsDataURL(uploadFile);
-              });
+              // Converte TODOS os arquivos do slot em base64
+              const arquivos=[];
+              for(const f of uploadFiles){
+                arquivos.push({fileName:f.name,fileBase64:await arquivoParaBase64(f)});
+              }
               const m=await onAction(order.id,"upload",{
-                arquivo:uploadName,obs:obsText,
-                fileBase64:base64,fileName:uploadName,
+                arquivo:arquivos.map(a=>a.fileName).join(", "),obs:obsText,
+                arquivos,
+                // compat: worker antigo lê o par solto (usa o 1º arquivo)
+                fileBase64:arquivos[0].fileBase64,fileName:arquivos[0].fileName,
                 propriedade:ETAPA_PROPRIEDADE[etapa],
               });
               setActionMsg(m||"");setActionDone(true);
@@ -3062,8 +3586,8 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
             finally{setUploading(false);}
           }}
           disabled={uploading}
-          style={{background:uploading?"#ccc":uploadFile?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFile&&!uploading?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
-          <Ic n="send" s={15} c={C.white}/> {uploading?"Enviando...":config.btn}
+          style={{background:uploading?"#ccc":uploadFiles.length?C.red:"#ccc",color:C.white,border:"none",borderRadius:7,padding:"11px 24px",cursor:uploadFiles.length&&!uploading?"pointer":"not-allowed",...F.body,fontWeight:700,fontSize:13,display:"flex",alignItems:"center",gap:8,alignSelf:"flex-start"}}>
+          <Ic n="send" s={15} c={C.white}/> {uploading?"Enviando...":config.btn+(uploadFiles.length>1?` (${uploadFiles.length} arquivos)`:"")}
         </button>
       </div>
     );
@@ -3108,18 +3632,9 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
         </div>}
         {/* Upload opcional */}
         <div>
-          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Amostra aprovada (opcional)</label>
-          <div style={{border:`2px dashed ${uploadFile?C.green:C.gray200}`,borderRadius:8,padding:"22px 20px",textAlign:"center",background:uploadFile?C.green+"06":C.gray50,cursor:"pointer"}}
-            onClick={()=>document.getElementById("upload-af-input").click()}
-            onDragOver={e=>{e.preventDefault();e.currentTarget.style.borderColor=C.red;}}
-            onDragLeave={e=>e.currentTarget.style.borderColor=uploadFile?C.green:C.gray200}
-            onDrop={e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f){setUploadFile(f);setUploadName(f.name);}e.currentTarget.style.borderColor=C.green;}}>
-            <input id="upload-af-input" type="file" accept="image/*" style={{display:"none"}}
-              onChange={e=>{const f=e.target.files[0];if(f){setUploadFile(f);setUploadName(f.name);}}}/>
-            {uploadFile
-              ?<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><Ic n="check" s={18} c={C.green}/><div style={{...F.body,fontWeight:700,fontSize:13,color:C.green}}>{uploadName}</div></div>
-              :<div style={{...F.body,fontSize:13,color:C.gray500}}>Clique ou arraste a foto da amostra aprovada</div>}
-          </div>
+          <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Amostra aprovada (opcional · pode anexar várias fotos)</label>
+          <CaixaAnexos files={uploadFiles} setFiles={setUploadFiles} accept="image/*" inputId="upload-af-input"
+            textoVazio="Clique ou arraste as fotos da amostra aprovada" compacto/>
         </div>
         {/* Motivo reprovação */}
         <div>
@@ -3132,18 +3647,22 @@ function AcaoTab({order,me,uploadFile,setUploadFile,uploadName,setUploadName,obs
           <button disabled={uploading} onClick={async()=>{
               setUploading(true);
               try{
-                let fileBase64=null,fileName=null;
-                if(uploadFile){
-                  fileBase64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(uploadFile);});
-                  fileName=uploadName;
+                // Anexo é opcional; quando existe, pode ser mais de um arquivo.
+                const arquivos=[];
+                for(const f of uploadFiles){
+                  arquivos.push({fileName:f.name,fileBase64:await arquivoParaBase64(f)});
                 }
-                const m=await onAction(order.id,"aprovar_amostra_fisica",{fileBase64,fileName,bordadoKeys:selKeys,obs:""});
+                const m=await onAction(order.id,"aprovar_amostra_fisica",{
+                  arquivos,
+                  fileBase64:arquivos[0]?.fileBase64||null,fileName:arquivos[0]?.fileName||null,
+                  bordadoKeys:selKeys,obs:"",
+                });
                 setActionMsg(m||"");setActionDone(true);
               }catch(e){alert("Erro: "+e.message);}
               finally{setUploading(false);}
             }}
             style={{flex:1,minWidth:160,background:uploading?"#ccc":C.green,color:C.white,border:"none",borderRadius:8,padding:"14px",...F.body,fontWeight:700,fontSize:14,cursor:uploading?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-            <Ic n="check" s={16} c={C.white}/> {uploading?"Enviando...":(uploadFile?"Anexar e aprovar":"Amostra Aprovada")}
+            <Ic n="check" s={16} c={C.white}/> {uploading?"Enviando...":(uploadFiles.length?`Anexar ${uploadFiles.length>1?uploadFiles.length+" arquivos ":""}e aprovar`:"Amostra Aprovada")}
           </button>
           <button onClick={async()=>{
               if(!obsText.trim()){alert("Pra reprovar, preencha o motivo. A programadora vai usar essa informação para refazer.");return;}
@@ -3557,26 +4076,30 @@ function SubstituirArquivoBtn({bordadoId,propriedade,rotulo,me}){
   const inputRef=useRef(null);
   if(!(me&&me.admin)||!bordadoId)return null;
   const onFile=async(e)=>{
-    const f=e.target.files&&e.target.files[0];
+    // Aceita VÁRIOS arquivos: o slot passa a ter todos os selecionados.
+    const fs=Array.from(e.target.files||[]);
     e.target.value="";
-    if(!f)return;
-    if(!confirm(`Substituir o arquivo de "${rotulo}" por "${f.name}"?\n\nO arquivo anterior deixa de ser exibido (fica no histórico do HubSpot). A etapa do pedido NÃO muda.`))return;
+    if(!fs.length)return;
+    const nomes=fs.map(f=>f.name).join(", ");
+    if(!confirm(`Substituir o arquivo de "${rotulo}" por ${fs.length>1?fs.length+" arquivos":`"${nomes}"`}?\n\n${fs.length>1?nomes+"\n\n":""}O(s) arquivo(s) anterior(es) deixa(m) de ser exibido(s) (ficam no histórico do HubSpot). A etapa do pedido NÃO muda.`))return;
     setRodando(true);
     try{
-      const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});
+      const arquivos=[];
+      for(const f of fs){ arquivos.push({fileName:f.name,fileBase64:await arquivoParaBase64(f)}); }
       const r=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
-        propriedade,fileBase64:b64,fileName:f.name,
-        nota:`Arquivo de ${rotulo} SUBSTITUÍDO (correção de anexo errado)`,
+        propriedade,arquivos,
+        fileBase64:arquivos[0].fileBase64,fileName:arquivos[0].fileName,
+        nota:`Arquivo de ${rotulo} SUBSTITUÍDO por ${arquivos.length} (correção de anexo errado): ${nomes}`,
         ctx:{executor:me?.nome||me?.email||"Admin SGP"},
-      });
-      if(r&&r.success)alert("Arquivo substituído com sucesso. Feche e reabra o pedido pra ver o novo anexo.");
+      },{timeoutMs:UPLOAD_TIMEOUT_MS});
+      if(r&&r.success)alert(`${fs.length>1?fs.length+" arquivos substituíram":"Arquivo substituído"} com sucesso. Feche e reabra o pedido pra ver o novo anexo.`);
       else throw new Error((r&&r.error)||"Erro desconhecido");
     }catch(err){alert("Erro ao substituir: "+err.message);}
     finally{setRodando(false);}
   };
   return(
     <>
-      <input ref={inputRef} type="file" style={{display:"none"}} onChange={onFile}/>
+      <input ref={inputRef} type="file" multiple style={{display:"none"}} onChange={onFile}/>
       <button onClick={()=>inputRef.current&&inputRef.current.click()} disabled={rodando}
         title="Substituir o arquivo desta etapa sem alterar o fluxo (admin)"
         style={{background:C.white,border:`1.5px solid ${C.amber}`,borderRadius:6,padding:"4px 10px",cursor:rodando?"wait":"pointer",...F.body,fontSize:11,fontWeight:700,color:"#92400e",display:"inline-flex",alignItems:"center",gap:5,marginLeft:10}}>
@@ -3659,6 +4182,12 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     tipoPedido: _orderLeve.tipoPedido || _enriched.tipoPedido || "",
     formularioSobMedida: (_orderLeve.formularioSobMedida&&_orderLeve.formularioSobMedida.length)
       ? _orderLeve.formularioSobMedida : (_enriched.formularioSobMedida||[]),
+    // Fechamento do pedido (closedate do Vendas) — base do prazo sob medida.
+    // O detalhe enriquecido devolve esse dado com outro nome (closedate /
+    // prazoFinal), então sem esta linha o campo sumia ao abrir o pedido e o
+    // prazo aparecia como "emissão não informada".
+    dataFechamento: _orderLeve.dataFechamento || _enriched.dataFechamento
+      || _enriched.closedate || _enriched.prazoFinal || null,
     // Ocorrência: o card leve é a fonte confiável (vem do funil de origem).
     ehOcorrencia: _orderLeve.ehOcorrencia || _enriched.ehOcorrencia || false,
     ocorrenciaId: _orderLeve.ocorrenciaId || _enriched.ocorrenciaId || "",
@@ -3669,7 +4198,10 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     improcPosvendaOk: _orderLeve.improcPosvendaOk || _enriched.improcPosvendaOk || false,
     improcSeparacaoOk: _orderLeve.improcSeparacaoOk || _enriched.improcSeparacaoOk || false,
   }:_orderLeve;
-  const ETAPAS_COM_ACAO=["Em Separação","Conferência e Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Análise de Frete"];
+  const ETAPAS_COM_ACAO=["Em Separação","Conferência e Direcionamento","Programação","Amostra Digital","Amostra Física","Aprovação de Amostra Digital","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo","Expedição","Análise de Frete",
+    // Sob medida: sem isto o pedido abria sem a aba Executar e a ação só existia
+    // no botão da fila — quem abria pra conferir o formulário ficava sem saída.
+    "Criação de OP Sob Medida","Aguardando Produção Sob Medida"];
   // A "etapa efetiva" é a que o USUÁRIO abriu (vinda da tela — ex.: "Separação"
   // via aba Separação). Se abriu de uma tela sem etapa específica, cai na
   // etapa real do card. Isso deixa a mesma order abrir sem ações quando vista
@@ -3688,15 +4220,18 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
   const[voltando,setVoltando]=useState(false);
   const[gerandoBordado,setGerandoBordado]=useState(false);
   const[cancelandoBordado,setCancelandoBordado]=useState(false);
+  const[corrigindoSilk,setCorrigindoSilk]=useState(false);   // correção pedido bordado -> silk/DTF
+  const[cancelandoPedido,setCancelandoPedido]=useState(false); // cancelamento do pedido inteiro
   const[sincItens,setSincItens]=useState(false);
+  const[attObs,setAttObs]=useState(false);
   const[modalGerar,setModalGerar]=useState(false);
   const[motivoAguard,setMotivoAguard]=useState("");
   const[pedidoDep,setPedidoDep]=useState("");           // vendasId do pedido escolhido
   const[pedidoDepBusca,setPedidoDepBusca]=useState(""); // texto de busca
   const[pedidoDepSel,setPedidoDepSel]=useState(null);   // {vendasId, pedidoLinx, client}
   const _snapDep=useSnapshotAberto();
-  const[uploadFile,setUploadFile]=useState(null);
-  const[uploadName,setUploadName]=useState("");
+  // Anexo do slot da etapa — LISTA (o mesmo slot aceita vários arquivos).
+  const[uploadFiles,setUploadFiles]=useState([]);
   const[obsText,setObsText]=useState("");
   const[actionDone,setActionDone]=useState(false);
   const[actionMsg,setActionMsg]=useState("");
@@ -3788,7 +4323,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               {/* SOB MEDIDA: destaque + nº da OP quando já registrada */}
               {/sob\s*medida/i.test(order.tipoPedido||"")&&<span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"3px 9px",borderRadius:6,background:"#fef3c7",color:"#92400e",border:"1px solid #f59e0b",whiteSpace:"nowrap"}}>SOB MEDIDA</span>}
               {order.numeroOP&&<span style={{...F.title,fontSize:10,fontWeight:800,letterSpacing:"0.05em",padding:"3px 9px",borderRadius:6,background:"#e8f5ec",color:"#0d4d24",border:"1px solid #4a8f5f",whiteSpace:"nowrap"}}>OP {order.numeroOP}</span>}
-              <ETag etapa={order.etapa}/>
+              <ETag etapa={order.etapa}/><TagDataEspecial o={order}/>
               {order.houveAlteracaoForm&&<Tag label="⚠ Já houve alteração de formulário" color="#b45309"/>}
               {order.temBordado===false&&<Tag label="Sem bordado" color={C.gray600}/>}
               {(sla.st==="late"||sla.st==="risk"||sla.ft==="late"||sla.ft==="risk")&&<Tag label={sla.st==="late"||sla.ft==="late"?"Prazo vencido":"Em risco"} color={sla.st==="late"||sla.ft==="late"?C.red:C.amber}/>}
@@ -3866,6 +4401,73 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
               <Ic n="close" s={13} c={C.red}/> {cancelandoBordado?"Cancelando...":"Cancelar Bordado"}
             </button>}
+            {/* Pedido lançado como bordado que na verdade é silk/DTF (o vendedor
+                marcou "tem bordado" no item e anexou a arte no campo de DTF).
+                Encerra o bordado, desmarca os itens e manda pra caixa Silk/DTF
+                numa ação só — sempre mostrando antes o que vai mudar. */}
+            {me&&me.admin&&<button
+              disabled={corrigindoSilk}
+              onClick={async()=>{
+                setCorrigindoSilk(true);
+                try{
+                  // 1º passo: simulação. Nada é alterado.
+                  const p=await apiFetch(`/corrigir-para-silk-dtf/${order.vendasId}`,"POST",{ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(p.error){alert("Não é possível corrigir:\n\n"+p.error);return;}
+                  const resumo=
+                    `Corrigir o pedido ${p.linx?"PED - "+p.linx:order.vendasId} para SILK/DTF?\n\n`+
+                    `Itens de silk/DTF encontrados:\n  • ${(p.itensSilk||[]).join("\n  • ")}\n\n`+
+                    (p.bordadoId?`O bordado (${p.etapaBordadoAtual}) será ENCERRADO.\n`:"")+
+                    ((p.itensDesmarcar||[]).length?`${p.itensDesmarcar.length} item(ns) serão desmarcados como bordado.\n`:"")+
+                    (p.posvendaId?`O pedido sai de "${p.etapaPvAtual}" e vai para a caixa Silk/DTF.\n`:"")+
+                    (p.aviso?`\n⚠ ${p.aviso}\n`:"");
+                  if(!window.confirm(resumo))return;
+                  const mot=window.prompt("Motivo da correção (fica registrado na timeline):","Itens são DTF — pedido foi lançado como bordado por engano");
+                  if(mot===null)return;
+                  if(!String(mot).trim()){alert("O motivo é obrigatório.");return;}
+                  const r=await apiFetch(`/corrigir-para-silk-dtf/${order.vendasId}`,"POST",
+                    {executar:true,motivo:mot,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(r.success){
+                    alert(`Pedido corrigido para Silk/DTF.${r.itensLimpos?` ${r.itensLimpos} item(ns) desmarcado(s).`:""}`);
+                    onClose();
+                  } else alert("Erro: "+(r.error||"desconhecido"));
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setCorrigindoSilk(false);}
+              }}
+              title="O pedido é silk/DTF mas entrou no fluxo de bordado — encerra o bordado e envia para Silk/DTF"
+              style={{background:C.white,border:`1.5px solid ${C.purple}`,borderRadius:6,padding:"7px 12px",cursor:corrigindoSilk?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.purple,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!corrigindoSilk)e.currentTarget.style.background=C.purple+"0e";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="image" s={13} c={C.purple}/> {corrigindoSilk?"Corrigindo...":"É Silk/DTF"}
+            </button>}
+            {/* Cancelar o pedido inteiro. NÃO exclua o pós-venda pra isso: o
+                bordado fica órfão, o histórico some dos indicadores e a
+                integração pode recriar o negócio. Aqui o pedido vai pra etapa
+                Cancelamento — sai das filas e mantém o rastro. */}
+            {me&&me.admin&&<button
+              disabled={cancelandoPedido}
+              onClick={async()=>{
+                const mot=window.prompt(
+                  "Cancelar este pedido?\n\nO pedido sai de todas as filas do SGP e vai para a etapa Cancelamento. O bordado, se ainda estiver ativo, é encerrado, e o cliente passa a ver \"Pedido cancelado\" no rastreio.\n\nO histórico é preservado.\n\nMotivo:",
+                  "Cancelado pelo cliente");
+                if(mot===null)return;
+                if(!String(mot).trim()){alert("O motivo é obrigatório.");return;}
+                setCancelandoPedido(true);
+                try{
+                  const r=await apiFetch(`/cancelar-pedido/${order.vendasId}`,"POST",
+                    {motivo:mot,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(r.success){
+                    alert("Pedido cancelado."+(r.itensLimpos?` ${r.itensLimpos} item(ns) com direcionamento limpo.`:""));
+                    onClose();
+                  } else alert("Erro: "+(r.error||"desconhecido"));
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setCancelandoPedido(false);}
+              }}
+              title="Cancela o pedido: sai das filas, mantém o histórico e o cliente vê 'Pedido cancelado' no rastreio"
+              style={{background:C.white,border:`1.5px solid ${C.gray600}`,borderRadius:6,padding:"7px 12px",cursor:cancelandoPedido?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.gray700,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!cancelandoPedido)e.currentTarget.style.background=C.gray50;}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="close" s={13} c={C.gray700}/> {cancelandoPedido?"Cancelando...":"Cancelar Pedido"}
+            </button>}
             {/* Itens do SGP vêm do objeto Pedidos Aprovados, criado na integração.
                 A automação só CRIA — se o item sair do pedido depois, o registro
                 fica órfão e continua na lista. Aqui a gente compara com os line
@@ -3891,6 +4493,51 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
               onMouseEnter={e=>{if(!sincItens)e.currentTarget.style.background=C.gray50;}}
               onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
               <Ic n="refresh" s={13} c={C.gray700}/> {sincItens?"Conferindo...":"Sincronizar Itens"}
+            </button>}
+            {/* A observação dos itens é lida do pedido e guardada em cache (12h).
+                Se o comercial corrigir o texto, isto relê na hora. */}
+            {me&&me.admin&&<button
+              disabled={attObs}
+              onClick={async()=>{
+                setAttObs(true);
+                try{
+                  const r=await apiFetch(`/atualizar-obs/${order.vendasId}`,"POST",{});
+                  if(r.error){alert("Erro: "+r.error);return;}
+                  alert(r.observacao
+                    ? `Observação relida do pedido:\n\n${r.observacao}`
+                    : "O pedido não tem observação nos itens.");
+                  onClose();
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setAttObs(false);}
+              }}
+              title="Relê a observação dos itens direto do pedido, ignorando o cache"
+              style={{background:C.white,border:`1.5px solid ${C.gray300}`,borderRadius:6,padding:"7px 12px",cursor:attObs?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.gray700,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!attObs)e.currentTarget.style.background=C.gray50;}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="refresh" s={13} c={C.gray700}/> {attObs?"Relendo...":"Atualizar Observação"}
+            </button>}
+            {/* Recupera a lista de itens a partir dos itens de linha do pedido.
+                Só aparece quando o pedido está SEM item nenhum no SGP. */}
+            {me&&me.admin&&(order.items||[]).length===0&&<button
+              disabled={sincItens}
+              onClick={async()=>{
+                setSincItens(true);
+                try{
+                  const p=await apiFetch(`/recriar-itens/${order.vendasId}`,"POST",{});
+                  if(p.error){alert("Erro: "+p.error);return;}
+                  const resumo=p.itens.slice(0,25).map(i=>`• ${i.sku} ${i.nome} — ${i.tamanho} ×${i.quantidade}`).join("\n");
+                  if(!confirm(`Recriar ${p.total} item(ns) a partir do pedido?\n\n${resumo}${p.total>25?`\n... e mais ${p.total-25}`:""}\n\n⚠ A quantidade já separada volta ZERADA.`))return;
+                  const r=await apiFetch(`/recriar-itens/${order.vendasId}`,"POST",{executar:true,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+                  if(r.success){alert(`${r.criados} item(ns) recriado(s).`);onClose();}
+                  else alert("Erro: "+(r.error||"desconhecido"));
+                }catch(e){alert("Erro: "+e.message);}
+                finally{setSincItens(false);}
+              }}
+              title="Recria a lista de itens a partir dos itens de linha do pedido"
+              style={{background:C.white,border:`1.5px solid ${C.green}`,borderRadius:6,padding:"7px 12px",cursor:sincItens?"wait":"pointer",display:"inline-flex",alignItems:"center",gap:6,color:C.green,fontWeight:700,fontSize:12,...F.body}}
+              onMouseEnter={e=>{if(!sincItens)e.currentTarget.style.background=C.green+"0e";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.white;}}>
+              <Ic n="refresh" s={13} c={C.green}/> {sincItens?"Recriando...":"Recriar Itens"}
             </button>}
             <button
               onClick={()=>imprimirPedido(order.vendasId||order.posvendaId)}
@@ -3918,7 +4565,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {/* NEGÓCIO */}
           {tab==="info"&&<div style={{padding:20,display:"flex",flexDirection:"column",gap:14}}>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:10}}>
-              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Centro de Custo",rotuloCentroCusto(order.centroCusto)||"—"],["Tipo",order.tipo||"—"],["Tipo de Pedido",order.tipoPedido||"—"],...(order.numeroOP?[["Nº da OP",order.numeroOP]]:[]),...(order.ehOcorrencia?[["Tipo da Ocorrência",order.ocorrenciaTipo||"—"],["Parecer da Qualidade",order.ocorrenciaParecer||"Pendente"]]:[]),["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtD(dataVencimento(order)):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)]].map(([k,v])=>(
+              {[["Cliente",order.client],["CNPJ",order.cnpj],["Razão Social",order.razaoSocial],["Vendedor",order.vendedor],["Telefone",order.tel],["E-mail",order.email],["Valor",fmtR(order.valor)],["Condição de Pgto",order.condicaoPagamento],["Centro de Custo",rotuloCentroCusto(order.centroCusto)||"—"],["Tipo",order.tipo||"—"],["Tipo de Pedido",order.tipoPedido||"—"],...(order.numeroOP?[["Nº da OP",order.numeroOP]]:[]),...(order.ehOcorrencia?[["Tipo da Ocorrência",order.ocorrenciaTipo||"—"],["Parecer da Qualidade",order.ocorrenciaParecer||"Pendente"]]:[]),["Transportadora",order.transportadora||"—"],["Frete",fmtR(order.valorFrete||0)+(order.pagadorFrete?` · ${order.pagadorFrete}`:"")],["Prazo Faturamento do Pedido", _loadingDet?"⏳ Carregando...":(dataVencimento(order)?fmtVenc(dataVencimento(order))+(temDataEspecial(order)?" · DATA ESPECIAL":""):"A definir (sem amostra aprovada)")],["Emissão",fmtD(order.dataFechamento||order.entradaAt)],...(ehEtapaSobMedida(order.etapa)?[["Prazo Sob Medida",(()=>{const p=prazoSobMedida(order);return p?`${fmtD(p.data.toISOString())} · ${p.atrasado?`atrasado ${Math.abs(p.dias)} dia(s)`:p.venceHoje?"vence hoje":`faltam ${p.dias} dia(s)`}`:"emissão não informada";})()]]:[])].map(([k,v])=>(
                 <div key={k} style={{background:C.gray50,borderRadius:6,padding:"10px 12px",border:`1px solid ${C.gray200}`}}>
                   <div style={{...F.body,fontSize:10,color:C.gray400,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:4}}>{k}</div>
                   <div style={{...F.body,fontSize:13,fontWeight:600,color:_loadingDet&&(k==="Prazo Faturamento do Pedido")?C.gray400:C.black,wordBreak:"break-word",fontStyle:_loadingDet&&(k==="Prazo Faturamento do Pedido")?"italic":"normal"}}>{v}</div>
@@ -3993,7 +4640,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                     <SecH>{title}</SecH>
                     <div style={{...F.title,fontSize:26,fontWeight:700,color:c,lineHeight:1}}>{vals[0]} <span style={{fontSize:14,fontWeight:400,color:C.gray400}}>{vals[1]}</span></div>
                     {title==="SLA desta Etapa"&&<div style={{marginTop:8}}><SLABar pct={sla.pct} st={sla.st}/></div>}
-                    {title==="Prazo Faturamento do Pedido"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtD(dataVencimento(order))}</div>}
+                    {title==="Prazo Faturamento do Pedido"&&dataVencimento(order)&&<div style={{...F.body,fontSize:12,color:C.gray600,marginTop:6,fontWeight:600}}>{fmtVenc(dataVencimento(order))}</div>}
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:6}}>{msg}</div>
                   </Card>
                 );
@@ -4158,8 +4805,7 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
           {tab==="chat"&&<div style={{height:isMobile?380:420}}><Chat order={order} me={me} usuarios={usuarios}/></div>}
           {tab==="acao"&&<AcaoTab
             order={order} me={me}
-            uploadFile={uploadFile} setUploadFile={setUploadFile}
-            uploadName={uploadName} setUploadName={setUploadName}
+            uploadFiles={uploadFiles} setUploadFiles={setUploadFiles}
             obsText={obsText} setObsText={setObsText}
             actionDone={actionDone} setActionDone={setActionDone}
             actionMsg={actionMsg} setActionMsg={setActionMsg}
@@ -4209,13 +4855,26 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
       </div>}
       {/* Modal — Gerar Bordado (admin): com amostra (Programação) ou sem (Liberado) */}
       {modalGerar&&(()=>{
-        const gerar=async(semAmostra)=>{
+        // forcar=true só é enviado depois que o usuário confirma o aviso do worker
+        // (pedido que pede programação sendo gerado "sem amostra").
+        const gerar=async(semAmostra,forcar=false)=>{
           setGerandoBordado(true);
           try{
-            const r=await apiFetch(`/gerar-bordado/${order.vendasId}`,"POST",{semAmostra,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
+            const r=await apiFetch(`/gerar-bordado/${order.vendasId}`,"POST",{semAmostra,forcar,ctx:{executor:me?.nome||me?.email||"Usuário SGP"}});
             if(r.success){ setModalGerar(false); alert(`Bordado gerado ${r.semAmostra?"pronto para direcionar (sem amostra)":"em Programação"} — ${r.programacoes} arquivo(s)${typeof r.itensMarcados==="number"?`, ${r.itensMarcados} item(ns) marcado(s) como bordado`:""}.`); onClose(); }
             else alert("Erro: "+(r.error||"desconhecido"));
-          }catch(e){alert("Erro: "+e.message);}
+          }catch(e){
+            // 409 com precisaConfirmar: o pedido pede programação e o usuário
+            // escolheu "sem amostra". Só segue se ele confirmar explicitamente.
+            if(e.corpo&&e.corpo.precisaConfirmar&&!forcar){
+              setGerandoBordado(false);
+              if(confirm(`⚠ ATENÇÃO\n\n${e.message}\n\nQuer mesmo gerar SEM amostra, ignorando a exigência de programação?`)){
+                await gerar(semAmostra,true);
+              }
+              return;
+            }
+            alert("Erro: "+e.message);
+          }
           finally{setGerandoBordado(false);}
         };
         return (
@@ -4250,7 +4909,10 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
       {/* Modal — Voltar Etapa (permissão voltar_etapa) */}
       {modalVoltar&&(()=>{
         const idxAtual=idxFunil(order.etapa);
-        const bordadoStages=new Set(["Programação","Amostra Digital","Aprovação de Amostra Digital","Amostra Física","Aprovação de Amostra Física","Bordado Interno","Bordado Externo","Bordado Interno e Externo"]);
+        // Etapas que pertencem ao funil de BORDADO: escolher uma delas move
+        // SOMENTE o negócio de Bordado (o pedido/pós-venda só é ajustado se
+        // estiver adiante). As demais movem o negócio de Pós-Venda.
+        const bordadoStages=new Set(["Programação","Amostra Digital","Aprovação de Amostra Digital","Amostra Física","Aprovação de Amostra Física","Liberado para Bordar","Bordado Interno","Bordado Externo","Bordado Interno e Externo"]);
         // Qualquer etapa diferente da atual (anterior OU posterior). Sem bordado
         // → oculta etapas de bordado.
         const opcoes=FUNIL_ORDEM.filter((e,i)=> (idxAtual<0? true : i!==idxAtual) && !(order.temBordado===false&&bordadoStages.has(e)));
@@ -4270,8 +4932,11 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
                 <select value={etapaVoltarSel} onChange={e=>setEtapaVoltarSel(e.target.value)}
                   style={{width:"100%",...F.body,fontSize:13,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",boxSizing:"border-box",marginBottom:14,background:C.white}}>
                   <option value="">— selecione a etapa —</option>
-                  {opcoes.map(e=>{const i=FUNIL_ORDEM.indexOf(e);const dir=idxAtual<0?"":i<idxAtual?"← voltar · ":"→ avançar · ";return <option key={e} value={e}>{dir}{e}</option>;})}
+                  {opcoes.map(e=>{const i=FUNIL_ORDEM.indexOf(e);const dir=idxAtual<0?"":i<idxAtual?"← voltar · ":"→ avançar · ";const alvo=bordadoStages.has(e)?" [só o bordado]":" [pedido]";return <option key={e} value={e}>{dir}{e}{alvo}</option>;})}
                 </select>
+                <div style={{...F.body,fontSize:11.5,color:C.gray500,marginTop:-8,marginBottom:14,lineHeight:1.5}}>
+                  <strong>[só o bordado]</strong> move apenas o negócio de Bordado — o pedido só é ajustado se estiver adiante da fase de bordado. <strong>[pedido]</strong> move o pós-venda.
+                </div>
                 <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",display:"block",marginBottom:6}}>Motivo (obrigatório)</label>
                 <textarea value={motivoVoltar} onChange={e=>setMotivoVoltar(e.target.value)} rows={3}
                   placeholder="Ex: amostra reprovada, precisa refazer; pulou etapa por engano; adiantar por urgência do cliente..."
@@ -4453,7 +5118,7 @@ function OCard({order,onClick,slaCfg}){
           <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{order.client}</div>
         </div>
         <div style={{display:"flex",gap:4,alignItems:"center",flexWrap:"wrap",justifyContent:"flex-end"}}>
-          <ETag etapa={order.etapa}/>
+          <ETag etapa={order.etapa}/><TagDataEspecial o={order}/>
           {order.subEtapa&&<span style={{...F.title,fontSize:9,fontWeight:700,letterSpacing:"0.04em",padding:"2px 6px",borderRadius:4,background:order.subEtapa==="Aguardando peça"?C.amber+"18":C.gray100,color:order.subEtapa==="Aguardando peça"?"#92400e":C.gray600,border:`1px solid ${order.subEtapa==="Aguardando peça"?C.amber+"55":C.gray200}`,whiteSpace:"nowrap"}}>{order.subEtapa==="Aguardando peça"?"⏳ ":""}{order.subEtapa}</span>}
         </div>
       </div>
@@ -4469,12 +5134,16 @@ function OCard({order,onClick,slaCfg}){
         border:`1px solid ${!venc?C.gray200:vencido?C.red+"35":risco?C.amber+"40":C.gray200}`}}>
         <Ic n="clock" s={13} c={corLimite}/>
         <span style={{...F.body,fontSize:11.5,fontWeight:700,color:corLimite}}>
-          {!venc?(order.temBordado===false?"⏳ Calculando prazo...":"Aguardando aprovação de amostra"):vencido?`Vencido em ${fmtDS(venc)}`:`Vence em ${fmtDS(venc)}`}
+          {!venc?(order.temBordado===false?"⏳ Calculando prazo...":"Aguardando aprovação de amostra"):vencido?`Vencido em ${fmtVenc(venc,true)}`:`Vence em ${fmtVenc(venc,true)}`}
         </span>
       </div>}
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <SLABar pct={sla.pct} st={sla.st}/>
-        {!ehProg&&<span style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0}}>{sla.hrs.toFixed(0)}h/{sla.sla}h</span>}
+        {!ehProg&&<span title={order.slaDesdeAprovacaoAmostra?"O pedido foi separado antes da amostra ficar pronta. O relógio conta a partir da aprovação do bordado.":undefined}
+          style={{...F.body,fontSize:10,color:sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.green,fontWeight:700,flexShrink:0,display:"inline-flex",alignItems:"center",gap:3}}>
+          {order.slaDesdeAprovacaoAmostra&&<Ic n="needle" s={9} c={C.gray400}/>}
+          {sla.hrs.toFixed(0)}h/{sla.sla}h
+        </span>}
         <button
           onClick={(e)=>{e.stopPropagation();imprimirPedido(order.vendasId||order.posvendaId);}}
           title="Imprimir folha de separação"
@@ -4531,7 +5200,7 @@ function MinhasDemandas({user,onOpen,slaCfg}){
   const agora=Date.now();
   const idsAtrasados=new Set();
   etapas.forEach(e=>((dados&&dados[e])||[]).forEach(o=>{
-    if(o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora) idsAtrasados.add(o.vendasId||o.id);
+    if(venceuAntes(o.dataVencimento,agora)) idsAtrasados.add(o.vendasId||o.id);
   }));
   const atrasados=idsAtrasados.size;
 
@@ -4706,6 +5375,189 @@ function TabelaFaltantes({ pedidos, etapaLabel }) {
 // "Em Separação" e ficavam eternamente pendentes, sujando fila e métrica.
 // Quando o pedido tem bordado, o card mostra em que etapa o bordado está — quem
 // dá o OK precisa saber se a peça já está pronta.
+// ── PENDENTE PAGAMENTO ───────────────────────────────────────────────────────
+// Pedidos que terminaram a expedição mas não podem faturar porque o pagamento
+// não foi liberado no ERP. Ficam aqui até o cron detectar o pagamento (a cada
+// 5 min) ou alguém liberar manualmente com motivo. O Pós-Venda cobra o cliente
+// a partir desta tela e registra o que foi combinado.
+function PendentePagamento({onOpen,user}){
+  const [pedidos,setPedidos]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [loadError,setLoadError]=useState(null);
+  const [busca,setBusca]=useState("");
+  const [agindo,setAgindo]=useState({});
+  const [feito,setFeito]=useState({});
+  const [aberto,setAberto]=useState({});      // id -> mostra painel de tratativa
+  const [texto,setTexto]=useState({});        // id -> texto digitado
+  const [hist,setHist]=useState({});          // pvId -> [tratativas]
+
+  const carregar=()=>{
+    setLoading(true);setLoadError(null);
+    apiFetch("/pendente-pagamento")
+      .then(res=>{
+        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Pendente Pagamento")));
+        else setLoadError(res.error||"Erro desconhecido");
+      })
+      .catch(e=>setLoadError(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[]);
+
+  const abrirTratativa=async(o)=>{
+    const novo=!aberto[o.id];
+    setAberto(p=>({...p,[o.id]:novo}));
+    if(novo&&!hist[o.posvendaId]){
+      try{
+        const r=await apiFetch(`/pendente-pagamento-tratativas/${o.posvendaId}`);
+        setHist(p=>({...p,[o.posvendaId]:r.data||[]}));
+      }catch{ setHist(p=>({...p,[o.posvendaId]:[]})); }
+    }
+  };
+
+  const registrar=async(o)=>{
+    const t=String(texto[o.id]||"").trim();
+    if(!t){alert("Escreva o que foi combinado com o cliente.");return;}
+    setAgindo(p=>({...p,[o.id]:"tratativa"}));
+    try{
+      const r=await apiFetch(`/pendente-pagamento-tratativa/${o.posvendaId}`,"POST",{tratativa:t,ctx:{executor:user?.nome||"Usuário SGP"}});
+      if(r.success){
+        setTexto(p=>({...p,[o.id]:""}));
+        setHist(p=>({...p,[o.posvendaId]:[{texto:"[SGP] [COBRANÇA] "+t,em:new Date().toISOString()},...(p[o.posvendaId]||[])]}));
+      } else alert("Erro: "+(r.error||"desconhecido"));
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setAgindo(p=>({...p,[o.id]:false}));}
+  };
+
+  const liberar=async(o)=>{
+    const motivo=prompt(`Liberar o pedido ${o.pedidoLinx||o.vendasId} para Análise de Frete SEM a confirmação de pagamento do ERP?\n\nDescreva o motivo (obrigatório — fica registrado na timeline):`);
+    if(motivo===null)return;
+    if(!String(motivo).trim()){alert("Motivo obrigatório.");return;}
+    setAgindo(p=>({...p,[o.id]:"liberar"}));
+    try{
+      const r=await apiFetch(`/pendente-pagamento-liberar/${o.posvendaId}`,"POST",{motivo:String(motivo).trim(),ctx:{executor:user?.nome||"Usuário SGP"}});
+      if(r.success){ setFeito(p=>({...p,[o.id]:"Análise de Frete"})); setTimeout(carregar,1200); }
+      else alert("Erro: "+(r.error||"desconhecido"));
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setAgindo(p=>({...p,[o.id]:false}));}
+  };
+
+  const q=busca.trim().toLowerCase();
+  const lista=(pedidos||[]).filter(o=>{
+    if(!q)return true;
+    return [o.pedidoLinx,o.vendasId,o.client,o.razaoSocial].map(x=>String(x||"").toLowerCase()).join(" ").includes(q);
+  });
+  // Há quanto tempo está parado nesta caixa.
+  const diasParado=(o)=>{
+    const base=o.etapaAt||o.entradaAt;
+    if(!base)return null;
+    return Math.max(0,Math.floor((Date.now()-new Date(base).getTime())/86400000));
+  };
+  const totalRetido=lista.reduce((s,o)=>s+(Number(o.valor)||0),0);
+
+  return(
+    <div style={{padding:20}}>
+      <PageH title="Pendente Pagamento" sub="Pedidos embalados que não podem faturar porque o pagamento não foi liberado. Assim que o ERP confirmar, o pedido segue sozinho para Análise de Frete." onRefresh={carregar} refreshing={loading}/>
+
+      {/* A trava só age na SAÍDA da Expedição — quem já estava na Análise de
+          Frete antes dela existir continua lá, mesmo sem pagamento liberado.
+          Este botão varre a fila do frete e traz esses pedidos pra cá.
+          Sempre mostra a prévia antes de mover. */}
+      {user?.admin&&
+        <div style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:8,padding:"12px 16px",marginBottom:14}}>
+          <div style={{...F.body,fontSize:12,fontWeight:700,color:C.gray700,marginBottom:2}}>Trazer da Análise de Frete</div>
+          <div style={{...F.body,fontSize:11.5,color:C.gray500,marginBottom:10}}>
+            Procura na Análise de Frete os pedidos sem faturamento liberado e move para cá. Mostra a lista antes de mover.
+          </div>
+          <MiniAcaoAdmin
+            rota="/admin/migrar-pendente-pagamento"
+            rotulo="Verificar Análise de Frete"
+            rotuloExec={n=>`Mover ${n} pedido${n!==1?"s":""} para Pendente Pagamento`}
+            vazio="Nenhum pedido na Análise de Frete está sem pagamento liberado."
+            linha={p=>`${p.linx?"PED - "+p.linx+" · ":""}${p.cliente||"—"} · ${fmtR(p.valor||0)}`}
+          />
+        </div>}
+
+      {!loading&&!loadError&&lista.length>0&&
+        <div style={{background:"#be123c0e",border:"1px solid #be123c33",borderRadius:8,padding:"12px 16px",marginBottom:14,display:"flex",gap:20,flexWrap:"wrap"}}>
+          <div><div style={{...F.body,fontSize:10.5,fontWeight:700,color:C.gray500,textTransform:"uppercase"}}>Pedidos retidos</div>
+            <div style={{...F.title,fontSize:20,fontWeight:800,color:"#be123c"}}>{lista.length}</div></div>
+          <div><div style={{...F.body,fontSize:10.5,fontWeight:700,color:C.gray500,textTransform:"uppercase"}}>Valor parado</div>
+            <div style={{...F.title,fontSize:20,fontWeight:800,color:"#be123c"}}>{fmtR(totalRetido)}</div></div>
+        </div>}
+
+      <div style={{marginBottom:12}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="Buscar por pedido ou cliente..."
+          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      </div>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando pedidos...</div>}
+      {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
+      {!loading&&!loadError&&lista.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhum pedido encontrado para a busca.":"Nenhum pedido retido por pagamento."}</div>}
+
+      {lista.map(o=>{
+        const done=feito[o.id];
+        const busy=agindo[o.id];
+        const dias=diasParado(o);
+        const tratativas=hist[o.posvendaId]||[];
+        return(
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:12,borderLeft:"3px solid #be123c"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:240}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
+                  <Tag label="Pagamento pendente" color="#be123c"/>
+                  <TagCentroCusto cc={o.centroCusto}/>
+                  {dias!=null&&<span style={{...F.body,fontSize:11,fontWeight:700,color:dias>=7?C.red:dias>=3?C.amber:C.gray500}}>
+                    {dias===0?"parado hoje":`parado há ${dias} dia${dias>1?"s":""}`}
+                  </span>}
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
+                <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>
+                  Emissão: <strong style={{color:C.gray700}}>{o.dataFechamento?fmtDS(o.dataFechamento):"—"}</strong>
+                  {o.condicaoPagamento?<> · Condição: <strong style={{color:C.gray700}}>{o.condicaoPagamento}</strong></>:null}
+                </div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
+                <Btn label={aberto[o.id]?"Fechar cobrança":"Registrar cobrança"} variant="secondary" size="sm" onClick={()=>abrirTratativa(o)}/>
+                {done
+                  ? <span style={{background:C.green+"18",color:"#065f46",border:`1px solid ${C.green}55`,borderRadius:6,padding:"9px 16px",...F.body,fontWeight:700,fontSize:12,display:"inline-flex",alignItems:"center",gap:6}}>
+                      <Ic n="check" s={14} c="#065f46"/> Enviado p/ {done}
+                    </span>
+                  : <button onClick={()=>liberar(o)} disabled={!!busy}
+                      style={{background:busy==="liberar"?"#ccc":"#be123c",color:C.white,border:"none",borderRadius:6,padding:"10px 16px",cursor:busy?"wait":"pointer",...F.body,fontWeight:700,fontSize:12.5}}>
+                      {busy==="liberar"?"Liberando...":"Liberar mesmo assim"}
+                    </button>}
+              </div>
+            </div>
+
+            {aberto[o.id]&&
+              <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid ${C.gray100}`}}>
+                <label style={{...F.body,fontSize:10.5,fontWeight:700,color:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>O que foi combinado com o cliente</label>
+                <textarea value={texto[o.id]||""} onChange={e=>setTexto(p=>({...p,[o.id]:e.target.value}))} rows={2}
+                  placeholder="Ex: falei com o financeiro do cliente, o pagamento sai dia 20; ou aguardando comprovante por e-mail..."
+                  style={{width:"100%",...F.body,fontSize:13,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}}/>
+                <div style={{display:"flex",justifyContent:"flex-end",marginTop:8}}>
+                  <Btn label={busy==="tratativa"?"Registrando...":"Registrar cobrança"} icon="check" variant="success" size="sm" disabled={!!busy} onClick={()=>registrar(o)}/>
+                </div>
+                {tratativas.length>0&&
+                  <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:6}}>
+                    <div style={{...F.body,fontSize:10.5,fontWeight:700,color:C.gray500,textTransform:"uppercase"}}>Histórico de cobrança</div>
+                    {tratativas.map((t,i)=>(
+                      <div key={i} style={{background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:6,padding:"8px 10px"}}>
+                        <div style={{...F.body,fontSize:12,color:C.gray700}}>{String(t.texto).replace("[SGP] [COBRANÇA] ","")}</div>
+                        <div style={{...F.body,fontSize:10.5,color:C.gray400,marginTop:2}}>{t.em?fmtD(t.em):""}</div>
+                      </div>
+                    ))}
+                  </div>}
+              </div>}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 function Bonificacoes({onOpen,user}){
   const [pedidos,setPedidos]=useState(null);
   const [loading,setLoading]=useState(true);
@@ -4713,6 +5565,12 @@ function Bonificacoes({onOpen,user}){
   const [agindo,setAgindo]=useState({});
   const [feito,setFeito]=useState({});
   const [busca,setBusca]=useState("");
+  // Sub-abas: pendentes (fila de OK) e finalizadas (histórico de quem já saiu).
+  const [aba,setAba]=useState("pendentes");
+  const [finalizadas,setFinalizadas]=useState(null);
+  const [finLoading,setFinLoading]=useState(false);
+  const [finErro,setFinErro]=useState(null);
+  const [finDias,setFinDias]=useState(90);
 
   const carregar=()=>{
     setLoading(true);setLoadError(null);
@@ -4725,6 +5583,19 @@ function Bonificacoes({onOpen,user}){
       .finally(()=>setLoading(false));
   };
   useEffect(carregar,[]);
+
+  // Finalizadas: carrega sob demanda (só ao abrir a aba) e quando muda o período.
+  const carregarFinalizadas=(dias)=>{
+    setFinLoading(true);setFinErro(null);
+    apiFetch(`/bonificacoes-finalizadas?dias=${dias||finDias}`)
+      .then(res=>{
+        if(res.success)setFinalizadas((res.data||[]).map(o=>normalizarCard(o,"Finalizado")));
+        else setFinErro(res.error||"Erro desconhecido");
+      })
+      .catch(e=>setFinErro(e.message))
+      .finally(()=>setFinLoading(false));
+  };
+  useEffect(()=>{ if(aba==="finalizadas"&&finalizadas===null) carregarFinalizadas(finDias); },[aba]);
 
   const concluir=async(o)=>{
     if(!o.posvendaId){alert("Pedido sem negócio de Pós-venda.");return;}
@@ -4747,16 +5618,76 @@ function Bonificacoes({onOpen,user}){
     return [o.pedidoLinx,o.vendasId,o.client,o.razaoSocial].map(x=>String(x||"").toLowerCase()).join(" ").includes(q);
   });
 
+  // Finalizadas passam pelo mesmo filtro de busca da aba de pendentes.
+  const listaFin=(finalizadas||[]).filter(o=>{
+    if(!q)return true;
+    return [o.pedidoLinx,o.vendasId,o.client,o.razaoSocial,o.notaFiscal].map(x=>String(x||"").toLowerCase()).join(" ").includes(q);
+  });
+  const abaBtn=(id,texto,n)=>(
+    <button onClick={()=>setAba(id)}
+      style={{background:aba===id?C.teal:C.white,color:aba===id?C.white:C.gray600,
+        border:`1.5px solid ${aba===id?C.teal:C.gray200}`,borderRadius:7,padding:"8px 16px",
+        ...F.body,fontSize:13,fontWeight:700,cursor:"pointer"}}>
+      {texto}{typeof n==="number"?` (${n})`:""}
+    </button>
+  );
+
   return(
     <div style={{padding:20}}>
-      <PageH title="Bonificações" sub="Processo apartado: ao dar OK o pedido é finalizado. Não entra em nenhum indicador." onRefresh={carregar} refreshing={loading}/>
+      <PageH title="Bonificações" sub="Processo apartado: ao dar OK o pedido é finalizado. Não entra em nenhum indicador."
+        onRefresh={()=>aba==="pendentes"?carregar():carregarFinalizadas(finDias)}
+        refreshing={aba==="pendentes"?loading:finLoading}/>
 
-      <div style={{marginBottom:12}}>
-        <input value={busca} onChange={e=>setBusca(e.target.value)}
-          placeholder="Buscar por pedido ou cliente..."
-          style={{width:"100%",maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+      <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+        {abaBtn("pendentes","Pendentes",pedidos?pedidos.length:undefined)}
+        {abaBtn("finalizadas","Finalizadas",finalizadas?finalizadas.length:undefined)}
       </div>
 
+      <div style={{marginBottom:12,display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+        <input value={busca} onChange={e=>setBusca(e.target.value)}
+          placeholder={aba==="pendentes"?"Buscar por pedido ou cliente...":"Buscar por pedido, cliente ou NF..."}
+          style={{flex:1,minWidth:240,maxWidth:440,...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",boxSizing:"border-box"}}/>
+        {aba==="finalizadas"&&
+          <select value={finDias} onChange={e=>{const d=Number(e.target.value);setFinDias(d);carregarFinalizadas(d);}}
+            style={{...F.body,fontSize:13,padding:"10px 12px",border:`1px solid ${C.gray200}`,borderRadius:8,outline:"none",background:C.white}}>
+            <option value={30}>Últimos 30 dias</option>
+            <option value={90}>Últimos 90 dias</option>
+            <option value={180}>Últimos 180 dias</option>
+            <option value={365}>Último ano</option>
+          </select>}
+      </div>
+
+      {/* ── ABA FINALIZADAS ─────────────────────────────────────────────── */}
+      {aba==="finalizadas"&&<>
+        {finLoading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando histórico...</div>}
+        {finErro&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {finErro}</div>}
+        {!finLoading&&!finErro&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{listaFin.length} bonificação{listaFin.length!==1?"ões":""} finalizada{listaFin.length!==1?"s":""} no período</div>}
+        {!finLoading&&!finErro&&listaFin.length===0&&<div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>{q?"Nenhuma bonificação encontrada para a busca.":"Nenhuma bonificação finalizada neste período."}</div>}
+        {listaFin.map(o=>(
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:12,borderLeft:`3px solid ${C.green}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:220}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
+                  <Tag label="Bonificação" color={C.teal}/>
+                  <TagCentroCusto cc={o.centroCusto}/>
+                  <Tag label={o.temBordado?"Com bordado":"Sem bordado"} color={o.temBordado?C.purple:C.gray600}/>
+                  {o.notaFiscal&&<Tag label={"NF "+o.notaFiscal} color={C.green}/>}
+                </div>
+                <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)}{o.qtdTotal?` · ${o.qtdTotal} peças`:""}</div>
+                <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>
+                  Emissão: <strong style={{color:C.gray700}}>{o.dataFechamento?fmtD(o.dataFechamento):"—"}</strong>
+                  {" · "}Finalizado em: <strong style={{color:C.gray700}}>{o.finalizadoEm?fmtD(o.finalizadoEm):"—"}</strong>
+                </div>
+              </div>
+              <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
+            </div>
+          </Card>
+        ))}
+      </>}
+
+      {/* ── ABA PENDENTES ───────────────────────────────────────────────── */}
+      {aba==="pendentes"&&<>
       {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando pedidos...</div>}
       {loadError&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>Erro: {loadError}</div>}
       {!loading&&!loadError&&<div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:12}}>{lista.length} pedido{lista.length!==1?"s":""} de bonificação</div>}
@@ -4766,18 +5697,19 @@ function Bonificacoes({onOpen,user}){
         const done=feito[o.id];
         const busy=agindo[o.id];
         return(
-          <Card key={o.id} style={{marginBottom:12,borderLeft:`3px solid ${C.teal}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:12,borderLeft:`3px solid ${C.teal}`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
               <div style={{flex:1,minWidth:220}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
                   <Tag label="Bonificação" color={C.teal}/>
                   <TagCentroCusto cc={o.centroCusto}/>
-                  {o.temBordado
-                    ? <Tag label={o.amOk?"Bordado pronto":"Bordado em andamento"} color={o.amOk?C.green:C.amber}/>
-                    : <Tag label="Sem bordado" color={C.gray600}/>}
+                  {/* Bonificação é processo apartado: aqui interessa só SE o
+                      pedido tem bordado, não em que ponto do bordado ele está. */}
+                  <Tag label={o.temBordado?"Com bordado":"Sem bordado"} color={o.temBordado?C.purple:C.gray600}/>
                 </div>
                 <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
+                <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Emissão: <strong style={{color:C.gray700}}>{o.dataFechamento?fmtD(o.dataFechamento):"—"}</strong></div>
               </div>
               <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen&&onOpen(o)}/>
@@ -4791,6 +5723,51 @@ function Bonificacoes({onOpen,user}){
           </Card>
         );
       })}
+      </>}
+    </div>
+  );
+}
+
+// Ação administrativa em dois passos: simula (mostra a lista) e só então executa.
+// Reaproveitada por qualquer rota que siga o padrão { simulacao, total, lista }.
+function MiniAcaoAdmin({rota,rotulo,rotuloExec,vazio,linha}){
+  const [carregando,setCarregando]=useState(false);
+  const [previa,setPrevia]=useState(null);
+  const simular=async()=>{
+    setCarregando(true);
+    try{
+      const r=await apiFetch(rota,"POST",{});
+      if(r.error){alert("Erro: "+r.error);return;}
+      setPrevia(r);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setCarregando(false);}
+  };
+  const executar=async()=>{
+    if(!confirm(`${rotuloExec(previa.total)}?`))return;
+    setCarregando(true);
+    try{
+      const r=await apiFetch(rota,"POST",{executar:true});
+      if(r.error){alert("Erro: "+r.error);return;}
+      alert(`Pronto: ${r.movidos??r.total} pedido(s) processado(s).`);
+      setPrevia(null);
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setCarregando(false);}
+  };
+  return(
+    <div>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        <Btn label={carregando?"Consultando...":rotulo} icon="search" variant="secondary" disabled={carregando} onClick={simular}/>
+        {previa&&previa.total>0&&<Btn label={rotuloExec(previa.total)} icon="check" variant="success" disabled={carregando} onClick={executar}/>}
+      </div>
+      {previa&&<div style={{marginTop:10}}>
+        {previa.total===0
+          ? <div style={{...F.body,fontSize:13,color:C.green}}>{vazio}</div>
+          : <div style={{maxHeight:200,overflowY:"auto",border:`1px solid ${C.gray200}`,borderRadius:6}} className="sgp-scroll">
+              {previa.lista.map((p,i)=>(
+                <div key={p.posvendaId||i} style={{padding:"7px 12px",borderBottom:`1px solid ${C.gray100}`,...F.body,fontSize:12}}>{linha(p)}</div>
+              ))}
+            </div>}
+      </div>}
     </div>
   );
 }
@@ -4829,6 +5806,17 @@ function MigrarBonificacoesBtn(){
         <Btn label={carregando?"Consultando...":"Ver pedidos a migrar"} icon="search" variant="secondary" disabled={carregando} onClick={simular}/>
         {previa&&previa.total>0&&<Btn label={`Migrar ${previa.total} pedido(s)`} icon="check" variant="success" disabled={carregando} onClick={executar}/>}
       </div>
+      <div style={{height:1,background:C.gray100,margin:"16px 0"}}/>
+      <div style={{...F.body,fontSize:12,color:C.gray500,marginBottom:10}}>
+        <strong>Tirar da caixa quem não é bonificação.</strong> A regra chegou a considerar a natureza fiscal e puxou pedidos comuns (remessa para demonstração, amostra grátis). Isto devolve esses pedidos para Em Separação, e o fluxo os reposiciona sozinho.
+      </div>
+      <MiniAcaoAdmin
+        rota="/admin/reverter-bonificacoes"
+        rotulo="Ver pedidos a devolver"
+        rotuloExec={(n)=>`Devolver ${n} pedido(s) ao fluxo normal`}
+        vazio="Nenhum pedido indevido na caixa."
+        linha={(p)=>`${p.pedido} · ${p.nome} — tipo: ${p.tipo||"—"}${p.natureza?` · ${p.natureza}`:""}`}
+      />
       {previa&&<div style={{marginTop:12}}>
         {previa.total===0
           ? <div style={{...F.body,fontSize:13,color:C.green}}>Nenhuma bonificação presa — está tudo certo.</div>
@@ -4904,7 +5892,7 @@ function SilkDtf({onOpen,slaCfg,user}){
       const pecas=(o.items||[]).filter(itemEhSilkDtf);
       const dias=o.etapaAt?diasUteisDesde(o.etapaAt):"";
       const entrou=o.etapaAt?fmtD(o.etapaAt):"";
-      const prazo=dataVencimento(o)?fmtD(dataVencimento(o)):"";
+      const prazo=dataVencimento(o)?fmtVenc(dataVencimento(o)):"";
       if(!pecas.length){
         linhas.push([o.pedidoLinx||"",o.vendasId||"",o.client||"",o.cnpj||"","","","","",entrou,dias,prazo]);
         continue;
@@ -4963,14 +5951,14 @@ function SilkDtf({onOpen,slaCfg,user}){
         const sla=getSLA(o,slaCfg);
         const pecas=(o.items||[]).filter(itemEhSilkDtf);
         return(
-          <Card key={o.id} style={{marginBottom:12,borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:12,borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,flexWrap:"wrap"}}>
               <div style={{flex:1,minWidth:220}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
                   <TagCentroCusto cc={o.centroCusto}/>
                   {o.ehOcorrencia&&<TagOcorrencia size="sm"/>}
-                  <ETag etapa="Silk/DTF"/>
+                  <ETag etapa="Silk/DTF"/><TagDataEspecial o={o} size="sm"/>
                 </div>
                 <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)}</div>
               </div>
@@ -5100,7 +6088,7 @@ function CaixaOcorrencia({title, sub, endpoint, etapaLabel, modo="simples", acao
         const f = form[o.id] || {};
         const sla = getSLA(o, slaCfg);
         return (
-          <Card key={o.id} style={{marginBottom:12,borderLeft:`4px solid ${C.red}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:12,borderLeft:`4px solid ${C.red}`}}>
             {/* Cabeçalho */}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10,flexWrap:"wrap",marginBottom:10}}>
               <div style={{minWidth:0,flex:1}}>
@@ -5218,7 +6206,7 @@ function CaixaOcorrencia({title, sub, endpoint, etapaLabel, modo="simples", acao
   );
 }
 
-function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user, faltantesExtraEndpoints}) {
+function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user, faltantesExtraEndpoints, semFaltantes}) {
   const [pedidos, setPedidos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -5291,13 +6279,16 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
   return (
     <div style={{padding:20}}>
       <PageH title={title} sub={sub} onRefresh={carregar} refreshing={loading}/>
-      {/* Sub-abas: lista de pedidos x tabela de peças faltantes */}
-      <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+      {/* Sub-abas: lista de pedidos x tabela de peças faltantes.
+          A tabela de faltantes é do fluxo de PCP (pedido separado parcial). Nas
+          etapas de SOB MEDIDA ela não faz sentido — a peça nem existe ainda, não
+          há o que faltar — então a tela vira só a lista. */}
+      {!semFaltantes&&<div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
         {[["pedidos","Pedidos"],["faltantes","Tabela de Peças Faltantes"]].map(([id,lbl])=>(
           <button key={id} onClick={()=>setSubAba(id)}
             style={{padding:"8px 16px",borderRadius:8,border:`1.5px solid ${subAba===id?C.red:C.gray200}`,background:subAba===id?C.red+"10":C.white,color:subAba===id?C.red:C.gray600,cursor:"pointer",...F.body,fontSize:13,fontWeight:subAba===id?700:500}}>{lbl}</button>
         ))}
-      </div>
+      </div>}
       {subAba==="pedidos"&&<div style={{marginBottom:12}}>
         <input value={busca} onChange={e=>setBusca(e.target.value)}
           placeholder="Buscar por Pedido Linx, ID HubSpot ou cliente..."
@@ -5314,16 +6305,22 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
         const busy = agindo[o.id];
         const sla = getSLA(o, slaCfg);
         return (
-          <Card key={o.id} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:C.purple}`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
               <div style={{flex:1,minWidth:220}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
-                  <ETag etapa={etapaLabel}/>
-                  <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
+                  <ETag etapa={etapaLabel}/><TagDataEspecial o={o} size="sm"/>
+                  {/* SOB MEDIDA: não há estoque pra separar (a peça vai ser
+                      fabricada), então o status de separação sai do card e no
+                      lugar entra o PRAZO — que é o que importa nessa fila. */}
+                  {ehEtapaSobMedida(etapaLabel)
+                    ?<PrazoSobMedida o={o} inline/>
+                    :<BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>}
                 </div>
                 <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:4}}>{o.client} · {fmtR(o.valor)} · {pecasDoCard(o)} peças</div>
-                {(o.qtdSeparada!=null)&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Separado: <strong style={{color:C.gray700}}>{o.qtdSeparada||0}</strong> de <strong style={{color:C.gray700}}>{o.qtdTotal||0}</strong> peças</div>}
+                {(!ehEtapaSobMedida(etapaLabel)&&o.qtdSeparada!=null)&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Separado: <strong style={{color:C.gray700}}>{o.qtdSeparada||0}</strong> de <strong style={{color:C.gray700}}>{o.qtdTotal||0}</strong> peças</div>}
+                {ehEtapaSobMedida(etapaLabel)&&<div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Fechamento: <strong style={{color:C.gray700}}>{o.dataFechamento?fmtDS(o.dataFechamento):"—"}</strong> · prazo de {PRAZO_SOB_MEDIDA_DIAS} dias</div>}
               </div>
               <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <Btn label="Ver detalhes" variant="secondary" size="sm" onClick={()=>onOpen(o)}/>
@@ -5384,6 +6381,8 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
       });
       if (r.success) {
         setConfirmed(prev => ({...prev, [o.id]: r.proximaEtapa}));
+        // Card sai da caixa na hora; o refresh logo atrás confirma.
+        snapRemoverPedido(o.vendasId, "Conferência Separação");
         setTimeout(() => carregar(), 1200);
       } else {
         alert("Erro: " + (r.error || "desconhecido"));
@@ -5433,11 +6432,11 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
         const isConfirming = confirming[o.id];
         const sla = getSLA(o, slaCfg);
         return (
-          <Card key={o.id} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:"#0369a1"}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:14, borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:"#0369a1"}`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
               <div style={{flex:1,minWidth:220}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
                   <ETag etapa="Conferência Separação"/>
                   <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                   {o.temBordado===false && <Tag label="Sem bordado" color={C.gray600}/>}
@@ -5506,12 +6505,16 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             prazoFinal:o.prazoFinal||new Date(Date.now()+7*86400000).toISOString(),
             etapa:"Conferência e Direcionamento",amOk:o.amostrasAprovada,sepOk:o.separacaoCompleta,
             entradaAt:o.dataEntrada,etapaAt:o.etapaAt||o.dataEntrada,
+  // SLA da Conferência e Direcionamento contado a partir da aprovação da amostra
+  // (pedido separado antes do bordado ficar pronto — ver worker).
+  slaDesdeAprovacaoAmostra:o.slaDesdeAprovacaoAmostra===true,
             alertas:o.alertas||[],concluido:false,
             bordado:{pts:0,cores:[],arq:"",arqOk:false,amDig:[],amDigObs:"",amFis:[],amFisObs:""},
             arquivoBordado:o.arquivoBordado||[],arquivoDtfsilk:o.arquivoDtfsilk||[],
             historico:o.historico||[],
             houveAlteracaoForm:o.houveAlteracaoForm||false,motivoAlteracaoForm:o.motivoAlteracaoForm||"",stageIdAtual:o.stageIdAtual||"",centroCusto:o.centroCusto||"",
             veioDoAguardandoAmostra:o.veioDoAguardandoAmostra===true,
+            slaDesdeAprovacaoAmostra:o.slaDesdeAprovacaoAmostra===true,
             temBordado:o.temBordado!==false,temSilkDtf:o.temSilkDtf===true,dataVencimento:o.dataVencimento||null,
             items:(o.items||[]).map(it=>({
               id:it.id,bordado:it.bordado===true,sku:it.sku||it.nome,desc:it.nome,cor:it.tamanho,qty:it.quantidade,
@@ -5712,11 +6715,11 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
           const isConfirmed = confirmed[o.id];
           const sla = getSLA(o, slaCfg);
           return (
-            <Card key={o.id} style={{marginBottom:14,borderLeft:`3px solid ${C.teal}`}}>
+            <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:14,borderLeft:`3px solid ${C.teal}`}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
                 <div>
                   <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                    <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
+                    <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
                     {ehSilk?<Tag label="Silk / DTF" color={C.purple}/>:<Tag label="Sem bordado" color={C.gray600}/>}
                     <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                     {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
@@ -5792,13 +6795,13 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
         const isConfirmed=confirmed[o.id];
         const sla=getSLA(o,slaCfg);
         return(
-          <Card key={o.id} style={{marginBottom:14,borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[o.etapa]||C.gray300}`}}>
+          <Card key={o.id} especial={temDataEspecial(o)} style={{marginBottom:14,borderLeft:`3px solid ${sla.st==="late"?C.red:sla.st==="risk"?C.amber:STAGE_COLOR[o.etapa]||C.gray300}`}}>
             {/* Cabeçalho do pedido */}
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:14,flexWrap:"wrap",gap:8,alignItems:"center"}}>
               <div>
                 <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span>
-                  <ETag etapa={o.etapa}/>
+                  <span style={{...F.body,fontWeight:700,fontSize:15}}>{idPedido(o)}</span><TagDataEspecial o={o} size="sm"/>
+                  <ETag etapa={o.etapa}/><TagDataEspecial o={o} size="sm"/>
                   <BadgeSeparacao status={o.statusSeparacao} qtdSep={o.qtdSeparada} qtdTot={o.qtdTotal} qtdItensSep={o.qtdItensSeparados} totalItens={o.totalItensSeparacao} size="sm"/>
                   {sla.st!=="ok"&&<Tag label={sla.st==="late"?"Etapa atrasada":"Etapa em risco"} color={sla.st==="late"?C.red:C.amber}/>}
                   {sla.ft==="late"&&<Tag label="Prazo vencido" color={C.red}/>}
@@ -6079,22 +7082,29 @@ const CENTRO_OPTIONS=[
   {value:"29 - Comercial Diretoria",label:"29 - Comercial Diretoria"},
 ];
 // Etapas em aberto, na ordem do funil, com endpoint
-const ABERTO_ETAPAS=[
-  {nome:"Em Separação",endpoint:"/em-separacao"},
-  {nome:"Conferência Separação",endpoint:"/conferencia-separacao"},
-  {nome:"Conferência e Direcionamento",endpoint:"/conferencia-direcionamento"},
-  {nome:"Programação",endpoint:"/programacao"},
-  {nome:"Amostra Digital",endpoint:"/amostra-digital"},
-  {nome:"Aprovação de Amostra Digital",endpoint:"/aprovacao-amostra-digital"},
-  {nome:"Amostra Física",endpoint:"/amostra-fisica"},
-  {nome:"Aprovação de Amostra Física",endpoint:"/aprovacao-amostra-fisica"},
-  {nome:"Bordado Interno",endpoint:"/bordado-interno"},
-  {nome:"Bordado Externo",endpoint:"/bordado-externo"},
-  {nome:"Expedição",endpoint:"/expedicao"},
-  {nome:"Análise de Frete",endpoint:"/analise-frete"},
-  {nome:"Pendência Comercial",endpoint:"/pendencia-comercial"},
-  {nome:"Aguardando Outro Pedido",endpoint:"/aguardando-pedido"},
-];
+// ⚠ Esta era uma lista FIXA de etapas, e toda etapa nova criada depois ficava de
+// fora — Análise PCP, Buscar em Loja, Análise Produção, as duas de Sob Medida,
+// Silk/DTF e Bonificações sumiam do Funil e da Gestão à Vista. Como o Dashboard
+// conta o snapshot inteiro, os totais divergiam (374 x 296).
+// Agora a lista é DERIVADA do próprio snapshot: qualquer etapa que exista nos
+// dados aparece, na ordem do funil, e o que não estiver na ordem entra no fim.
+// Assim, criar etapa nova nunca mais desalinha as telas.
+const ETAPAS_PAUSA=["Pendência Comercial","Aguardando Outro Pedido"];
+function etapasDoSnapshot(pedidos){
+  // Considera TODAS as etapas ativas do card, não só a principal. Antes, uma
+  // etapa cujos pedidos estivessem todos com a etapa principal em outro lugar
+  // (ex.: separação com bordado ativo) simplesmente não gerava linha/coluna —
+  // a etapa desaparecia do Dashboard e do Funil mesmo tendo pedidos.
+  const presentes=new Set();
+  for(const o of (pedidos||[])){
+    const ets=(o.etapasAtivas&&o.etapasAtivas.length)?o.etapasAtivas:[o.etapa];
+    for(const e of ets) if(e) presentes.add(e);
+  }
+  const ordem=[...FUNIL_ORDEM,...ETAPAS_PAUSA];
+  const conhecidas=ordem.filter(n=>presentes.has(n));
+  const novas=[...presentes].filter(n=>!ordem.includes(n)).sort();
+  return [...conhecidas,...novas].map(nome=>({nome}));
+}
 
 // Painel de capacidade x lotação (peças com bordado em aberto) por destino
 function PainelLotacao({capLot,destinos,titulo,carregando}){
@@ -6266,7 +7276,7 @@ function Dashboard({onOpen,slaCfg}){
     return true;
   });
   const agora=Date.now();
-  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
+  const isAtrasado=o=>venceuAntes(dataVencimento(o),agora);
   const totalAberto=abertoFiltrado.length;
   const totalAtrasado=abertoFiltrado.filter(isAtrasado).length;
   const totalNoPrazo=totalAberto-totalAtrasado;
@@ -6277,8 +7287,12 @@ function Dashboard({onOpen,slaCfg}){
     return true;
   }));
   // Por etapa
-  const porEtapa=ABERTO_ETAPAS.map(e=>{
-    const ords=ordenarPorPrioridade(abertoFiltrado.filter(o=>o.etapa===e.nome));
+  const porEtapa=etapasDoSnapshot(abertoFiltrado).map(e=>{
+    // Conta por etapasAtivas, igual as telas de fila. Contar só por o.etapa
+    // (a principal) fazia o Dashboard mostrar menos pedidos que a própria
+    // caixa: um pedido em separação com bordado ativo tem a etapa
+    // principal no bordado e sumia da linha 'Em Separação'.
+    const ords=ordenarPorPrioridade(abertoFiltrado.filter(o=>(o.etapasAtivas||[o.etapa]).includes(e.nome)));
     return {etapa:e.nome,total:ords.length,atrasados:ords.filter(isAtrasado).length,ords};
   }).filter(s=>s.total>0);
 
@@ -6553,7 +7567,7 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
   const carregar = snap.refresh;
 
   const agora=Date.now();
-  const isAtrasado=o=>{const v=dataVencimento(o);return v&&new Date(v).getTime()<agora;};
+  const isAtrasado=o=>venceuAntes(dataVencimento(o),agora);
   const q=busca.trim().toLowerCase();
   const filtrados=(aberto||[]).filter(o=>{
     if(centro&&o.centroCusto!==centro)return false;
@@ -6575,7 +7589,7 @@ function TodosPedidos({onOpen,slaCfg,initialBusca}){
   // etapasAtivas.includes(nome) — assim um card em separação + programação
   // aparece nas duas seções.
   const perteceEtapa = (o, nome) => (o.etapasAtivas||[o.etapa]).includes(nome);
-  const porEtapa=ABERTO_ETAPAS.map(e=>({
+  const porEtapa=etapasDoSnapshot(filtrados).map(e=>({
     etapa:e.nome,
     ords:ordenarPorPrioridade(filtrados.filter(o=>perteceEtapa(o,e.nome))),
   })).filter(s=>s.ords.length>0);
@@ -6656,9 +7670,9 @@ function Funil({onOpen,slaCfg}){
   const carregar = snap.refresh;
 
   const agora=Date.now();
-  const isAtrasado=o=>o.dataVencimento&&new Date(o.dataVencimento).getTime()<agora;
-  const stats=ABERTO_ETAPAS.map(e=>{
-    const ords=ordenarPorPrioridade((aberto||[]).filter(o=>o.etapa===e.nome));
+  const isAtrasado=o=>venceuAntes(o.dataVencimento,agora);
+  const stats=etapasDoSnapshot(aberto).map(e=>{
+    const ords=ordenarPorPrioridade((aberto||[]).filter(o=>(o.etapasAtivas||[o.etapa]).includes(e.nome)));
     const atrasados=ords.filter(isAtrasado).length;
     return{
       etapa:e.nome,count:ords.length,
@@ -7771,7 +8785,7 @@ function Fila({title,sub,etapa,orders,onOpen,actionLabel,actionColor=C.green,sla
           const totalPecas=somaItems>0?somaItems:Number(o.qtdTotal||0);
           const totalSKUs=o.items.length>0?o.items.length:Number(o.totalItensSeparacao||0);
           return(
-            <Card key={o.id} onClick={()=>onOpen({...o,_etapaOrigem:etapa})}
+            <Card key={o.id} especial={temDataEspecial(o)} onClick={()=>onOpen({...o,_etapaOrigem:etapa})}
               style={{marginBottom:10,borderLeft:`4px solid ${ac}`,cursor:"pointer",transition:"box-shadow 0.15s,transform 0.15s"}}
               onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.08)";e.currentTarget.style.transform="translateY(-1px)";}}
               onMouseLeave={e=>{e.currentTarget.style.boxShadow="";e.currentTarget.style.transform="";}}>
@@ -7837,7 +8851,7 @@ function Fila({title,sub,etapa,orders,onOpen,actionLabel,actionColor=C.green,sla
                   </div>}
                   {!finalizado&&o.dataVencimento&&<div style={{...F.body,fontSize:11,color:new Date(o.dataVencimento)<new Date()?C.red:C.gray600,marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
                     <Ic n="clock" s={11} c={new Date(o.dataVencimento)<new Date()?C.red:C.gray500}/>
-                    Vence em {fmtDS(o.dataVencimento)}
+                    Vence em {fmtVenc(dataVencimento(o),true)}
                   </div>}
                   {!finalizado&&<div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,maxWidth:340}}>
                     <SLABar pct={sla.pct} st={sla.st}/>
@@ -8114,14 +9128,18 @@ function Usuarios(){
     setForm(f=>({...f,modulos:allOn?f.modulos.filter(m=>!ids.includes(m)):[...new Set([...f.modulos,...ids])]}));
   };
 
-  const abrirNovo=()=>{setEditId(null);setForm({nome:"",email:"",senha:"",modulos:[]});setShow(true);};
-  const abrirEdit=(u)=>{setEditId(u.id);setForm({nome:u.nome,email:u.email,senha:"",modulos:u.modulos||[]});setShow(true);};
+  const abrirNovo=()=>{setEditId(null);setForm({nome:"",email:"",senha:"",modulos:[],bordadorExterno:""});setShow(true);};
+  const abrirEdit=(u)=>{setEditId(u.id);setForm({nome:u.nome,email:u.email,senha:"",modulos:u.modulos||[],bordadorExterno:u.bordadorExterno||""});setShow(true);};
 
   const salvar=()=>{
     if(!form.nome||!form.email||(!editId&&!form.senha)){alert("Preencha nome, e-mail e senha.");return;}
+    // Acesso EXTERNO: quem tem bordador vinculado enxerga só a tela dele.
+    // Zeramos os módulos pra não sobrar permissão interna por engano.
+    const ext=String(form.bordadorExterno||"").trim();
+    const mods=ext?[]:form.modulos;
     const req = editId
-      ? apiFetch(`/usuarios/${encodeURIComponent(editId)}`,"PATCH",{nome:form.nome,modulos:form.modulos,...(form.senha?{senha:form.senha}:{})})
-      : apiFetch("/usuarios","POST",{nome:form.nome,email:form.email,senha:form.senha,modulos:form.modulos});
+      ? apiFetch(`/usuarios/${encodeURIComponent(editId)}`,"PATCH",{nome:form.nome,modulos:mods,bordadorExterno:ext,...(form.senha?{senha:form.senha}:{})})
+      : apiFetch("/usuarios","POST",{nome:form.nome,email:form.email,senha:form.senha,modulos:mods,bordadorExterno:ext});
     req.then(r=>{if(r.success){setShow(false);carregar();}else alert(r.error||"Erro");})
        .catch(e=>alert(e.message));
   };
@@ -8164,8 +9182,29 @@ function Usuarios(){
           </div>
         </div>
 
+        {/* ACESSO EXTERNO — bordador terceirizado.
+            Fica no topo porque muda tudo o que vem depois: escolhido um
+            bordador, a pessoa passa a ver SÓ as peças dela e nada mais do SGP.
+            Por isso as permissões internas somem da tela. */}
+        <div style={{border:`1.5px solid ${form.bordadorExterno?C.purple:C.gray200}`,background:form.bordadorExterno?C.purple+"0a":C.gray50,borderRadius:8,padding:"12px 14px",marginBottom:16}}>
+          <label style={{...F.body,fontSize:10,fontWeight:700,color:form.bordadorExterno?C.purple:C.gray500,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:6}}>Acesso externo — bordador terceirizado</label>
+          <select value={form.bordadorExterno||""} onChange={e=>setForm({...form,bordadorExterno:e.target.value})}
+            style={{width:"100%",border:`1px solid ${C.gray200}`,borderRadius:6,padding:"9px 12px",...F.body,fontSize:13,outline:"none",boxSizing:"border-box",background:C.white}}>
+            <option value="">Não — usuário interno da Citerol</option>
+            <option value="bordadel">Bordadel</option>
+            <option value="mg_bordados">MG Bordados</option>
+          </select>
+          {form.bordadorExterno
+            ? <div style={{...F.body,fontSize:11.5,color:C.purple,marginTop:7,lineHeight:1.5,fontWeight:600}}>
+                Este acesso verá <strong>apenas as peças direcionadas a {form.bordadorExterno==="bordadel"?"Bordadel":"MG Bordados"}</strong> — sem cliente, valor ou CNPJ. As permissões internas abaixo não se aplicam e serão limpas ao salvar.
+              </div>
+            : <div style={{...F.body,fontSize:11.5,color:C.gray500,marginTop:7,lineHeight:1.5}}>
+                Deixe assim para usuários da Citerol. Só marque quando for uma empresa de fora.
+              </div>}
+        </div>
+
         {/* Administrador — acesso total + ações restritas */}
-        {(()=>{const on=form.modulos.includes("admin");return(
+        {!form.bordadorExterno&&(()=>{const on=form.modulos.includes("admin");return(
           <div onClick={()=>toggleMod("admin")} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",borderRadius:8,border:`1.5px solid ${on?C.red:C.gray200}`,background:on?C.red+"0a":C.gray50,cursor:"pointer",marginBottom:16}}>
             <div style={{width:18,height:18,borderRadius:5,border:`1.5px solid ${on?C.red:C.gray300}`,background:on?C.red:C.white,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{on&&<Ic n="check" s={12} c={C.white}/>}</div>
             <div>
@@ -8174,10 +9213,10 @@ function Usuarios(){
             </div>
           </div>);})()}
 
-        {/* Seleção de módulos por grupo */}
-        <div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10}}>Módulos com acesso <span style={{fontWeight:400,textTransform:"none",color:C.gray400}}>(ignorado se for Administrador)</span></div>
+        {/* Seleção de módulos por grupo — não se aplica a acesso externo */}
+        {!form.bordadorExterno&&<div style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:10}}>Módulos com acesso <span style={{fontWeight:400,textTransform:"none",color:C.gray400}}>(ignorado se for Administrador)</span></div>}
         <div style={{display:"flex",flexDirection:"column",gap:14,marginBottom:16}}>
-          {GRUPOS.map(grupo=>{
+          {!form.bordadorExterno&&GRUPOS.map(grupo=>{
             const itensGrupo=NAV_ITEMS.filter(n=>n.grupo===grupo);
             const allOn=itensGrupo.every(n=>form.modulos.includes(n.id));
             return(
@@ -8343,7 +9382,7 @@ function Login({onLogin}){
           // adiciona ini e admin para o portal
           const nome=r.user.nome||r.user.name||r.user.email||"Usuário";
           const u={...r.user,nome,name:nome,ini:nome.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()};
-          onLogin(u);
+          onLogin(u,r.sessao);   // guarda o token de sessão junto
         }else setErr(r.error||"E-mail ou senha incorretos.");
       })
       .catch(()=>setErr("E-mail ou senha incorretos."))
@@ -8448,7 +9487,7 @@ function FinalizadosPage({onOpen}){
         const st=(o.statusFaturamento||"").toLowerCase();
         const fat=st.includes("parcial")?{lbl:"FATURADO PARCIAL",cor:"#92400e",bg:C.amber+"20"}:st.includes("faturado")?{lbl:"FATURADO",cor:"#065f46",bg:C.green+"18"}:{lbl:"FINALIZADO",cor:C.gray600,bg:C.gray100};
         return (
-          <Card key={o.id} onClick={()=>onOpen(normalizarCard(o,"Finalizado"))}
+          <Card key={o.id} especial={temDataEspecial(o)} onClick={()=>onOpen(normalizarCard(o,"Finalizado"))}
             style={{marginBottom:10,borderLeft:`4px solid ${C.green}`,cursor:"pointer",transition:"box-shadow 0.15s"}}
             onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 3px 12px rgba(0,0,0,0.08)";}}
             onMouseLeave={e=>{e.currentTarget.style.boxShadow="";}}>
@@ -9454,11 +10493,12 @@ function Kpi({lab,val,un,sub,subCor,oq,como}){
     <div style={{...F.body,fontSize:11,fontWeight:600,marginTop:3,color:subCor||C.gray500}}>{sub}</div>
   </div>;
 }
-function TituloCard({texto,oq,como,extra}){
-  return <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:5}}>
-    <span style={{...F.title,fontSize:14,fontWeight:600}}>{texto}</span>
+function TituloCard({texto,oq,como,extra,tv}){
+  // tv=true: painel de parede. Fonte maior e sem cinza claro no texto auxiliar.
+  return <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:tv?10:5}}>
+    <span style={{...F.title,fontSize:tv?"clamp(17px,1.6vw,26px)":14,fontWeight:tv?800:600,color:C.black}}>{texto}</span>
     {oq&&<Ajuda oq={oq} como={como}/>}
-    {extra&&<span style={{marginLeft:"auto",...F.body,fontSize:11,color:C.gray500,fontWeight:600}}>{extra}</span>}
+    {extra&&<span style={{marginLeft:"auto",...F.body,fontSize:tv?"clamp(14px,1.2vw,20px)":11,color:tv?C.red:C.gray500,fontWeight:tv?800:600}}>{extra}</span>}
   </div>;
 }
 function BarLinha({nm,pct,txt,cor}){
@@ -9555,28 +10595,28 @@ function GestaoVista(){
   const tot=d?d.total:0, pAtr=tot?Math.round(d.atrasados/tot*100):0, pPz=100-pAtr;
   const maxTot=d&&d.porEtapa.length?Math.max(...d.porEtapa.map(s=>s.tot),1):1;
   return (
-    <div style={{padding:isMobile?14:"18px 22px",maxWidth:1180,margin:"0 auto"}}>
-      <div style={{background:C.black,color:"#fff",borderRadius:16,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
-        <div><div style={{...F.title,fontSize:11,letterSpacing:"0.15em",color:"#c9a36b",fontWeight:600}}>SGP · CITEROL</div>
-          <h2 style={{...F.title,fontSize:"clamp(22px,2.4vw,32px)",margin:"4px 0 0"}}>GESTÃO À VISTA</h2>
-          <div style={{...F.body,fontSize:12,color:"#b9b6b0",marginTop:4}}>Pedidos em aberto · atualiza sozinho</div></div>
-        <div style={{textAlign:"right"}}><div style={{...F.title,fontSize:"clamp(24px,3vw,40px)",lineHeight:1}}>{hora}</div>
-          <div style={{...F.body,fontSize:12,color:"#b9b6b0",marginTop:4}}>{DIAS[ag.getDay()]}, {ag.getDate()} {MES[ag.getMonth()]}</div></div>
+    <div style={{padding:isMobile?14:"22px 26px",maxWidth:1760,margin:"0 auto"}}>
+      <div style={{background:C.black,color:"#fff",borderRadius:16,padding:"22px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
+        <div><div style={{...F.title,fontSize:"clamp(13px,1.1vw,17px)",letterSpacing:"0.15em",color:"#e0b978",fontWeight:700}}>SGP · CITEROL</div>
+          <h2 style={{...F.title,fontSize:"clamp(30px,3.4vw,52px)",margin:"6px 0 0",fontWeight:800}}>GESTÃO À VISTA</h2>
+          <div style={{...F.body,fontSize:"clamp(13px,1.1vw,18px)",color:"#ffffff",marginTop:6,fontWeight:600}}>Pedidos em aberto · atualiza sozinho</div></div>
+        <div style={{textAlign:"right"}}><div style={{...F.title,fontSize:"clamp(40px,4.6vw,76px)",lineHeight:1,fontWeight:800}}>{hora}</div>
+          <div style={{...F.body,fontSize:"clamp(13px,1.1vw,18px)",color:"#ffffff",marginTop:6,fontWeight:600}}>{DIAS[ag.getDay()]}, {ag.getDate()} {MES[ag.getMonth()]}</div></div>
       </div>
       <EstadoCarga loading={loading&&!d} erro={erro&&!d} onRetry={carregar}/>
       {d&&<>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-          <TileGV cor={C.red} sombra="0 8px 24px #9E0B0F40" lab="Em atraso" num={d.atrasados} sub={`${pAtr}% dos pedidos em aberto`}
+          <TileGV cor={C.red} sombra="0 8px 24px #9E0B0F40" lab="Em atraso" num={d.atrasados} pct={pAtr} sub="dos pedidos em aberto"
             oq="Pedidos em aberto cujo vencimento já passou." como="Não finalizados com vencimento anterior a hoje."/>
-          <TileGV cor={C.green} lab="No prazo" num={d.noPrazo} sub={`${pPz}% dos pedidos em aberto`}
+          <TileGV cor={C.green} lab="No prazo" num={d.noPrazo} pct={pPz} sub="dos pedidos em aberto"
             oq="Pedidos em aberto dentro do prazo." como="Não finalizados com vencimento ≥ hoje."/>
         </div>
         <div style={{...cardBox,marginBottom:14}}>
-          <div style={{display:"flex",justifyContent:"space-between",marginBottom:9,...F.title,fontSize:12.5,fontWeight:600,color:C.gray600}}>
-            <span>SAÚDE DO PRAZO</span><span style={{color:C.gray500}}>meta: 90% no prazo</span></div>
-          <div style={{display:"flex",height:28,borderRadius:8,overflow:"hidden",...F.title,fontWeight:600,fontSize:13,color:"#fff"}}>
-            <div style={{background:C.green,width:pPz+"%",display:"flex",alignItems:"center",paddingLeft:12,minWidth:0}}>{pPz}% no prazo</div>
-            <div style={{background:C.red,width:pAtr+"%",display:"flex",alignItems:"center",justifyContent:"flex-end",paddingRight:12,minWidth:0}}>{pAtr}%</div>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:12,...F.title,fontSize:"clamp(15px,1.4vw,22px)",fontWeight:700,color:C.black}}>
+            <span>SAÚDE DO PRAZO</span><span style={{color:C.black}}>meta: 90% no prazo</span></div>
+          <div style={{display:"flex",height:"clamp(56px,6vw,92px)",borderRadius:10,overflow:"hidden",...F.title,fontWeight:800,fontSize:"clamp(26px,3.2vw,54px)",color:"#fff"}}>
+            <div style={{background:C.green,width:pPz+"%",display:"flex",alignItems:"center",paddingLeft:18,minWidth:0,whiteSpace:"nowrap"}}>{pPz}%</div>
+            <div style={{background:C.red,width:pAtr+"%",display:"flex",alignItems:"center",justifyContent:"flex-end",paddingRight:18,minWidth:0,whiteSpace:"nowrap"}}>{pAtr}%</div>
           </div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12,marginBottom:14}}>
@@ -9587,44 +10627,177 @@ function GestaoVista(){
         </div>
         <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:14}}>
           <div style={cardBox}>
-            <TituloCard texto="Onde estão os atrasados" extra={d.atrasados+" atrasados"}/>
+            <TituloCard texto="Onde estão os atrasados" extra={d.atrasados+" atrasados"} tv/>
             {d.porEtapa.length? d.porEtapa.map((s,i)=>{const lw=s.tot?s.late/s.tot*100:0;return (
-              <div key={i} style={{display:"flex",alignItems:"center",gap:9,margin:"8px 0"}}>
-                <span style={{flex:"0 0 110px",...F.body,fontSize:12,fontWeight:600,color:C.gray700}}>{s.nm}</span>
-                <span style={{flex:1,height:18,background:C.gray100,borderRadius:5,overflow:"hidden",display:"flex",width:(s.tot/maxTot*100)+"%"}}>
-                  <span style={{height:"100%",width:(100-lw)+"%",background:"#c3c8bb"}}/><span style={{height:"100%",width:lw+"%",background:C.red}}/></span>
-                <span style={{flex:"0 0 64px",textAlign:"right",...F.title,fontWeight:600,fontSize:12.5}}>{s.tot}{s.late?<b style={{color:C.red}}> · {s.late}</b>:null}</span>
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,margin:"11px 0"}}>
+                <span style={{flex:"0 0 190px",...F.body,fontSize:"clamp(14px,1.2vw,20px)",fontWeight:700,color:C.black}}>{s.nm}</span>
+                {/* Trilho e barra em tons sólidos: o cinza claro sumia na TV. */}
+                <span style={{flex:1,height:"clamp(22px,2vw,32px)",background:C.gray300,borderRadius:5,overflow:"hidden",display:"flex",width:(s.tot/maxTot*100)+"%"}}>
+                  <span style={{height:"100%",width:(100-lw)+"%",background:"#7d8a6a"}}/><span style={{height:"100%",width:lw+"%",background:C.red}}/></span>
+                <span style={{flex:"0 0 96px",textAlign:"right",...F.title,fontWeight:800,fontSize:"clamp(16px,1.5vw,24px)",color:C.black}}>{s.tot}{s.late?<b style={{color:C.red}}> · {s.late}</b>:null}</span>
               </div>);}):<Vazio/>}
           </div>
           <div style={cardBox}>
-            <TituloCard texto="Mais atrasados" extra="resolver primeiro"/>
+            <TituloCard texto="Mais atrasados" extra="resolver primeiro" tv/>
             {d.maisAtrasados.length? d.maisAtrasados.map((o,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:11,padding:"9px 0",borderBottom:`1px solid ${C.gray100}`}}>
-                <span style={{...F.title,fontWeight:600,fontSize:13.5}}>{idPedido(o)}</span>
-                <span style={{flex:1,minWidth:0}}><span style={{display:"block",...F.body,fontSize:13,fontWeight:600,color:C.gray700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{o.cli}</span>
-                  <span style={{...F.body,fontSize:11,color:C.gray500}}>{o.et}</span></span>
-                <span style={{...F.title,fontWeight:600,fontSize:12,padding:"4px 10px",borderRadius:20,background:"#9E0B0F14",color:C.red,whiteSpace:"nowrap"}}>{o.dias} {o.dias===1?"dia":"dias"}</span>
-              </div>)):<div style={{...F.body,fontSize:12,color:C.gray500,padding:"12px 0"}}>Nenhum pedido atrasado. 🎉</div>}
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${C.gray200}`}}>
+                <span style={{...F.title,fontWeight:700,fontSize:"clamp(15px,1.3vw,21px)",color:C.black}}>{idPedido(o)}</span>
+                <span style={{flex:1,minWidth:0}}><span style={{display:"block",...F.body,fontSize:"clamp(15px,1.3vw,21px)",fontWeight:700,color:C.black,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{o.cli}</span>
+                  <span style={{...F.body,fontSize:"clamp(12px,1.05vw,17px)",color:C.black,fontWeight:600}}>{o.et}</span></span>
+                <span style={{...F.title,fontWeight:800,fontSize:"clamp(15px,1.4vw,23px)",padding:"6px 14px",borderRadius:20,background:C.red,color:"#fff",whiteSpace:"nowrap"}}>{o.dias} {o.dias===1?"dia":"dias"}</span>
+              </div>)):<div style={{...F.body,fontSize:"clamp(14px,1.2vw,19px)",color:C.black,padding:"14px 0",fontWeight:600}}>Nenhum pedido atrasado. 🎉</div>}
           </div>
         </div>
       </>}
     </div>
   );
 }
-function TileGV({cor,sombra,lab,num,sub,oq,como}){
-  return <div style={{borderRadius:18,padding:"20px 22px",background:cor,color:"#fff",boxShadow:sombra||"none"}}>
-    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.06em",fontSize:"clamp(14px,1.4vw,18px)",fontWeight:600,display:"flex",alignItems:"center",gap:8}}>{lab}
+// Painel de TV: tudo precisa ser legível a vários metros de distância.
+// Nada de texto com opacidade — de longe, translúcido some.
+function TileGV({cor,sombra,lab,num,sub,pct,oq,como}){
+  return <div style={{borderRadius:18,padding:"26px 30px",background:cor,color:"#fff",boxShadow:sombra||"none"}}>
+    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.06em",fontSize:"clamp(20px,2.2vw,34px)",fontWeight:700,display:"flex",alignItems:"center",gap:10,color:"#fff"}}>{lab}
       <span style={{filter:"invert(1)"}}><Ajuda oq={oq} como={como}/></span></div>
-    <div style={{...F.title,fontWeight:700,lineHeight:.92,marginTop:6,fontSize:"clamp(54px,6.5vw,96px)"}}>{num}</div>
-    <div style={{...F.body,fontSize:"clamp(12px,1vw,15px)",marginTop:7,fontWeight:600,opacity:.93}}>{sub}</div>
+    <div style={{...F.title,fontWeight:800,lineHeight:.9,marginTop:10,fontSize:"clamp(96px,13vw,240px)",color:"#fff"}}>{num}</div>
+    {/* A porcentagem é o que a fábrica olha de longe: vem em destaque, não como legenda. */}
+    {pct!=null&&<div style={{...F.title,fontWeight:800,lineHeight:1,marginTop:2,fontSize:"clamp(40px,5vw,86px)",color:"#fff"}}>{pct}%</div>}
+    <div style={{...F.body,fontSize:"clamp(16px,1.6vw,26px)",marginTop:8,fontWeight:700,color:"#fff"}}>{sub}</div>
   </div>;
 }
 function MiniGV({lab,num,sub,cor,oq,como}){
   return <div style={{...cardBox,...(cor===C.red?{borderColor:"#9E0B0F33",background:"linear-gradient(180deg,#fff,#fdf4f4)"}:{})}}>
-    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.05em",fontSize:11,fontWeight:600,color:C.gray500,display:"flex",gap:5,alignItems:"center"}}>{lab}{oq&&<Ajuda oq={oq} como={como}/>}</div>
-    <div style={{...F.title,fontSize:"clamp(28px,3.2vw,44px)",fontWeight:700,lineHeight:1,marginTop:5,color:cor||C.black}}>{num}</div>
-    <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:3,fontWeight:600}}>{sub}</div>
+    <div style={{...F.title,textTransform:"uppercase",letterSpacing:"0.05em",fontSize:"clamp(13px,1.2vw,19px)",fontWeight:700,color:C.black,display:"flex",gap:6,alignItems:"center"}}>{lab}{oq&&<Ajuda oq={oq} como={como}/>}</div>
+    <div style={{...F.title,fontSize:"clamp(48px,5.5vw,92px)",fontWeight:800,lineHeight:1,marginTop:8,color:cor||C.black}}>{num}</div>
+    <div style={{...F.body,fontSize:"clamp(13px,1.1vw,18px)",color:C.black,marginTop:5,fontWeight:700}}>{sub}</div>
   </div>;
+}
+
+
+// ─── PORTAL DO BORDADOR EXTERNO (dentro do SGP) ──────────────────────────────
+// Tela única de um terceiro (Bordadel, MG Bordados). Ele vê SOMENTE as peças
+// direcionadas a ele — e quem decide isso é o worker, a partir do cadastro do
+// usuário. O front não manda filtro nenhum: não há o que adulterar aqui.
+// Mostra só o necessário pra produzir: pedido, peça, tamanho, quantidade,
+// posição, observação, prazo e o arquivo. Sem cliente, valor ou CNPJ.
+function BordadorDemandas({user}){
+  const [dados,setDados]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [erro,setErro]=useState("");
+  const [verConcluidos,setVerConcluidos]=useState(false);
+  const [busy,setBusy]=useState({});
+
+  const carregar=()=>{
+    setLoading(true);setErro("");
+    apiFetch("/bordador/demandas","POST",{incluirConcluidos:verConcluidos})
+      .then(r=>{ if(r.success)setDados(r); else setErro(r.error||"Não foi possível carregar."); })
+      .catch(e=>setErro(e.message))
+      .finally(()=>setLoading(false));
+  };
+  useEffect(carregar,[verConcluidos]);
+
+  const baixar=async(itemId,fileId,k)=>{
+    setBusy(p=>({...p,[k]:true}));
+    try{
+      const r=await apiFetch("/bordador/arquivo","POST",{itemId,fileId});
+      if(r.success&&r.url)window.open(r.url,"_blank");
+      else alert(r.error||"Arquivo indisponível no momento.");
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setBusy(p=>({...p,[k]:false}));}
+  };
+  const concluir=async(itemId)=>{
+    if(!confirm("Confirmar que esta peça está bordada e pronta?"))return;
+    setBusy(p=>({...p,[itemId]:true}));
+    try{
+      const r=await apiFetch("/bordador/concluir","POST",{itemId});
+      if(r.success)carregar(); else alert(r.error||"Não foi possível registrar.");
+    }catch(e){alert("Erro: "+e.message);}
+    finally{setBusy(p=>({...p,[itemId]:false}));}
+  };
+
+  // Prazo em dias, tratando a data como DIA (não instante) — mesma regra do SGP.
+  const diasAte=(iso)=>{
+    const f=fimDoDiaVenc(iso);
+    if(f==null)return null;
+    const hoje=new Date();hoje.setHours(0,0,0,0);
+    return Math.round((f-86399999-hoje.getTime())/86400000);
+  };
+  const ChipPrazo=({iso})=>{
+    const n=diasAte(iso);
+    if(n===null)return <Tag label="sem prazo" color={C.gray600}/>;
+    if(n<0)return <Tag label={`atrasado ${Math.abs(n)}d`} color={C.red}/>;
+    if(n===0)return <Tag label="entregar hoje" color={C.amber}/>;
+    if(n<=3)return <Tag label={`faltam ${n}d`} color={C.amber}/>;
+    return <Tag label={`faltam ${n}d`} color={C.green}/>;
+  };
+
+  const peds=dados?.pedidos||[];
+  const totPecas=peds.reduce((s,p)=>s+p.pecas.filter(x=>!x.concluido).reduce((a,x)=>a+(x.quantidade||0),0),0);
+  const totAtras=peds.filter(p=>{const n=diasAte(p.prazo);return n!==null&&n<0;}).length;
+
+  return(
+    <div style={{padding:20}}>
+      <PageH title="Minhas demandas" sub={`Peças direcionadas para ${dados?.nome||"você"}. Baixe o arquivo e marque como concluída quando terminar.`}
+        onRefresh={carregar} refreshing={loading}/>
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12,marginBottom:16}}>
+        <Stat label="Pedidos" value={peds.length} icon="list"/>
+        <Stat label="Peças a bordar" value={totPecas} icon="needle"/>
+        <Stat label="Em atraso" value={totAtras} color={C.red} icon="warn"/>
+      </div>
+
+      <label style={{display:"inline-flex",alignItems:"center",gap:8,...F.body,fontSize:13,color:C.gray700,marginBottom:14,cursor:"pointer"}}>
+        <input type="checkbox" checked={verConcluidos} onChange={e=>setVerConcluidos(e.target.checked)} style={{width:16,height:16,cursor:"pointer"}}/>
+        Mostrar também o que já concluí
+      </label>
+
+      {loading&&<div style={{...F.body,fontSize:13,color:C.gray500,padding:"12px 16px"}}>Carregando suas demandas...</div>}
+      {erro&&<div style={{padding:"12px 16px",background:C.red+"0e",border:`1px solid ${C.red}28`,borderRadius:8,...F.body,fontSize:13,color:C.red}}>{erro}</div>}
+      {!loading&&!erro&&peds.length===0&&
+        <div style={{...F.body,color:C.gray400,textAlign:"center",padding:48,fontSize:13,background:C.white,borderRadius:8,border:`1px solid ${C.gray200}`}}>
+          Nenhuma peça com você no momento.
+        </div>}
+
+      {peds.map(p=>(
+        <Card key={p.pedidoId} style={{marginBottom:14,borderLeft:`3px solid ${C.purple}`}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",paddingBottom:12,borderBottom:`1px solid ${C.gray100}`,marginBottom:6}}>
+            <div>
+              <div style={{...F.title,fontSize:17,fontWeight:700}}>Pedido {p.pedido}</div>
+              <div style={{...F.body,fontSize:12,color:C.gray500,marginTop:2}}>{p.pendentes} peça(s) pendente(s) · {p.totalPecas} no total</div>
+            </div>
+            <ChipPrazo iso={p.prazo}/>
+          </div>
+          {p.pecas.map(pc=>(
+            <div key={pc.itemId} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"12px 0",borderBottom:`1px solid ${C.gray100}`,flexWrap:"wrap"}}>
+              <div style={{minWidth:56,textAlign:"center",background:C.gray100,borderRadius:9,padding:"8px 6px"}}>
+                <div style={{...F.title,fontSize:21,fontWeight:700,lineHeight:1}}>{pc.quantidade||0}</div>
+                <div style={{...F.body,fontSize:9.5,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.05em",marginTop:2}}>peças</div>
+              </div>
+              <div style={{flex:1,minWidth:180}}>
+                <div style={{...F.body,fontSize:14,fontWeight:600}}>{pc.produto}</div>
+                <div style={{...F.body,fontSize:12.5,color:C.gray600,marginTop:3}}>
+                  Tamanho {pc.tamanho||"—"}{pc.cor?` · ${pc.cor}`:""}
+                </div>
+                {pc.observacao&&<div style={{...F.body,fontSize:12.5,color:C.amber,marginTop:4,fontWeight:600}}>⚠ {pc.observacao}</div>}
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:7,minWidth:170}}>
+                {(pc.arquivos||[]).length>0
+                  ? pc.arquivos.map((a,i)=>(
+                      <Btn key={i} label={busy[pc.itemId+"-"+i]?"Abrindo...":`Baixar ${a.posicao||"arquivo"}`}
+                        variant="secondary" size="sm" disabled={!!busy[pc.itemId+"-"+i]}
+                        onClick={()=>baixar(pc.itemId,a.fileId,pc.itemId+"-"+i)}/>
+                    ))
+                  : <div style={{...F.body,fontSize:11.5,color:C.gray400,textAlign:"center"}}>Sem arquivo anexado</div>}
+                {pc.concluido
+                  ? <div style={{...F.body,fontSize:12.5,fontWeight:700,color:C.green,textAlign:"center",padding:"8px 0"}}>✓ Concluída</div>
+                  : <Btn label={busy[pc.itemId]?"Registrando...":"Marcar concluída"} icon="check" variant="success" size="sm"
+                      disabled={!!busy[pc.itemId]} onClick={()=>concluir(pc.itemId)}/>}
+              </div>
+            </div>
+          ))}
+        </Card>
+      ))}
+    </div>
+  );
 }
 
 // ─── PEDIDOS EM RISCO ────────────────────────────────────────────────────────
@@ -9713,9 +10886,13 @@ function AppInner(){
       return u;
     }catch{return null;}
   });
-  const doLogin=(u)=>{
+  const doLogin=(u,sessao)=>{
     try{sessionStorage.setItem("sgp_user",JSON.stringify(u));}catch{}
+    // Token de sessão individual — exigido pelas rotas do bordador externo.
+    try{ if(sessao) localStorage.setItem("sgp_sessao",sessao); }catch{}
     setUser(u);
+    // Bordador externo só tem uma tela: vai direto pra ela, ignorando hash.
+    if(u.bordadorExterno){ setPage("bordador_demandas"); return; }
     // Se o usuário entrou direto numa URL com hash (#funil, etc), respeita
     if (!(typeof window !== "undefined" && window.location.hash && window.location.hash.length > 1)) {
       setPage(u.admin ? "raiox" : "demandas"); // admin cai no Raio-X
@@ -9723,6 +10900,7 @@ function AppInner(){
   };
   const doLogout=()=>{
     try{sessionStorage.removeItem("sgp_user");}catch{}
+    try{localStorage.removeItem("sgp_sessao");}catch{}
     setUser(null);
   };
   // Página persistida no hash da URL: F5 mantém o módulo atual, e dá pra
@@ -9756,6 +10934,22 @@ function AppInner(){
   const[buscaPedidos,setBuscaPedidos]=useState(""); // busca inicial em Todos os Pedidos
   const naoLidas=notifs.filter(n=>!n.lida).length;
   const[chatResumo,setChatResumo]=useState({total:0,porPedido:{},mencoes:0}); // badge do chat
+  // Contadores do menu: quantos pedidos em cada caixa. Sai do snapshot que o
+  // app já tem em memória (fonte única, cache no Worker) — nenhuma chamada nova.
+  const snapMenu=useSnapshotAberto();
+  const contagensMenu=useMemo(()=>{
+    const porEtapa=snapMenu.data?.porEtapa;
+    if(!porEtapa)return {};
+    const out={};
+    for(const [modulo,etapa] of Object.entries(MODULO_ETAPA)){
+      const g=porEtapa[etapa];
+      const n=g&&Array.isArray(g.items)?g.items.length:0;
+      // Módulos que apontam pra mesma etapa (ex.: Amostra Digital e Alteração
+      // de Amostra Digital) recebem a mesma contagem — é a fila que importa.
+      if(n>0)out[modulo]=n;
+    }
+    return out;
+  },[snapMenu.data]);
   const[chatPedido,setChatPedido]=useState(null); // pedido a abrir direto no chat
   const carregarChatResumo=()=>{
     if(!user?.email)return;
@@ -9863,6 +11057,22 @@ function AppInner(){
         resultMsg="Conferido — movido para Expedição.";
       }
 
+      // ── SOB MEDIDA: registrar a OP → Aguardando Produção ───────────────────────
+      else if(tipo==="op_sob_medida"){
+        if(!o.posvendaId){ alert("Pedido sem pós-venda associado."); return; }
+        const res=await apiFetch(`/op-sob-medida/${o.posvendaId}`,"POST",{ numeroOP:payload.numeroOP, obs:payload.obs||"", ctx });
+        if(res.error) throw new Error(res.error);
+        resultMsg=`OP ${payload.numeroOP} registrada. Pedido em Aguardando Produção Sob Medida.`;
+      }
+
+      // ── SOB MEDIDA: produção concluída → Conferência e Direcionamento ──────────
+      else if(tipo==="producao_sm_concluida"){
+        if(!o.posvendaId){ alert("Pedido sem pós-venda associado."); return; }
+        const res=await apiFetch(`/producao-sm-concluida/${o.posvendaId}`,"POST",{ obs:payload.obs||"", ctx });
+        if(res.error) throw new Error(res.error);
+        resultMsg="Produção concluída — pedido liberado para Conferência e Direcionamento.";
+      }
+
       // ── UPLOAD (Programação, Amostra Digital, Amostra Física) ──────────────────
       else if(tipo==="upload"){
         const nextMap={
@@ -9872,18 +11082,25 @@ function AppInner(){
         };
         const next=nextMap[o.etapa]||o.etapa;
         if(!bordadoId){ alert("Pedido sem negócio de Bordado associado."); return; }
-        if(!payload.fileBase64||!payload.propriedade){ alert("Arquivo ou propriedade ausente."); return; }
+        // Slot com N arquivos: manda a lista; o par solto vai junto só por compat.
+        const arqs=payload.arquivos&&payload.arquivos.length
+          ? payload.arquivos
+          : (payload.fileBase64&&payload.fileName?[{fileBase64:payload.fileBase64,fileName:payload.fileName}]:[]);
+        if(!arqs.length||!payload.propriedade){ alert("Arquivo ou propriedade ausente."); return; }
+        const nomes=arqs.map(a=>a.fileName).join(", ");
         const res=await apiFetch(`/upload-etapa/${bordadoId}`,"POST",{
           propriedade:payload.propriedade,
           propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
-          fileBase64:payload.fileBase64,
-          fileName:payload.fileName,
+          arquivos:arqs,
+          fileBase64:arqs[0].fileBase64,
+          fileName:arqs[0].fileName,
           sku:payload.sku||o.items?.find(it=>it.bordado)?.sku||"",
           novaEtapa:ETAPA_STAGE_ID[next],
-          nota:`${o.etapa} → ${next} (arquivo: ${payload.fileName})`,
+          nota:`${o.etapa} → ${next} (${arqs.length>1?arqs.length+" arquivos":"arquivo"}: ${nomes})`,
           ctx,
-        });
+        },{timeoutMs:UPLOAD_TIMEOUT_MS});
         if(res.error) throw new Error(res.error);
+        if(arqs.length>1) resultMsg=`${arqs.length} arquivos enviados. ${o.etapa} → ${next}.`;
       }
 
       // ── AVANÇAR ETAPA quando todos os bordados já foram executados ─────────
@@ -9917,13 +11134,14 @@ function AppInner(){
         const next=nextMap[o.etapa]||o.etapa;
         const res=await apiFetch(`/programacao-exec/${bordadoId}`,"POST",{
           execucoes:payload.execucoes,
+          anexos:payload.anexos||{},   // arquivos enviados 1x, referenciados por {ref}
           propriedade:ETAPA_PROPRIEDADE[o.etapa],
           propMotivo:ETAPA_PROP_MOTIVO[o.etapa]||"",
           propriedadeEmb:payload.propriedadeEmb||"",
           novaEtapa:ETAPA_STAGE_ID[next],
           nota:`${o.etapa} → ${next}`,
           ctx,
-        });
+        },{timeoutMs:UPLOAD_TIMEOUT_MS});
         if(res.error) throw new Error(res.error);
         // Se stage não avançou (ainda faltam outros bordados desse pedido)
         if (res.stageAvancou === false && res.bordadosPendentes?.length > 0) {
@@ -9967,16 +11185,20 @@ function AppInner(){
       // ── APROVAR AMOSTRA FÍSICA c/ anexo do vendedor (opcional, multi-bordado) ───
       else if(tipo==="aprovar_amostra_fisica"){
         if(!bordadoId) throw new Error("Pedido sem negócio de Bordado.");
+        const arqsAF=payload.arquivos&&payload.arquivos.length
+          ? payload.arquivos
+          : (payload.fileBase64&&payload.fileName?[{fileBase64:payload.fileBase64,fileName:payload.fileName}]:[]);
         const res=await apiFetch(`/aprovar-amostra-fisica/${bordadoId}`,"POST",{
-          fileBase64:payload.fileBase64||null,
-          fileName:payload.fileName||null,
+          arquivos:arqsAF,
+          fileBase64:arqsAF[0]?.fileBase64||null,
+          fileName:arqsAF[0]?.fileName||null,
           bordadoKeys:payload.bordadoKeys||[],
           obs:payload.obs||"",
           ctx,
-        });
+        },{timeoutMs:UPLOAD_TIMEOUT_MS});
         if(res.error) throw new Error(res.error);
-        resultMsg=payload.fileName
-          ?"Amostra física aprovada e anexada. Pedido liberado para bordar."
+        resultMsg=arqsAF.length
+          ?`Amostra física aprovada e ${arqsAF.length>1?arqsAF.length+" arquivos anexados":"anexada"}. Pedido liberado para bordar.`
           :"Amostra física aprovada. Pedido liberado para bordar.";
       }
 
@@ -10045,8 +11267,12 @@ function AppInner(){
           "Análise de Frete": "Finalizados",
         };
         const novaEtapa=stageMap[o.etapa];
-        await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`,ctx});
-        resultMsg = `Pedido movido para ${nomeProx[o.etapa]}.`;
+        const rMov=await apiFetch(`/mover-posvenda/${o.posvendaId}`,"PATCH",{novaEtapa,nota:`${o.etapa} concluída`,ctx});
+        // O worker pode DESVIAR o destino: se o faturamento não está liberado,
+        // o pedido vai pra Pendente Pagamento em vez de Análise de Frete.
+        resultMsg = rMov?.travadoPorPagamento
+          ? "Expedição concluída, mas o pagamento deste pedido NÃO foi liberado.\n\nO pedido foi para a caixa PENDENTE PAGAMENTO. Ele volta sozinho para a Análise de Frete assim que o ERP confirmar o pagamento."
+          : `Pedido movido para ${nomeProx[o.etapa]}.`;
       }
 
       // ── EM SEPARAÇÃO SEM ITENS → ANÁLISE PCP ───────────────────────────────────
@@ -10073,11 +11299,16 @@ function AppInner(){
       _liberar();
     }
 
-    // Sucesso — recarrega as filas E o snapshot geral. NÃO fecha o modal:
-    // o botão exibe a tela de pós-execução com a mensagem. Mas quando o
-    // usuário fechar, a Fila JÁ vai estar atualizada (sem o card processado).
-    // O worker precisa de ~500ms pra HubSpot indexar a nova stage após o PATCH.
-    setTimeout(()=>{ triggerRefresh(); _fetchSnap(true); }, 500);
+    // Sucesso — o card sai da caixa NA HORA (remoção otimista) e o quadro é
+    // reconstruído logo atrás. Sem isso, o usuário ficava alguns segundos vendo
+    // o pedido ainda na fila depois de tomar a ação e achava que não pegou.
+    // A etapa de origem é a que o usuário estava olhando (_etapaOrigem).
+    snapRemoverPedido(o.vendasId, o._etapaOrigem || o.etapa);
+    // Refresh SEM force: a ação já apagou o cache do worker, então a próxima
+    // leitura reconstrói uma única vez e todo mundo passa a ler o dado novo.
+    // Forçar aqui fazia CADA ação disparar um rebuild de 5-8s só pra quem agiu.
+    // 2s dá tempo do HubSpot indexar a nova etapa antes da reconstrução.
+    setTimeout(()=>{ triggerRefresh(); _fetchSnap(false); }, 2000);
     return resultMsg||"O pedido foi movimentado com sucesso.";
   };
 
@@ -10105,7 +11336,7 @@ function AppInner(){
   return(
     <div style={{display:"flex",height:"100dvh",...F.body,background:C.gray100,overflow:"hidden",flexDirection:"column"}}>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>
-        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)} chatTotal={chatResumo.mencoes}/>}
+        {!isMobile&&<Sidebar user={user} active={page} onNav={nav} collapsed={collapsed} onToggle={()=>setCollapsed(!collapsed)} chatTotal={chatResumo.mencoes} contagens={contagensMenu}/>}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
           <Topbar user={user} title={TITLES[page]||""} naoLidas={naoLidas} onBell={toggleBell} onLogout={doLogout} isMobile={isMobile}/>
           {showN&&<NotifPanel notifs={notifs} onClose={()=>setShowN(false)} onAbrir={abrirPedidoNotif}/>}
@@ -10124,11 +11355,11 @@ function AppInner(){
             {page==="op_sob_medida"&&<CaixaPCP title="Criação de OP Sob Medida" sub="Pedidos sob medida aguardando a abertura da ordem de produção." endpoint="/op-sob-medida" etapaLabel="Criação de OP Sob Medida" acoes={[
               {label:"Registrar OP", cor:C.red, icon:"check", apiPath:"/op-sob-medida",
                pedirCampo:{chave:"numeroOP", label:"Número da OP"}},
-            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user} semFaltantes/>}
             {page==="aguardando_producao_sm"&&<CaixaPCP title="Aguardando Produção Sob Medida" sub="Peças sob medida em produção. Ao concluir, o pedido segue para Conferência e Direcionamento." endpoint="/aguardando-producao-sm" etapaLabel="Aguardando Produção Sob Medida" acoes={[
               {label:"Produção concluída", cor:C.green, icon:"check", apiPath:"/producao-sm-concluida",
                confirmMsg:"Confirmar que a produção da peça sob medida foi concluída? O pedido vai para Conferência e Direcionamento."},
-            ]} onOpen={setSel} slaCfg={slaCfg} user={user}/>}
+            ]} onOpen={setSel} slaCfg={slaCfg} user={user} semFaltantes/>}
             {page==="bonificacoes"&&<Bonificacoes onOpen={setSel} user={user}/>}
             {page==="silk_dtf"&&<SilkDtf onOpen={setSel} slaCfg={slaCfg} user={user}/>}
             {/* ── OCORRÊNCIA (devolução / reclamação) ─────────────────────── */}
@@ -10180,6 +11411,8 @@ function AppInner(){
             {page==="bordado_externo"&&<BordadoExternoPage orders={orders} onOpen={setSel} slaCfg={slaCfg}/>}
             {page==="expedicao"&&<Fila title="Expedição" etapa="Expedição" endpoint="/expedicao" orders={orders} onOpen={setSel} actionLabel="Enviar p/ análise de frete" actionColor={C.teal} slaCfg={slaCfg}/>}
             {page==="analise_frete"&&<Fila title="Análise de Frete" etapa="Análise de Frete" endpoint="/analise-frete" orders={orders} onOpen={setSel} actionLabel="Finalizar pedido" actionColor="#0891b2" slaCfg={slaCfg}/>}
+            {page==="bordador_demandas"&&<BordadorDemandas user={user}/>}
+            {page==="pendente_pagamento"&&<PendentePagamento onOpen={setSel} user={user}/>}
             {page==="finalizados"&&<FinalizadosPage onOpen={setSel}/>}
             {page==="alteracoes_form"&&<AlteracoesFormList/>}
             {page==="codigos_barra"&&<CodigosBarra user={user}/>}
@@ -10221,10 +11454,10 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
     setLoading(true);
     setErro(null);
     try {
-      // Passo 1: força carregar snapshot-aberto (popula o cache no worker)
-      // Sem isso, o /painel-posvenda pode retornar 503 se ninguém abriu outras filas antes.
-      await apiFetch("/snapshot-aberto").catch(()=>null);
-      // Passo 2: painel usa o cache do snapshot
+      // O /painel-posvenda já lê o snapshot da mesma fonte das outras telas
+      // (cache no KV). A chamada extra a /snapshot-aberto que existia aqui era
+      // pra "aquecer" um cache em memória que não é mais usado — só dobrava o
+      // tempo de abertura da tela.
       const r = await apiFetch("/painel-posvenda");
       if (r.success) setDados(r);
       else setErro(r.error || "Erro desconhecido");
@@ -10269,8 +11502,41 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
     return true;
   });
 
+  // ⚠ Os KPIs vinham prontos do worker, calculados sobre TODOS os pedidos —
+  // então filtrar por responsável/vendedor/etapa mudava só a tabela e os cards
+  // continuavam mostrando os números da operação inteira. Quem filtrava a
+  // própria carteira lia aqueles totais como sendo dela.
+  // Agora os cards são recalculados sobre a MESMA lista que a tabela mostra.
+  // "Faturados hoje" é o único que continua vindo do worker (é um recorte de
+  // outra base, não está nesta lista) e por isso fica marcado como geral.
+  const baseKpi = filtroChip === "todos" ? filtrados
+    : pedidos.filter(p => {
+        if (filtroEtapa && !((p.etapasAtivas && p.etapasAtivas.length ? p.etapasAtivas : [p.etapa]).includes(filtroEtapa))) return false;
+        if (filtroVendedores.length > 0 && !filtroVendedores.includes(p.vendedor)) return false;
+        if (filtroRespPV && responsavelPosVendaDe(p.vendedor) !== filtroRespPV) return false;
+        return true;
+      });
+  const filtrandoAlgo = !!(filtroEtapa || filtroVendedores.length || filtroRespPV || busca);
+  const k = {
+    totalAtivos: baseKpi.length,
+    valorTotalAtendimento: baseKpi.reduce((acc, p) => acc + Number(p.valor || 0), 0),
+    atrasados: baseKpi.filter(p => p.atrasado).length,
+    emRisco: baseKpi.filter(p => p.risco && !p.atrasado).length,
+    vencemHoje: baseKpi.filter(p => p.vencemHoje).length,
+    emPendencia: baseKpi.filter(p => p.emPendencia).length,
+    aguardandoCliente: baseKpi.filter(p => p.aguardandoCliente).length,
+    aguardandoOutroPedido: baseKpi.filter(p => p.aguardandoOutro).length,
+  };
+
   // Cores das etapas
   const corEtapa = {
+    // Faltavam as etapas novas: todas caíam em cinza e viravam um bloco único
+    // indistinguível na barra de distribuição.
+    "Pendente Pagamento": "#be123c", "Silk/DTF": "#7c3aed", "Bonificações": "#0d9488",
+    "Criação de OP Sob Medida": "#a16207", "Aguardando Produção Sob Medida": "#ca8a04",
+    "Análise PCP": "#4338ca", "Buscar em Loja": "#0891b2", "Análise Produção": "#7e22ce",
+    "Bordado Interno e Externo": "#9333ea",
+    "Pendência Comercial": "#6d28d9", "Aguardando Outro Pedido": "#1d4ed8",
     "Em Separação": "#3b82f6", "Conferência Separação": "#0369a1",
     "Conferência e Direcionamento": "#059669", "Programação": "#f59e0b",
     "Amostra Digital": "#8b5cf6", "Aprovação de Amostra Digital": "#7c3aed",
@@ -10288,16 +11554,18 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
   };
 
   // Formata prazo
+  // O prazo é um DIA inteiro, não um instante. Contar pelo relógio fazia o
+  // pedido que vence hoje aparecer como "Vencido 1d" desde a véspera.
   const fmtPrazo = (venc) => {
-    if (!venc) return "—";
-    const dv = new Date(venc);
-    const diff = dv.getTime() - Date.now();
-    const dias = Math.floor(diff / (24*60*60*1000));
+    const fim = fimDoDiaVenc(venc);
+    if (fim == null) return "—";
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const dias = Math.round((fim - 86399999 - hoje.getTime()) / 86400000);
     if (dias < 0) return `Vencido ${Math.abs(dias)}d`;
     if (dias === 0) return "Hoje";
     if (dias === 1) return "Amanhã";
     if (dias < 7) return `${dias} dias`;
-    return dv.toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit"});
+    return fmtVenc(venc, true);
   };
 
   return (
@@ -10321,7 +11589,7 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
               (p.valor||0).toFixed(2).replace(".",","),
               p.etapa||"", dias,
               p.etapaAt?new Date(p.etapaAt).toLocaleString("pt-BR"):"",
-              p.dataVencimento?new Date(p.dataVencimento).toLocaleDateString("pt-BR"):"",
+              p.dataVencimento?fmtVenc(p.dataVencimento):"",
               status, contato];
           });
           const csv = "\uFEFF" + [cols, ...linhas].map(row =>
@@ -10344,14 +11612,14 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
       {/* KPIs clicáveis */}
       <div style={{padding:"16px 32px",background:C.white,borderBottom:`1px solid ${C.gray200}`}}>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}}>
-          <KpiCard label="Ativos" value={kpis.totalAtivos||0} sub={`R$ ${((kpis.valorTotalAtendimento||0)/1000).toFixed(1)}k`} color="#4b5563" active={filtroChip==="todos"} onClick={()=>setFiltroChip("todos")}/>
-          <KpiCard label="Atrasados" value={kpis.atrasados||0} sub="Ação urgente" color={C.red} active={filtroChip==="atrasados"} onClick={()=>setFiltroChip("atrasados")}/>
-          <KpiCard label="Em Risco" value={kpis.emRisco||0} sub="Vencem em ≤ 48h" color="#d97706" active={filtroChip==="risco"} onClick={()=>setFiltroChip("risco")}/>
-          <KpiCard label="Vencem Hoje" value={kpis.vencemHoje||0} sub="Prazo do dia" color="#ea580c" active={filtroChip==="vencem_hoje"} onClick={()=>setFiltroChip("vencem_hoje")}/>
-          <KpiCard label="Pendência Comercial" value={kpis.emPendencia||0} sub="Ação interna" color="#7c3aed" active={filtroChip==="pendencia"} onClick={()=>setFiltroChip("pendencia")}/>
-          <KpiCard label="Aguardando Cliente" value={kpis.aguardandoCliente||0} sub="Aprovação amostra" color="#0891b2" active={filtroChip==="aguardando"} onClick={()=>setFiltroChip("aguardando")}/>
-          <KpiCard label="Aguardando Outro Pedido" value={kpis.aguardandoOutroPedido||0} sub="Faturar/enviar junto" color="#1d4ed8" active={filtroChip==="aguardando_outro"} onClick={()=>setFiltroChip("aguardando_outro")}/>
-          <KpiCard label="Faturados Hoje" value={kpis.faturadosHoje||0} sub={`R$ ${((kpis.valorFaturadosHoje||0)/1000).toFixed(1)}k`} color={C.green}/>
+          <KpiCard label="Ativos" value={k.totalAtivos} sub={`R$ ${(k.valorTotalAtendimento/1000).toFixed(1)}k`} color="#4b5563" active={filtroChip==="todos"} onClick={()=>setFiltroChip("todos")}/>
+          <KpiCard label="Atrasados" value={k.atrasados} sub="Ação urgente" color={C.red} active={filtroChip==="atrasados"} onClick={()=>setFiltroChip("atrasados")}/>
+          <KpiCard label="Em Risco" value={k.emRisco} sub="Vencem em ≤ 48h" color="#d97706" active={filtroChip==="risco"} onClick={()=>setFiltroChip("risco")}/>
+          <KpiCard label="Vencem Hoje" value={k.vencemHoje} sub="Prazo do dia" color="#ea580c" active={filtroChip==="vencem_hoje"} onClick={()=>setFiltroChip("vencem_hoje")}/>
+          <KpiCard label="Pendência Comercial" value={k.emPendencia} sub="Ação interna" color="#7c3aed" active={filtroChip==="pendencia"} onClick={()=>setFiltroChip("pendencia")}/>
+          <KpiCard label="Aguardando Cliente" value={k.aguardandoCliente} sub="Aprovação amostra" color="#0891b2" active={filtroChip==="aguardando"} onClick={()=>setFiltroChip("aguardando")}/>
+          <KpiCard label="Aguardando Outro Pedido" value={k.aguardandoOutroPedido} sub="Faturar/enviar junto" color="#1d4ed8" active={filtroChip==="aguardando_outro"} onClick={()=>setFiltroChip("aguardando_outro")}/>
+          <KpiCard label="Faturados Hoje" value={kpis.faturadosHoje||0} sub={`R$ ${((kpis.valorFaturadosHoje||0)/1000).toFixed(1)}k · geral`} color={C.green}/>
         </div>
       </div>
 
@@ -10379,10 +11647,10 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
       </div>
 
       {/* Alerta */}
-      {kpis.vencemHoje > 0 && filtroChip !== "vencem_hoje" && <div style={{margin:"14px 32px",padding:"12px 16px",background:"#fef3c7",border:"1px solid #fcd34d",borderLeft:"4px solid #f59e0b",borderRadius:8,display:"flex",alignItems:"center",gap:12,...F.body,fontSize:13,color:"#92400e"}}>
+      {k.vencemHoje > 0 && filtroChip !== "vencem_hoje" && <div style={{margin:"14px 32px",padding:"12px 16px",background:"#fef3c7",border:"1px solid #fcd34d",borderLeft:"4px solid #f59e0b",borderRadius:8,display:"flex",alignItems:"center",gap:12,...F.body,fontSize:13,color:"#92400e"}}>
         <span style={{fontSize:18}}>⚠️</span>
         <div style={{flex:1}}>
-          <strong>{kpis.vencemHoje} pedido{kpis.vencemHoje!==1?"s":""}</strong> {kpis.vencemHoje!==1?"vencem":"vence"} hoje
+          <strong>{k.vencemHoje} pedido{k.vencemHoje!==1?"s":""}</strong> {k.vencemHoje!==1?"vencem":"vence"} hoje
         </div>
         <button onClick={()=>setFiltroChip("vencem_hoje")} style={{padding:"6px 12px",background:"#f59e0b",color:C.white,border:"none",borderRadius:5,fontSize:12,fontWeight:600,cursor:"pointer",...F.body}}>Ver</button>
       </div>}
@@ -10476,6 +11744,16 @@ function PainelPosVenda({onOpen, slaCfg, user}) {
                       <span style={{display:"inline-flex",alignItems:"center",gap:5,padding:"3px 9px",borderRadius:20,fontSize:11,fontWeight:700,background:(corEtapa[p.etapa]||C.gray400)+"20",color:corEtapa[p.etapa]||C.gray600,...F.body,whiteSpace:"nowrap"}}>
                         <span style={{width:6,height:6,borderRadius:"50%",background:corEtapa[p.etapa]||C.gray400}}/>{p.etapa}
                       </span>
+                      {/* Retido por falta de pagamento: o Pós-Venda precisa
+                          cobrar o cliente pra o pedido voltar a andar. */}
+                      {/* Usa etapasAtivas: se o pedido tem bordado ativo, a etapa
+                          principal pode ser a do bordado e o selo sumia justamente
+                          no pedido que precisa de cobrança. */}
+                      {((p.etapasAtivas&&p.etapasAtivas.length?p.etapasAtivas:[p.etapa]).includes("Pendente Pagamento"))&&
+                        <span title="Pedido embalado, mas o faturamento não foi liberado — cobrar o cliente"
+                          style={{display:"inline-flex",alignItems:"center",gap:4,marginLeft:6,padding:"3px 9px",borderRadius:20,fontSize:10,fontWeight:800,background:"#be123c",color:C.white,...F.body,whiteSpace:"nowrap"}}>
+                          COBRAR CLIENTE
+                        </span>}
                     </td>
                     <td style={{padding:"11px 12px",fontSize:11,...F.body}}>
                       <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:4,fontWeight:700,background:dias>=4?"#fee2e2":dias>=2?"#fef3c7":C.gray100,color:dias>=4?"#991b1b":dias>=2?"#92400e":C.gray600}}>
@@ -10571,7 +11849,7 @@ function PainelDetalhePedido({pedido, onClose, onAbrirDetalhe, user}) {
               <InfoBox label="Valor" value={fmtR(pedido.valor)}/>
               <InfoBox label="Vendedor" value={pedido.vendedor}/>
               <InfoBox label="Etapa" value={pedido.etapa} highlight/>
-              <InfoBox label="Vencimento" value={pedido.dataVencimento?new Date(pedido.dataVencimento).toLocaleDateString("pt-BR"):"—"} color={pedido.atrasado?C.red:pedido.risco?"#d97706":C.green}/>
+              <InfoBox label="Vencimento" value={pedido.dataVencimento?fmtVenc(pedido.dataVencimento):"—"} color={pedido.atrasado?C.red:pedido.risco?"#d97706":C.green}/>
             </div>
           </div>
 
@@ -10991,6 +12269,12 @@ function ChatPage({user,usuarios,chatResumo,onResumo,pedidoInicial,onLimparInici
   const abrirThread=(pid,cliente)=>{
     if(!pid)return;
     setSel(String(pid)); setSelCliente(cliente||"");
+    // Limpa antes de buscar: sem isso o cabeçalho já mostrava o pedido novo
+    // enquanto o corpo ainda exibia as mensagens do anterior — e se a busca
+    // falhasse, ficava assim indefinidamente (você lia e respondia achando
+    // que estava na conversa certa).
+    setMsgs([]);
+    setMencSel({});
     carregarMsgs(String(pid));
     apiFetch("/chat/marcar-lido","POST",{email:meuEmail,pedidoId:String(pid)})
       .then(()=>{onResumo&&onResumo();carregarThreads();}).catch(()=>{});
@@ -11002,6 +12286,9 @@ function ChatPage({user,usuarios,chatResumo,onResumo,pedidoInicial,onLimparInici
 
   const enviar=async()=>{
     const t=texto.trim(); if(!t||!sel)return;
+    // Enter dispara direto e o campo só é limpo DEPOIS do await — dois Enter
+    // rápidos (ou rede lenta) mandavam a mesma mensagem duas vezes.
+    if(enviando)return;
     setEnviando(true);
     try{
       await apiFetch("/chat/"+encodeURIComponent(sel),"POST",{texto:t,autorNome:user.nome||user.name||user.email,autorEmail:meuEmail,cliente:selCliente,mencionados:resolverMencoes(t)});
@@ -11035,7 +12322,10 @@ function ChatPage({user,usuarios,chatResumo,onResumo,pedidoInicial,onLimparInici
               <button key={tb.k} onClick={()=>setAba(tb.k)}
                 style={{flex:1,padding:"10px 6px",background:"none",border:"none",borderBottom:on?`2px solid ${C.red}`:"2px solid transparent",cursor:"pointer",...F.body,fontSize:12,fontWeight:on?700:500,color:on?C.red:C.gray500,display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}>
                 {tb.label}
-                {tb.k==="mencao"&&chatResumo&&chatResumo.mencoes>0
+                {/* Antes a aba mostrava chatResumo.mencoes (nº de MENSAGENS) enquanto a
+                    lista abaixo tinha threads — badge "7" com 2 conversas. Agora as
+                    duas abas contam a mesma coisa: conversas. */}
+                {false
                   ? <span style={{background:C.red,color:C.white,borderRadius:9,fontSize:9,fontWeight:800,padding:"1px 5px"}}>{chatResumo.mencoes}</span>
                   : <span style={{color:C.gray400,fontWeight:700}}>{tb.n}</span>}
               </button>
@@ -11206,8 +12496,8 @@ function RaioX({user,onOpen,slaCfg,onIrChat}){
             <span style={{fontWeight:700,color:C.black,minWidth:70}}>#{p.pedidoLinx||p.vendasId}</span>
             <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.client}</span>
             <span style={{fontSize:11,color:C.gray500}}>{p.etapa}</span>
-            <span style={{fontSize:11,fontWeight:700,color:C.red}}>{p.dataVencimento?("venc "+new Date(p.dataVencimento).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})):""}</span>
-            {btnChat(p.pedidoLinx||p.vendasId)}
+            <span style={{fontSize:11,fontWeight:700,color:C.red}}>{p.dataVencimento?("venc "+fmtVenc(p.dataVencimento,true)):""}</span>
+            {btnChat(p.vendasId||p.pedidoLinx)}
           </Linha>
         ))}
         {atrasados.length===0&&<div style={{...F.body,fontSize:12.5,color:C.green}}>✓ Nenhum pedido atrasado.</div>}
@@ -11227,7 +12517,7 @@ function RaioX({user,onOpen,slaCfg,onIrChat}){
             <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.client}</span>
             <span style={{fontSize:11,color:C.gray500}}>{p.etapa}</span>
             <span style={{fontSize:11,fontWeight:700,color:"#0891b2"}}>{diasParado(p)}d parado</span>
-            {btnChat(p.pedidoLinx||p.vendasId)}
+            {btnChat(p.vendasId||p.pedidoLinx)}
           </Linha>
         ))}
         {paradosTempo.length===0&&<div style={{...F.body,fontSize:12.5,color:C.gray500}}>Nenhum pedido parado há {corte}+ dias.</div>}
