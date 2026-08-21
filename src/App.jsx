@@ -706,12 +706,23 @@ function PrazoSobMedida({o,inline}){
     </span>
   );
 }
-const ordenarPorPrioridade=(arr)=>[...arr].sort((a,b)=>{
+// ORDEM PADRÃO DE TODA FILA: vencimento do PEDIDO, mais atrasado primeiro.
+// Empate (mesmo dia) desempata por quem está parado há mais tempo na etapa.
+// Sem vencimento definido vai para o fim — não some, só não disputa o topo.
+const ordenarPorPrioridade=(arr)=>[...(arr||[])].sort((a,b)=>{
   const da=dataVencimento(a), db=dataVencimento(b);
-  if(!da&&!db)return 0;
-  if(!da)return 1;          // sem data vai para o fim
-  if(!db)return -1;
-  return new Date(da)-new Date(db); // mais cedo primeiro
+  if(da&&db){
+    const dif=new Date(da)-new Date(db);
+    if(dif)return dif;
+  } else if(da||db){
+    return da?-1:1;
+  }
+  const pa=a?.etapaAt||a?.entradaAt||a?.dataFechamento||null;
+  const pb=b?.etapaAt||b?.entradaAt||b?.dataFechamento||null;
+  if(!pa&&!pb)return 0;
+  if(!pa)return 1;
+  if(!pb)return -1;
+  return new Date(pa)-new Date(pb);   // parado há mais tempo primeiro
 });
 
 // Normaliza um card cru do Worker para o formato que o modal/cards esperam
@@ -5459,7 +5470,7 @@ function PendentePagamento({onOpen,user}){
     setLoading(true);setLoadError(null);
     apiFetch("/pendente-pagamento")
       .then(res=>{
-        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Pendente Pagamento")));
+        if(res.success)setPedidos(ordenarPorPrioridade((res.data||[]).map(o=>normalizarCard(o,"Pendente Pagamento"))));
         else setLoadError(res.error||"Erro desconhecido");
       })
       .catch(e=>setLoadError(e.message))
@@ -5640,7 +5651,7 @@ function Bonificacoes({onOpen,user}){
     setLoading(true);setLoadError(null);
     apiFetch("/bonificacoes")
       .then(res=>{
-        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Bonificações")));
+        if(res.success)setPedidos(ordenarPorPrioridade((res.data||[]).map(o=>normalizarCard(o,"Bonificações"))));
         else setLoadError(res.error||"Erro desconhecido");
       })
       .catch(e=>setLoadError(e.message))
@@ -5926,7 +5937,7 @@ function SilkDtf({onOpen,slaCfg,user}){
     setLoading(true);setLoadError(null);
     apiFetch("/silk-dtf")
       .then(res=>{
-        if(res.success)setPedidos((res.data||[]).map(o=>normalizarCard(o,"Silk/DTF")));
+        if(res.success)setPedidos(ordenarPorPrioridade((res.data||[]).map(o=>normalizarCard(o,"Silk/DTF"))));
         else setLoadError(res.error||"Erro desconhecido");
       })
       .catch(e=>setLoadError(e.message))
@@ -6085,7 +6096,7 @@ function CaixaOcorrencia({title, sub, endpoint, etapaLabel, modo="simples", acao
     setLoading(true); setLoadError(null);
     apiFetch(endpoint)
       .then(res => {
-        if (res.success) setPedidos((res.data || []).map(o => normalizarCard(o, etapaLabel)));
+        if (res.success) setPedidos(ordenarPorPrioridade((res.data || []).map(o => normalizarCard(o, etapaLabel))));
         else setLoadError(res.error || "Erro desconhecido");
       })
       .catch(e => setLoadError(e.message))
@@ -6286,7 +6297,7 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
     setLoading(true); setLoadError(null);
     apiFetch(endpoint)
       .then(res => {
-        if (res.success) setPedidos((res.data || []).map(o => normalizarCard(o, etapaLabel)));
+        if (res.success) setPedidos(ordenarPorPrioridade((res.data || []).map(o => normalizarCard(o, etapaLabel))));
         else setLoadError(res.error || "Erro desconhecido");
       })
       .catch(e => setLoadError(e.message))
@@ -6294,7 +6305,7 @@ function CaixaPCP({title, sub, endpoint, etapaLabel, acoes, onOpen, slaCfg, user
     const extras = faltantesExtraEndpoints || [];
     if (extras.length) {
       Promise.all(extras.map(ep => apiFetch(ep).then(r => r.success ? (r.data || []) : []).catch(() => [])))
-        .then(listas => setPedidosExtra(listas.flat().map(o => normalizarCard(o, "PCP"))))
+        .then(listas => setPedidosExtra(ordenarPorPrioridade(listas.flat().map(o => normalizarCard(o, "PCP")))))
         .catch(() => setPedidosExtra([]));
     } else {
       setPedidosExtra([]);
@@ -6432,7 +6443,7 @@ function ConferenciaSeparacao({orders, onOpen, slaCfg, user}) {
   const pedidos = useMemo(() => {
     if (!snap.data) return null;
     const items = snap.data.porEtapa?.["Conferência Separação"]?.items || [];
-    return items.map(o => normalizarCard(o, "Conferência Separação"));
+    return ordenarPorPrioridade(items.map(o => normalizarCard(o, "Conferência Separação")));
   }, [snap.data]);
 
   const confirmarConferencia = async (o) => {
@@ -6588,7 +6599,10 @@ function Direcionamento({orders,setOrders,onOpen,slaCfg,user}){
             timeline:[{stage:"Conferência e Direcionamento",user:"Sistema",enteredAt:o.etapaAt||o.dataEntrada,exitedAt:null,dH:null}],
             chat:[],
           }));
-          setHsOrders(converted);
+          // Fila em ordem de vencimento do pedido — mais atrasado no topo.
+          // Esta tela monta a lista por conta própria (endpoint dedicado) e era
+          // a única que exibia na ordem crua devolvida pelo HubSpot.
+          setHsOrders(ordenarPorPrioridade(converted));
         }
       })
       .catch(e=>setLoadError(e.message))
@@ -8722,16 +8736,12 @@ function Fila({title,sub,etapa,orders,onOpen,actionLabel,actionColor=C.green,sla
       return new Date(cb)-new Date(ca);  // mais recente primeiro
     });
   } else {
-    // Demais etapas: URGÊNCIA DE SLA — o mais "estourado" primeiro (casa com o
-    // badge ATRASADO/EM RISCO/NO PRAZO e a barra Xh/Yh do card). htd = horas
-    // úteis restantes até o prazo (negativo = já venceu; quanto menor, mais atrasado).
-    mine=[...mine].sort((a,b)=>{
-      const ha=getSLA(a,slaCfg,etapa).htd, hb=getSLA(b,slaCfg,etapa).htd;
-      if(ha==null&&hb==null)return 0;
-      if(ha==null)return 1;   // sem prazo definido vai pro fim
-      if(hb==null)return -1;
-      return ha-hb;           // menor htd (mais vencido) primeiro
-    });
+    // Demais etapas: VENCIMENTO DO PEDIDO — o mais atrasado primeiro.
+    // Antes ordenava pelo SLA DA ETAPA (htd), que mede há quanto tempo o card
+    // está parado ali — coisa diferente do prazo de faturamento do pedido. Um
+    // pedido que vence amanhã e acabou de chegar na etapa ficava embaixo de um
+    // que vence daqui a três semanas mas está parado há dias.
+    mine=ordenarPorPrioridade(mine);
   }
 
   // Contadores para os chips de filtro. Usa o MESMO critério da lista (mine):
@@ -10027,7 +10037,7 @@ function AguardandoOutroPedido({user}){
   const [selected,setSelected]=useState(null);
   const [motivoRetorno,setMotivoRetorno]=useState("");
   const [msg,setMsg]=useState("");
-  const carregar=()=>{ setLoading(true); apiFetch("/aguardando-outro-pedido").then(r=>{ if(r.success)setItems(r.items||[]); }).finally(()=>setLoading(false)); };
+  const carregar=()=>{ setLoading(true); apiFetch("/aguardando-outro-pedido").then(r=>{ if(r.success)setItems(ordenarPorPrioridade(r.items||[])); }).finally(()=>setLoading(false)); };
   useEffect(()=>{ carregar(); },[]);
   const fmtH=(h)=>{ if(h<1)return `${Math.round(h*60)}min`; if(h<24)return `${h.toFixed(1)}h`; return `${Math.floor(h/24)}d ${Math.round(h%24)}h`; };
   const confirmarRetorno=async()=>{
@@ -10276,7 +10286,7 @@ function PendenciaComercial({user}){
   const carregar=()=>{
     setLoading(true);
     apiFetch("/pendencia-comercial").then(r=>{
-      if(r.success)setItems(r.items||[]);
+      if(r.success)setItems(ordenarPorPrioridade(r.items||[]));
     }).finally(()=>setLoading(false));
   };
   useEffect(()=>{ carregar(); },[]);
