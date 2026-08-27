@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, Component, Fragment } from "react
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 // ─── VERSÃO ───────────────────────────────────────────────────────────────────
-const SGP_VERSION = "v3.35.0";
+const SGP_VERSION = "v3.37.0";
 if (typeof window !== "undefined") window.SGP_VERSION = SGP_VERSION;
 const BRASAO_SGP = "data:image/png;base64,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";
 const FAVICON_SGP = "data:image/png;base64,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";
@@ -2028,6 +2028,25 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
     }
     return out;
   };
+  // [OBS DO BORDADO] Um arquivo vale para vários produtos, e CADA registro do
+  // bordados_json pode trazer observação própria. A tela mostrava só produto e
+  // posição — o que a programação precisa ler (o que fazer com a arte) ficava
+  // invisível, embora aparecesse na folha impressa e no HubSpot.
+  // Junta as observações de todos os registros do mesmo arquivo, sem repetir.
+  const obsDoArquivo=(b)=>{
+    const fid=b&&b.fileId?String(b.fileId):("nome:"+((b&&b.fileName)||""));
+    const vistos=new Set(); const out=[];
+    for(const r of ((order.bordadosJson||[]).filter(x=>x&&(x.fileId?String(x.fileId):("nome:"+(x.fileName||"")))===fid))){
+      for(const [rot,txt] of [["PROGRAMAÇÃO",r.obs_programacao],["BORDADO",r.obs_bordado]]){
+        const t=String(txt||"").trim();
+        if(!t)continue;
+        const k=rot+"|"+t.toLowerCase();
+        if(vistos.has(k))continue;
+        vistos.add(k); out.push({rot,txt:t});
+      }
+    }
+    return out;
+  };
   const RenderCombos=({b})=>{
     const cs=combosDe(b);
     if(!cs.length) return b.positionLabel?<span style={{color:"#6b21a8"}}>📍 {b.positionLabel}</span>:null;
@@ -2497,6 +2516,42 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
         <div style={{...F.title,fontSize:11,fontWeight:700,color:C.gray500,letterSpacing:"0.1em",marginBottom:4}}>{TITULOS[etapa]||"EXECUÇÃO"}</div>
         <div style={{...F.body,fontSize:13,color:C.gray600}}>{HINTS[etapa]||"Anexe o(s) arquivo(s) de cada bordado."}</div>
       </div>
+      {/* [INSTRUÇÕES DO PEDIDO] Observação do vendedor e informação importante.
+          Estavam na folha impressa e no HubSpot, mas não nesta tela — quem
+          programa o bordado precisa dessas instruções ANTES de executar, e
+          estava tendo que abrir o pedido em outro lugar pra ler. */}
+      {(() => {
+        const info = String(order.infoImportante||"").trim();
+        const obsProd = String(order.obsProdutos||"").split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean);
+        // Sem repetir: a mesma frase costuma vir na obs de vários produtos.
+        const obsUnicas = [...new Set(obsProd.map(x=>x))];
+        if(!info && !obsUnicas.length) return null;
+        return (
+          <div style={{background:"#fff8e6",border:"1.5px solid #f0c36d",borderLeft:"5px solid #d99b1c",borderRadius:8,padding:"12px 16px"}}>
+            <div style={{...F.title,fontSize:11,fontWeight:800,color:"#7a4b00",letterSpacing:"0.07em",marginBottom:8}}>
+              INSTRUÇÕES DO PEDIDO
+            </div>
+            {info&&(
+              <div style={{marginBottom:obsUnicas.length?10:0}}>
+                <div style={{...F.body,fontSize:10,fontWeight:800,color:"#a35c00",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>
+                  Informação importante
+                </div>
+                <div style={{...F.body,fontSize:13,color:"#5c3a00",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word",fontWeight:600}}>{info}</div>
+              </div>
+            )}
+            {obsUnicas.length>0&&(
+              <div>
+                <div style={{...F.body,fontSize:10,fontWeight:800,color:"#a35c00",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>
+                  Observação dos produtos
+                </div>
+                {obsUnicas.map((o,i)=>(
+                  <div key={i} style={{...F.body,fontSize:13,color:"#5c3a00",lineHeight:1.5,padding:"2px 0",whiteSpace:"pre-wrap",wordBreak:"break-word"}}>• {o}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
       {order.reprogramacao&&<div style={{background:"#f97316"+"12",border:`1.5px solid #f97316`,borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:10}}>
         <div style={{width:30,height:30,borderRadius:7,background:"#f97316",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,...F.title,fontSize:16,color:C.white}}>↻</div>
         <div style={{flex:1}}>
@@ -2608,6 +2663,15 @@ function ExecPorBordado({order,etapa,onAction,comDificuldade,setActionMsg,setAct
                     <div style={{...F.body,fontSize:11,color:C.gray500,marginTop:2,lineHeight:1.5}}>
                       <RenderCombos b={b}/>
                     </div>
+                    {/* Observações do bordado: é a instrução do que fazer com
+                        a arte. Fica em destaque âmbar, como na folha impressa. */}
+                    {obsDoArquivo(b).map((o,oi)=>(
+                      <div key={oi} style={{...F.body,fontSize:11.5,color:"#7a4b00",background:"#fff8e6",
+                        border:"1px solid #f0c36d",borderLeft:"3px solid #d99b1c",borderRadius:4,
+                        padding:"5px 8px",marginTop:5,lineHeight:1.45,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
+                        <strong style={{fontSize:10,letterSpacing:"0.04em"}}>[{o.rot}]</strong> {o.txt}
+                      </div>
+                    ))}
                     {b.fileUrl&&<button onClick={()=>setPreviewExec({url:b.fileUrl,nome:b.fileName})} style={{...F.body,fontSize:11,color:C.blue,fontWeight:600,background:"none",border:"none",padding:0,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:4,marginTop:3}}><Ic n="search" s={12} c={C.blue}/> Pré-visualizar referência</button>}
                     {disp&&executado.motivo&&<div style={{...F.body,fontSize:11,color:"#92400e",fontStyle:"italic",marginTop:2}}>💬 {executado.motivo}</div>}
                   </div>
@@ -4320,6 +4384,9 @@ function OrderModal({order: _orderLeve,me,onClose,usuarios,onAction,isMobile,sla
     pagamentos: (_orderLeve.pagamentos&&_orderLeve.pagamentos.length)?_orderLeve.pagamentos:(_enriched.pagamentos||[]),
     totalRecebido: _orderLeve.totalRecebido || _enriched.totalRecebido || 0,
     infoImportante: _orderLeve.infoImportante || _enriched.infoImportante || "",
+    // obsProdutos (observação do vendedor nos itens) só existe no snapshot —
+    // o detalhe não traz. Sem preservar aqui, a instrução some ao abrir o card.
+    obsProdutos: _orderLeve.obsProdutos || _enriched.obsProdutos || "",
     dadosAdicionais: _orderLeve.dadosAdicionais || _enriched.dadosAdicionais || "",
     centroCusto: _orderLeve.centroCusto || _enriched.centroCusto || "",
     tipo: _orderLeve.tipo || _enriched.tipo || "",
@@ -8214,6 +8281,8 @@ function SLAConfig({slaCfg,onSave,user}){
   const[local,setLocal]=useState({...slaCfg});
   const[prazoCom,setPrazoCom]=useState(15);
   const[prazoSem,setPrazoSem]=useState(7);
+  // Bonificação conta em dias ÚTEIS — processo apartado e rápido.
+  const[prazoBonif,setPrazoBonif]=useState(3);
   const[cap,setCap]=useState({interno:0,bordadel:0,mg_bordados:0,outros:0});
   const[senhaExp,setSenhaExp]=useState("");
   const[temSenhaExp,setTemSenhaExp]=useState(false);
@@ -8231,6 +8300,7 @@ function SLAConfig({slaCfg,onSave,user}){
         if(r.config.etapas)setLocal(prev=>({...prev,...r.config.etapas}));
         if(r.config.prazoComBordado!=null)setPrazoCom(r.config.prazoComBordado);
         if(r.config.prazoSemBordado!=null)setPrazoSem(r.config.prazoSemBordado);
+        if(r.config.prazoBonificacao!=null)setPrazoBonif(r.config.prazoBonificacao);
         if(r.config.capacidade)setCap(prev=>({...prev,...r.config.capacidade}));
         setTemSenhaExp(!!r.config.temSenhaExpedicao);
         if(Array.isArray(r.config.feriados))setFeriados(r.config.feriados);
@@ -8245,7 +8315,7 @@ function SLAConfig({slaCfg,onSave,user}){
   const save=async()=>{
     setSaving(true);
     try{
-      const payload={etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem),capacidade:{interno:Number(cap.interno||0),bordadel:Number(cap.bordadel||0),mg_bordados:Number(cap.mg_bordados||0),outros:Number(cap.outros||0)},feriados,emitente:emit};
+      const payload={etapas:local,prazoComBordado:Number(prazoCom),prazoSemBordado:Number(prazoSem),prazoBonificacao:Number(prazoBonif),capacidade:{interno:Number(cap.interno||0),bordadel:Number(cap.bordadel||0),mg_bordados:Number(cap.mg_bordados||0),outros:Number(cap.outros||0)},feriados,emitente:emit};
       if(senhaExp.trim()) payload.senhaDesbloqueioExpedicao=senhaExp.trim();
       await apiFetch("/config-sla","PATCH",payload);
       if(senhaExp.trim()){setTemSenhaExp(true);setSenhaExp("");}
@@ -8281,6 +8351,17 @@ function SLAConfig({slaCfg,onSave,user}){
                 style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
               <span style={{...F.body,fontSize:12,color:C.gray400}}>dias</span>
             </div>
+          </div>
+          <div>
+            <label style={{...F.body,fontSize:11,fontWeight:700,color:C.gray600,textTransform:"uppercase",letterSpacing:"0.06em",display:"block",marginBottom:8}}>Bonificação</label>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <input type="number" value={prazoBonif} onChange={e=>setPrazoBonif(e.target.value)}
+                style={{width:80,border:`1.5px solid ${C.gray200}`,borderRadius:6,padding:"8px 12px",...F.body,fontSize:14,fontWeight:700,outline:"none",textAlign:"center"}}/>
+              {/* Aqui é dia ÚTIL, diferente dos dois acima — o rótulo precisa
+                  deixar isso claro, senão vira erro de leitura. */}
+              <span style={{...F.body,fontSize:12,color:C.gray500,fontWeight:600}}>dias úteis</span>
+            </div>
+            <div style={{...F.body,fontSize:11,color:C.gray400,marginTop:4}}>Contados da emissão, pulando fim de semana e feriados.</div>
           </div>
         </div>
       </Card>
@@ -8405,6 +8486,8 @@ function SLAConfig({slaCfg,onSave,user}){
         <CorrigirPrazoComBordadoBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <CriarPosvendaBtn user={user}/>
+        <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
+        <PrazoBonificacaoBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
         <SincronizarCanceladosBtn/>
         <div style={{height:1,background:C.gray100,margin:"18px 0"}}/>
@@ -8593,6 +8676,26 @@ function BackfillVencimentoBtn(){
 // mostra a lista e só executa depois de confirmar.
 // Coloca no fluxo um pedido que a automação do HubSpot deixou de fora. Sem o
 // pós-venda o pedido não existe pro SGP — e não existe erro nenhum avisando.
+function PrazoBonificacaoBtn(){
+  return (
+    <div>
+      <div style={{...F.body,fontSize:13,color:C.gray500,marginBottom:10}}>
+        <strong>Prazo das bonificações.</strong> Recalcula o vencimento dos pedidos que estão na caixa
+        de Bonificações usando o prazo em <em>dias úteis</em> configurado acima, contado da emissão
+        (pula fim de semana e feriados). Pedido com data especial não é tocado — prazo combinado à mão
+        vale mais que a regra. As bonificações novas já nascem com esse prazo, sem precisar rodar isto.
+      </div>
+      <MiniAcaoAdmin
+        rota="/admin/prazo-bonificacao"
+        rotulo="Ver prazos a ajustar"
+        rotuloExec={(n)=>`Ajustar ${n} pedido(s)`}
+        vazio="Todos os prazos já estão certos."
+        linha={(p)=>`${p.linx?"PED - "+p.linx:p.vendasId} · ${p.cliente||"—"} — emissão ${p.emissao} · ${p.prazoAtual} → ${p.prazoNovo}`}
+      />
+    </div>
+  );
+}
+
 function CriarPosvendaBtn({user}){
   const [id,setId]=useState("");
   const [previa,setPrevia]=useState(null);
